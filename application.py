@@ -378,6 +378,6 @@ def __main__():
     #     print(noSsException)
     #     print('-'*110)
 
-    return argumentNamingScore
+    return "SOMETHING"
 
 __main__()
