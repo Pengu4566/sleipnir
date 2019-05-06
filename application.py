@@ -158,7 +158,7 @@ def __main__():
     print(files)
     return str(files)
 
-    # local filepath
+    # local filepaths
     # filePath = "site\\repository\\file\\"
 
     # azure filepath
