@@ -153,9 +153,7 @@ def radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
 def __main__():
 
     import os
-    folder = '.'
-    filepaths = [os.path.join(folder, f) for f in os.listdir(folder)]
-
+    filepaths = os.listdir('.')
     return filepaths
 
     # local filepath
