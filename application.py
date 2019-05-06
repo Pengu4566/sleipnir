@@ -333,9 +333,9 @@ def __main__():
     #[activityNamingScore, improperNamedActivities] = ActivityNamingCheck(df_activity)
 
     #screenshot in try/catch block
-    [screenshotScore, noSsException] = CheckSsinTC(df_catches)
+    #[screenshotScore, noSsException] = CheckSsinTC(df_catches)
 
-    [wfAnnotationScore, notAnnotatedWf] = checkWfAnnotation(df_annotation)
+    #[wfAnnotationScore, notAnnotatedWf] = checkWfAnnotation(df_annotation)
 
     # radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
     #           activityNamingScore, screenshotScore, wfAnnotationScore)
