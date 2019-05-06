@@ -323,23 +323,23 @@ def __main__():
                                       == workflowPath,'annotated'] = 1
                     break
         # end annotation dataframe
-    # #check variable naming convention
-    # [variableNamingScore, variableUsageScore, improperNamedVariable, unusedVariable] = CheckVariableName(df_variable)
-    #
-    # #check argument in/out
-    # [argumentNamingScore, improperNamedArguments] = checkArgumentName(df_argument)
-    #
-    # #check activity names
-    # [activityNamingScore, improperNamedActivities] = ActivityNamingCheck(df_activity)
-    #
-    # #screenshot in try/catch block
-    # [screenshotScore, noSsException] = CheckSsinTC(df_catches)
-    #
-    # [wfAnnotationScore, notAnnotatedWf] = checkWfAnnotation(df_annotation)
-    #
-    # radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
-    #           activityNamingScore, screenshotScore, wfAnnotationScore)
-    #
+    #check variable naming convention
+    [variableNamingScore, variableUsageScore, improperNamedVariable, unusedVariable] = CheckVariableName(df_variable)
+
+    #check argument in/out
+    [argumentNamingScore, improperNamedArguments] = checkArgumentName(df_argument)
+
+    #check activity names
+    [activityNamingScore, improperNamedActivities] = ActivityNamingCheck(df_activity)
+
+    #screenshot in try/catch block
+    [screenshotScore, noSsException] = CheckSsinTC(df_catches)
+
+    [wfAnnotationScore, notAnnotatedWf] = checkWfAnnotation(df_annotation)
+
+    radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
+              activityNamingScore, screenshotScore, wfAnnotationScore)
+
     #
     # if ((len(improperNamedVariable) != 0) or (len(unusedVariable) != 0) or
     #     (len(improperNamedArguments) != 0) or (len(improperNamedActivities) != 0)
