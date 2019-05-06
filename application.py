@@ -156,13 +156,13 @@ def __main__():
     filepaths = os.listdir('.')
 
     print(filepaths)
-    return str(filepaths)
+    #return str(filepaths)
 
     # local filepath
     # filePath = "site\\repository\\file\\"
 
     # azure filepath
-    filePath = "site\\repository\\file\\"
+    filePath = ".\\file\\"
 
     files = []
 
