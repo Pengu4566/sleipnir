@@ -152,6 +152,12 @@ def radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
 @app.route("/")
 def __main__():
 
+    import os
+    folder = '.'
+    filepaths = [os.path.join(folder, f) for f in os.listdir(folder)]
+
+    return filepaths
+
     # local filepath
     # filePath = "site\\repository\\file\\"
 
