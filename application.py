@@ -172,40 +172,40 @@ def __main__():
     df_annotation = pd.DataFrame(columns=['workflowName', 'filePath'])
     # end dataframe initiation
 
-    # fileCount = 1
-    # numFiles = len(files)
-    #
-    # for filePath in files:
-    #     print("Progress %d/%d: Scanning %s" % (fileCount, numFiles, filePath))
-    #     fileCount += 1
-    #
-    #     # variables dataframe
-    #     with open(filePath, encoding='utf-8', mode='r') as f:
-    #         for line in f:
-    #             if line.strip(" ").startswith('<Variable x:'):
-    #                 variableName = untangle.parse(line.strip(" "))\
-    #                                        .children[0]['Name']
-    #                 dataType = untangle.parse(line.strip(" "))\
-    #                                    .children[0]['x:TypeArguments']\
-    #                                    .split(":")[1].split("(")[0]
-    #                 if '[]' in dataType:
-    #                     dataType = 'Array'
-    #                 if (filePath not in list(df_variable[df_variable.variableName
-    #                                                 == variableName].filePath)):
-    #                     df_variable = df_variable.append({'variableType': dataType,
-    #                                                       'variableName':
-    #                                                           variableName,
-    #                                                       'count': 1,
-    #                                                       'filePath': filePath},
-    #                                                      ignore_index=True)
-    #     with open(filePath, encoding='utf-8', mode='r') as f:
-    #         for line in f:
-    #             for index, row in df_variable.iterrows():
-    #                 if (re.search(('\[.*'+row['variableName']+'.*\]'),
-    #                               line) is not None) and \
-    #                    (filePath == row['filePath']):
-    #                     row['count'] += 1
-    #     # end variables dataframe
+    fileCount = 1
+    numFiles = len(files)
+
+    for filePath in files:
+        print("Progress %d/%d: Scanning %s" % (fileCount, numFiles, filePath))
+        fileCount += 1
+
+        # variables dataframe
+        with open(filePath, encoding='utf-8', mode='r') as f:
+            for line in f:
+                if line.strip(" ").startswith('<Variable x:'):
+                    variableName = untangle.parse(line.strip(" "))\
+                                           .children[0]['Name']
+                    dataType = untangle.parse(line.strip(" "))\
+                                       .children[0]['x:TypeArguments']\
+                                       .split(":")[1].split("(")[0]
+                    if '[]' in dataType:
+                        dataType = 'Array'
+                    if (filePath not in list(df_variable[df_variable.variableName
+                                                    == variableName].filePath)):
+                        df_variable = df_variable.append({'variableType': dataType,
+                                                          'variableName':
+                                                              variableName,
+                                                          'count': 1,
+                                                          'filePath': filePath},
+                                                         ignore_index=True)
+        with open(filePath, encoding='utf-8', mode='r') as f:
+            for line in f:
+                for index, row in df_variable.iterrows():
+                    if (re.search(('\[.*'+row['variableName']+'.*\]'),
+                                  line) is not None) and \
+                       (filePath == row['filePath']):
+                        row['count'] += 1
+        # end variables dataframe
     #
     #     # argument dataframe
     #
