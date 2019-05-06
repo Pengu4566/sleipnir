@@ -7,5 +7,12 @@ import untangle
 import re
 
 @app.route("/")
-def hello():
-    return "Hello Innovatio!"
+def __main__():
+
+    message = "Hello New Innovation!"
+
+    print(message)
+
+    return message
+
+__main__()
