@@ -152,7 +152,12 @@ def radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
 @app.route("/")
 def __main__():
 
-    filePath = "file\\"
+    # local filepath
+    # filePath = "site\\repository\\file\\"
+
+    # azure filepath
+    filePath = "site\\repository\\file\\"
+
     files = []
 
     for r, d, f in os.walk(filePath):
@@ -175,8 +180,9 @@ def __main__():
     fileCount = 1
     numFiles = len(files)
 
+    # checks for empty files list, program should not continue
     if (files == []):
-        return "COULD NOT FIND FILES"
+        return "Could not find project files! Did you put them in the right place?"
 
     for filePath in files:
         print("Progress %d/%d: Scanning %s" % (fileCount, numFiles, filePath))
