@@ -8,4 +8,4 @@ import re
 
 @app.route("/")
 def hello():
-    return "Hello Innovationsd!"
+    return "Hello Innovatio!"
