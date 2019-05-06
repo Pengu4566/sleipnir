@@ -172,212 +172,212 @@ def __main__():
     df_annotation = pd.DataFrame(columns=['workflowName', 'filePath'])
     # end dataframe initiation
 
-    fileCount = 1
-    numFiles = len(files)
-
-    for filePath in files:
-        print("Progress %d/%d: Scanning %s" % (fileCount, numFiles, filePath))
-        fileCount += 1
-
-        # variables dataframe
-        with open(filePath, encoding='utf-8', mode='r') as f:
-            for line in f:
-                if line.strip(" ").startswith('<Variable x:'):
-                    variableName = untangle.parse(line.strip(" "))\
-                                           .children[0]['Name']
-                    dataType = untangle.parse(line.strip(" "))\
-                                       .children[0]['x:TypeArguments']\
-                                       .split(":")[1].split("(")[0]
-                    if '[]' in dataType:
-                        dataType = 'Array'
-                    if (filePath not in list(df_variable[df_variable.variableName
-                                                    == variableName].filePath)):
-                        df_variable = df_variable.append({'variableType': dataType,
-                                                          'variableName':
-                                                              variableName,
-                                                          'count': 1,
-                                                          'filePath': filePath},
-                                                         ignore_index=True)
-        with open(filePath, encoding='utf-8', mode='r') as f:
-            for line in f:
-                for index, row in df_variable.iterrows():
-                    if (re.search(('\[.*'+row['variableName']+'.*\]'),
-                                  line) is not None) and \
-                       (filePath == row['filePath']):
-                        row['count'] += 1
-        # end variables dataframe
-
-        # argument dataframe
-
-        with open(filePath, encoding='utf-8', mode='r') as f:
-            printLine = False
-            style = 1
-            for line in f:
-                if 'ui:InvokeWorkflowFile.Arguments>' in line.strip(" "):
-                    printLine = not printLine
-                    style = 1
-                if printLine and \
-                   ('ui:InvokeWorkflowFile.Arguments>' not in line.strip(" ")) and\
-                   (style == 1):
-                    argumentName = untangle.parse(line.strip(" "))\
-                                           .children[0]['x:Key']
-                    argumentType = untangle.parse(line.strip(" "))\
-                                           .children[0]._name
-                    df_argument = df_argument.append({'argumentName': argumentName,
-                                                      'argumentType':
-                                                          argumentType,
-                                                      'filePath': filePath},
-                                                     ignore_index=True)
-                if ('<x:Members>' in line.strip(" ")) or \
-                   ('</x:Members>' in line.strip(" ")):
-                    printLine = not printLine
-                    style = 2
-                if printLine and \
-                   ('<x:Members>' not in line.strip(" ")) and (style == 2):
-                    argumentName = untangle.parse(line.strip(" "))\
-                                           .children[0]['Name']
-                    argumentType = untangle.parse(line.strip(" "))\
-                                           .children[0]['Type']
-                    argumentType = argumentType[:argumentType.index('(')]
-                    df_argument = df_argument.append({'argumentName': argumentName,
-                                                      'argumentType':
-                                                          argumentType,
-                                                      'filePath': filePath},
-                                                     ignore_index=True)
-        # end argument dataframe
-
-        # activity dataframe
-        with open(filePath, encoding='utf-8', mode='r') as f:
-            for line in f:
-                if 'DisplayName=' in line:
-                    name = re.search('DisplayName=\"[^\"]*\"',
-                                     line.strip(' '))\
-                                     .group(0)[len("DisplayName=\""):-1]
-                    activity = line.strip(' ').split(' ')[0].strip('<')
-                    activity = activity if 'ui:' not in activity else activity[3:]
-                    df_activity = df_activity.append({'activityName': name,
-                                                      'activityType': activity,
-                                                      'filePath': filePath},
-                                                     ignore_index=True)
-        # end activity dataframe
-
-        # try catch dataframe
-        with open(filePath, encoding='utf-8', mode='r') as f:
-            printLine = False
-            activityList = []
-            evaluate = False
-            catchId = ''
-            for line in f:
-                if line.strip(" ").startswith('<Catch x:'):
-                    activityList = []
-                    printLine = not printLine
-                    if 'sap2010:WorkflowViewState.IdRef' in line:
-                        name = re.search("sap2010:WorkflowViewState.IdRef=\"[^\"]*\"",
-                                         line.strip(" ")).group(0)
-                        catchId = name[len("sap2010:WorkflowViewState.IdRef=\""):-1]
-                if '</Catch>' in line.strip(" "):
-                    printLine = not printLine
-                    evaluate = True
-                if printLine and (catchId == ''):
-                    if ('<sap2010:WorkflowViewState.IdRef>' in line.strip(" ")) and \
-                       ('</sap2010:WorkflowViewState.IdRef>' in line.strip(" ")) and \
-                       ('Catch`' in line.strip(" ")):
-                        catchId = re.search("Catch[^<]*", line.strip(" ")).group(0)
-                if printLine and ('<Catch x:' not in line.strip(" ")):
-                    activityList.append(line.strip(" ").split(" ")[0].strip("<"))
-                if evaluate:
-                    evaluate = False
-                    screenshotIncluded = False
-                    for i in activityList:
-                        if 'ui:TakeScreenshot' == i:
-                            screenshotIncluded = True
-                            break
-                    df_catches = df_catches.append({'Catch Id': catchId,
-                                                    'Screenshot Included':
-                                                        screenshotIncluded,
-                                                    'filePath': filePath},
-                                                   ignore_index=True)
-                    catchId = ''
-        # end try catch dataframe
-
-        # annotation dataframe
-        with open(filePath, encoding='utf-8', mode='r') as f:
-            for line in f:
-                if (line.strip(" ").startswith("<ui:InvokeWorkflowFile") and \
-                    "WorkflowFileName=" in line.strip(" ")):
-                    workflowName = re.search('WorkflowFileName=\"[^\"]*\.xaml\"',
-                                             line.strip(" ")).group(0)
-                    workflowName = workflowName[(len('WorkflowFileName="')):-1]
-                    df_annotation = df_annotation.append({'workflowName':
-                                                          workflowName,
-                                                          'annotated': False},
-                                                         ignore_index = True)
-        df_annotation = df_annotation.drop_duplicates()
-
-    for workflowPath in list(df_annotation['workflowName']):
-        with open("file\\"+workflowPath, encoding='utf-8', mode='r') as workflow:
-            for line in workflow:
-                if "DisplayName=" in line:
-                    if "AnnotationText=" in line:
-                        print(line.strip(" "))
-                        df_annotation.loc[df_annotation.workflowName
-                                      == workflowPath,'annotated'] = 1
-                    break
-        # end annotation dataframe
-    #check variable naming convention
-    [variableNamingScore, variableUsageScore, improperNamedVariable, unusedVariable] = CheckVariableName(df_variable)
-
-    #check argument in/out
-    [argumentNamingScore, improperNamedArguments] = checkArgumentName(df_argument)
-
-    #check activity names
-    [activityNamingScore, improperNamedActivities] = ActivityNamingCheck(df_activity)
-
-    #screenshot in try/catch block
-    [screenshotScore, noSsException] = CheckSsinTC(df_catches)
-
-    [wfAnnotationScore, notAnnotatedWf] = checkWfAnnotation(df_annotation)
-
-    radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
-              activityNamingScore, screenshotScore, wfAnnotationScore)
-
-
-    if ((len(improperNamedVariable) != 0) or (len(unusedVariable) != 0) or
-        (len(improperNamedArguments) != 0) or (len(improperNamedActivities) != 0)
-        or (len(noSsException) != 0)):
-        print("Result Explanation\n\n")
-    if (len(improperNamedVariable) != 0):
-        print("A proper variable name should start with an abbreviation of " +
-              "data type, following by a hyphen to data name. Variables that" +
-              " are not properly named includes: \n")
-        print(improperNamedVariable)
-        print('-'*110)
-
-    if (len(unusedVariable) != 0):
-        print("An unused variable should be deleted. Variables that are" +
-              " declared but not used includes: \n")
-        print(unusedVariable)
-        print('-'*110)
-
-    if (len(improperNamedArguments) != 0):
-        print("A proper argument name should starts 'in_', 'out_', or" +
-              " 'io_' to annotate the argument's property. Arguments that are" +
-              " not properly named includes: \n")
-        print(improperNamedArguments)
-        print('-'*110)
-
-    if (len(improperNamedActivities) != 0):
-        print("An activity should not use its default name. Activities that" +
-              " are not properly named includes: \n")
-        print(improperNamedActivities)
-        print('-'*110)
-
-    if (len(noSsException) != 0):
-        print("An exception should always be recorded by a screenshot " +
-              "activity. Exceptions that are not handled by" +
-              " screenshot includes: \n")
-        print(noSsException)
-        print('-'*110)
+    # fileCount = 1
+    # numFiles = len(files)
+    #
+    # for filePath in files:
+    #     print("Progress %d/%d: Scanning %s" % (fileCount, numFiles, filePath))
+    #     fileCount += 1
+    #
+    #     # variables dataframe
+    #     with open(filePath, encoding='utf-8', mode='r') as f:
+    #         for line in f:
+    #             if line.strip(" ").startswith('<Variable x:'):
+    #                 variableName = untangle.parse(line.strip(" "))\
+    #                                        .children[0]['Name']
+    #                 dataType = untangle.parse(line.strip(" "))\
+    #                                    .children[0]['x:TypeArguments']\
+    #                                    .split(":")[1].split("(")[0]
+    #                 if '[]' in dataType:
+    #                     dataType = 'Array'
+    #                 if (filePath not in list(df_variable[df_variable.variableName
+    #                                                 == variableName].filePath)):
+    #                     df_variable = df_variable.append({'variableType': dataType,
+    #                                                       'variableName':
+    #                                                           variableName,
+    #                                                       'count': 1,
+    #                                                       'filePath': filePath},
+    #                                                      ignore_index=True)
+    #     with open(filePath, encoding='utf-8', mode='r') as f:
+    #         for line in f:
+    #             for index, row in df_variable.iterrows():
+    #                 if (re.search(('\[.*'+row['variableName']+'.*\]'),
+    #                               line) is not None) and \
+    #                    (filePath == row['filePath']):
+    #                     row['count'] += 1
+    #     # end variables dataframe
+    #
+    #     # argument dataframe
+    #
+    #     with open(filePath, encoding='utf-8', mode='r') as f:
+    #         printLine = False
+    #         style = 1
+    #         for line in f:
+    #             if 'ui:InvokeWorkflowFile.Arguments>' in line.strip(" "):
+    #                 printLine = not printLine
+    #                 style = 1
+    #             if printLine and \
+    #                ('ui:InvokeWorkflowFile.Arguments>' not in line.strip(" ")) and\
+    #                (style == 1):
+    #                 argumentName = untangle.parse(line.strip(" "))\
+    #                                        .children[0]['x:Key']
+    #                 argumentType = untangle.parse(line.strip(" "))\
+    #                                        .children[0]._name
+    #                 df_argument = df_argument.append({'argumentName': argumentName,
+    #                                                   'argumentType':
+    #                                                       argumentType,
+    #                                                   'filePath': filePath},
+    #                                                  ignore_index=True)
+    #             if ('<x:Members>' in line.strip(" ")) or \
+    #                ('</x:Members>' in line.strip(" ")):
+    #                 printLine = not printLine
+    #                 style = 2
+    #             if printLine and \
+    #                ('<x:Members>' not in line.strip(" ")) and (style == 2):
+    #                 argumentName = untangle.parse(line.strip(" "))\
+    #                                        .children[0]['Name']
+    #                 argumentType = untangle.parse(line.strip(" "))\
+    #                                        .children[0]['Type']
+    #                 argumentType = argumentType[:argumentType.index('(')]
+    #                 df_argument = df_argument.append({'argumentName': argumentName,
+    #                                                   'argumentType':
+    #                                                       argumentType,
+    #                                                   'filePath': filePath},
+    #                                                  ignore_index=True)
+    #     # end argument dataframe
+    #
+    #     # activity dataframe
+    #     with open(filePath, encoding='utf-8', mode='r') as f:
+    #         for line in f:
+    #             if 'DisplayName=' in line:
+    #                 name = re.search('DisplayName=\"[^\"]*\"',
+    #                                  line.strip(' '))\
+    #                                  .group(0)[len("DisplayName=\""):-1]
+    #                 activity = line.strip(' ').split(' ')[0].strip('<')
+    #                 activity = activity if 'ui:' not in activity else activity[3:]
+    #                 df_activity = df_activity.append({'activityName': name,
+    #                                                   'activityType': activity,
+    #                                                   'filePath': filePath},
+    #                                                  ignore_index=True)
+    #     # end activity dataframe
+    #
+    #     # try catch dataframe
+    #     with open(filePath, encoding='utf-8', mode='r') as f:
+    #         printLine = False
+    #         activityList = []
+    #         evaluate = False
+    #         catchId = ''
+    #         for line in f:
+    #             if line.strip(" ").startswith('<Catch x:'):
+    #                 activityList = []
+    #                 printLine = not printLine
+    #                 if 'sap2010:WorkflowViewState.IdRef' in line:
+    #                     name = re.search("sap2010:WorkflowViewState.IdRef=\"[^\"]*\"",
+    #                                      line.strip(" ")).group(0)
+    #                     catchId = name[len("sap2010:WorkflowViewState.IdRef=\""):-1]
+    #             if '</Catch>' in line.strip(" "):
+    #                 printLine = not printLine
+    #                 evaluate = True
+    #             if printLine and (catchId == ''):
+    #                 if ('<sap2010:WorkflowViewState.IdRef>' in line.strip(" ")) and \
+    #                    ('</sap2010:WorkflowViewState.IdRef>' in line.strip(" ")) and \
+    #                    ('Catch`' in line.strip(" ")):
+    #                     catchId = re.search("Catch[^<]*", line.strip(" ")).group(0)
+    #             if printLine and ('<Catch x:' not in line.strip(" ")):
+    #                 activityList.append(line.strip(" ").split(" ")[0].strip("<"))
+    #             if evaluate:
+    #                 evaluate = False
+    #                 screenshotIncluded = False
+    #                 for i in activityList:
+    #                     if 'ui:TakeScreenshot' == i:
+    #                         screenshotIncluded = True
+    #                         break
+    #                 df_catches = df_catches.append({'Catch Id': catchId,
+    #                                                 'Screenshot Included':
+    #                                                     screenshotIncluded,
+    #                                                 'filePath': filePath},
+    #                                                ignore_index=True)
+    #                 catchId = ''
+    #     # end try catch dataframe
+    #
+    #     # annotation dataframe
+    #     with open(filePath, encoding='utf-8', mode='r') as f:
+    #         for line in f:
+    #             if (line.strip(" ").startswith("<ui:InvokeWorkflowFile") and \
+    #                 "WorkflowFileName=" in line.strip(" ")):
+    #                 workflowName = re.search('WorkflowFileName=\"[^\"]*\.xaml\"',
+    #                                          line.strip(" ")).group(0)
+    #                 workflowName = workflowName[(len('WorkflowFileName="')):-1]
+    #                 df_annotation = df_annotation.append({'workflowName':
+    #                                                       workflowName,
+    #                                                       'annotated': False},
+    #                                                      ignore_index = True)
+    #     df_annotation = df_annotation.drop_duplicates()
+    #
+    # for workflowPath in list(df_annotation['workflowName']):
+    #     with open("file\\"+workflowPath, encoding='utf-8', mode='r') as workflow:
+    #         for line in workflow:
+    #             if "DisplayName=" in line:
+    #                 if "AnnotationText=" in line:
+    #                     print(line.strip(" "))
+    #                     df_annotation.loc[df_annotation.workflowName
+    #                                   == workflowPath,'annotated'] = 1
+    #                 break
+    #     # end annotation dataframe
+    # #check variable naming convention
+    # [variableNamingScore, variableUsageScore, improperNamedVariable, unusedVariable] = CheckVariableName(df_variable)
+    #
+    # #check argument in/out
+    # [argumentNamingScore, improperNamedArguments] = checkArgumentName(df_argument)
+    #
+    # #check activity names
+    # [activityNamingScore, improperNamedActivities] = ActivityNamingCheck(df_activity)
+    #
+    # #screenshot in try/catch block
+    # [screenshotScore, noSsException] = CheckSsinTC(df_catches)
+    #
+    # [wfAnnotationScore, notAnnotatedWf] = checkWfAnnotation(df_annotation)
+    #
+    # radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
+    #           activityNamingScore, screenshotScore, wfAnnotationScore)
+    #
+    #
+    # if ((len(improperNamedVariable) != 0) or (len(unusedVariable) != 0) or
+    #     (len(improperNamedArguments) != 0) or (len(improperNamedActivities) != 0)
+    #     or (len(noSsException) != 0)):
+    #     print("Result Explanation\n\n")
+    # if (len(improperNamedVariable) != 0):
+    #     print("A proper variable name should start with an abbreviation of " +
+    #           "data type, following by a hyphen to data name. Variables that" +
+    #           " are not properly named includes: \n")
+    #     print(improperNamedVariable)
+    #     print('-'*110)
+    #
+    # if (len(unusedVariable) != 0):
+    #     print("An unused variable should be deleted. Variables that are" +
+    #           " declared but not used includes: \n")
+    #     print(unusedVariable)
+    #     print('-'*110)
+    #
+    # if (len(improperNamedArguments) != 0):
+    #     print("A proper argument name should starts 'in_', 'out_', or" +
+    #           " 'io_' to annotate the argument's property. Arguments that are" +
+    #           " not properly named includes: \n")
+    #     print(improperNamedArguments)
+    #     print('-'*110)
+    #
+    # if (len(improperNamedActivities) != 0):
+    #     print("An activity should not use its default name. Activities that" +
+    #           " are not properly named includes: \n")
+    #     print(improperNamedActivities)
+    #     print('-'*110)
+    #
+    # if (len(noSsException) != 0):
+    #     print("An exception should always be recorded by a screenshot " +
+    #           "activity. Exceptions that are not handled by" +
+    #           " screenshot includes: \n")
+    #     print(noSsException)
+    #     print('-'*110)
 
     return "THIS APP DOES SOMETHING"
 
