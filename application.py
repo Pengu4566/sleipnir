@@ -324,10 +324,10 @@ def __main__():
                     break
         # end annotation dataframe
     #check variable naming convention
-    [variableNamingScore, variableUsageScore, improperNamedVariable, unusedVariable] = CheckVariableName(df_variable)
+    #[variableNamingScore, variableUsageScore, improperNamedVariable, unusedVariable] = CheckVariableName(df_variable)
 
     #check argument in/out
-    #[argumentNamingScore, improperNamedArguments] = checkArgumentName(df_argument)
+    [argumentNamingScore, improperNamedArguments] = checkArgumentName(df_argument)
 
     #check activity names
     #[activityNamingScore, improperNamedActivities] = ActivityNamingCheck(df_activity)
@@ -378,6 +378,6 @@ def __main__():
     #     print(noSsException)
     #     print('-'*110)
 
-    return "THIS APP DOES SOMETHING"
+    return argumentNamingScore
 
 __main__()
