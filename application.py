@@ -5,6 +5,8 @@ from builtins import len, open, list
 import pandas as pd
 import untangle
 import re
+import matplotlib.pyplot as plt
+from math import pi
 
 # check variable's naming convention
 def CheckVariableName(df_variable):
@@ -114,8 +116,6 @@ def checkWfAnnotation(df_annotation):
 # radar chart
 def radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
               activityNamingScore, screenshotScore, wfAnnotationScore):
-    import matplotlib.pyplot as plt
-    from math import pi
     # Set data
     df = pd.DataFrame({
             'group': ['Score', 'tolerance'],
