@@ -154,7 +154,9 @@ def __main__():
 
     import os
     filepaths = os.listdir('.')
-    return filepaths
+
+    print(filepaths)
+    return filepaths[5]
 
     # local filepath
     # filePath = "site\\repository\\file\\"
