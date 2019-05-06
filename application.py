@@ -153,16 +153,16 @@ def radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
 def __main__():
 
     #testing file structure
-    import os
-    files = os.listdir('file')
-    print(files)
-    return str(files)
+    #import os
+    #files = os.listdir('file')
+    #print(files)
+    #return str(files)
 
     # local filepaths
     # filePath = "site\\repository\\file\\"
 
     # azure filepath
-    filePath = "file\\"
+    filePath = "file"
 
     files = []
 
