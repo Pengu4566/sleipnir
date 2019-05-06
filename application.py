@@ -327,7 +327,7 @@ def __main__():
     #[variableNamingScore, variableUsageScore, improperNamedVariable, unusedVariable] = CheckVariableName(df_variable)
 
     #check argument in/out
-    [argumentNamingScore, improperNamedArguments] = checkArgumentName(df_argument)
+    #[argumentNamingScore, improperNamedArguments] = checkArgumentName(df_argument)
 
     #check activity names
     #[activityNamingScore, improperNamedActivities] = ActivityNamingCheck(df_activity)

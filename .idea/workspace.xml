@@ -15,8 +15,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/application.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1355">
-              <caret line="381" lean-forward="true" selection-start-line="381" selection-end-line="381" />
+            <state relative-caret-position="355">
+              <caret line="329" column="5" selection-start-line="329" selection-start-column="5" selection-end-line="329" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -57,6 +57,30 @@
             <path>
               <item name="sleipnir" type="b2602c69:ProjectViewProjectNode" />
               <item name="sleipnir" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="sleipnir" type="b2602c69:ProjectViewProjectNode" />
+              <item name="sleipnir" type="462c0819:PsiDirectoryNode" />
+              <item name="env" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="sleipnir" type="b2602c69:ProjectViewProjectNode" />
+              <item name="sleipnir" type="462c0819:PsiDirectoryNode" />
+              <item name="env" type="462c0819:PsiDirectoryNode" />
+              <item name="Lib" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="sleipnir" type="b2602c69:ProjectViewProjectNode" />
+              <item name="sleipnir" type="462c0819:PsiDirectoryNode" />
+              <item name="env" type="462c0819:PsiDirectoryNode" />
+              <item name="Lib" type="462c0819:PsiDirectoryNode" />
+              <item name="site-packages" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="sleipnir" type="b2602c69:ProjectViewProjectNode" />
+              <item name="sleipnir" type="462c0819:PsiDirectoryNode" />
+              <item name="env" type="462c0819:PsiDirectoryNode" />
+              <item name="Scripts" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -142,8 +166,8 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/application.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1355">
-          <caret line="381" lean-forward="true" selection-start-line="381" selection-end-line="381" />
+        <state relative-caret-position="355">
+          <caret line="329" column="5" selection-start-line="329" selection-start-column="5" selection-end-line="329" selection-end-column="5" />
         </state>
       </provider>
     </entry>
