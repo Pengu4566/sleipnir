@@ -175,6 +175,9 @@ def __main__():
     fileCount = 1
     numFiles = len(files)
 
+    if (files == []):
+        return "COULD NOT FIND FILES"
+
     for filePath in files:
         print("Progress %d/%d: Scanning %s" % (fileCount, numFiles, filePath))
         fileCount += 1
