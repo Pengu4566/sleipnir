@@ -8,7 +8,7 @@ import re
 import matplotlib.pyplot as plt
 from math import pi
 
-# check variable's naming convention
+# check variable's naming conventionn
 def CheckVariableName(df_variable):
     numVariables = len(df_variable.variableName)
 
