@@ -395,7 +395,7 @@ def __main__():
     #
     if (len(noSsException) != 0):
         return_string = "An exception should always be recorded by a screenshot activityd. " \
-                "Exceptions that are not handled by screenshot includes: \n" + str(noSsException) + '-'*110
+                "Exceptions that are not handled by screenshot includes: \n" + str(noSsException)
         print(return_string)
     return return_string
 
