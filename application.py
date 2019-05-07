@@ -1,5 +1,3 @@
-from flask import Flask
-app = Flask(__name__)
 import os
 from builtins import len, open, list
 import pandas as pd
@@ -7,6 +5,10 @@ import untangle
 import re
 import matplotlib.pyplot as plt
 from math import pi
+
+from flask import Flask
+app = Flask(__name__)
+
 
 # check variable's naming conventionn
 def CheckVariableName(df_variable):
@@ -186,7 +188,7 @@ def __main__():
     fileCount = 1
     numFiles = len(files)
 
-    # checks for empty files list, program should not continue
+    # checks for empty files list, program should end if this gets triggered
     if (files == []):
         return "Could not find project files! Did you put them in the right place?"
 
@@ -314,30 +316,30 @@ def __main__():
                     catchId = ''
         # end try catch dataframe
 
-        # annotation dataframe
-        with open(filePath, encoding='utf-8', mode='r') as f:
-            for line in f:
-                if (line.strip(" ").startswith("<ui:InvokeWorkflowFile") and \
-                    "WorkflowFileName=" in line.strip(" ")):
-                    workflowName = re.search('WorkflowFileName=\"[^\"]*\.xaml\"',
-                                             line.strip(" ")).group(0)
-                    workflowName = workflowName[(len('WorkflowFileName="')):-1]
-                    df_annotation = df_annotation.append({'workflowName':
-                                                          workflowName,
-                                                          'annotated': False},
-                                                         ignore_index = True)
-        df_annotation = df_annotation.drop_duplicates()
-
-    for workflowPath in list(df_annotation['workflowName']):
-        with open("file\\"+workflowPath, encoding='utf-8', mode='r') as workflow:
-            for line in workflow:
-                if "DisplayName=" in line:
-                    if "AnnotationText=" in line:
-                        print(line.strip(" "))
-                        df_annotation.loc[df_annotation.workflowName
-                                      == workflowPath,'annotated'] = 1
-                    break
-        # end annotation dataframe
+    #     # annotation dataframe
+    #     with open(filePath, encoding='utf-8', mode='r') as f:
+    #         for line in f:
+    #             if (line.strip(" ").startswith("<ui:InvokeWorkflowFile") and \
+    #                 "WorkflowFileName=" in line.strip(" ")):
+    #                 workflowName = re.search('WorkflowFileName=\"[^\"]*\.xaml\"',
+    #                                          line.strip(" ")).group(0)
+    #                 workflowName = workflowName[(len('WorkflowFileName="')):-1]
+    #                 df_annotation = df_annotation.append({'workflowName':
+    #                                                       workflowName,
+    #                                                       'annotated': False},
+    #                                                      ignore_index = True)
+    #     df_annotation = df_annotation.drop_duplicates()
+    #
+    # for workflowPath in list(df_annotation['workflowName']):
+    #     with open("file\\"+workflowPath, encoding='utf-8', mode='r') as workflow:
+    #         for line in workflow:
+    #             if "DisplayName=" in line:
+    #                 if "AnnotationText=" in line:
+    #                     print(line.strip(" "))
+    #                     df_annotation.loc[df_annotation.workflowName
+    #                                   == workflowPath,'annotated'] = 1
+    #                 break
+    #     # end annotation dataframe
 
 
     # #check variable naming convention
