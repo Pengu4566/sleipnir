@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b769883a-a816-42ab-bc07-1ccb3d961c12" name="Default Changelist" comment="" />
+    <list default="true" id="b769883a-a816-42ab-bc07-1ccb3d961c12" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/application.py" beforeDir="false" afterPath="$PROJECT_DIR$/application.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -13,8 +15,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/application.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1118">
-              <caret line="396" selection-start-line="396" selection-end-line="396" />
+            <state relative-caret-position="370">
+              <caret line="342" column="6" selection-start-line="342" selection-start-column="6" selection-end-line="342" selection-end-column="6" />
             </state>
           </provider>
         </entry>
@@ -119,12 +121,12 @@
     <frame x="243" y="0" width="1299" height="840" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.11480602" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.11480602" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.26657262" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.26657262" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -141,8 +143,8 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/application.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1118">
-          <caret line="396" selection-start-line="396" selection-end-line="396" />
+        <state relative-caret-position="370">
+          <caret line="342" column="6" selection-start-line="342" selection-start-column="6" selection-end-line="342" selection-end-column="6" />
         </state>
       </provider>
     </entry>

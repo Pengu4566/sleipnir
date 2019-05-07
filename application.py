@@ -338,9 +338,10 @@ def __main__():
                                       == workflowPath,'annotated'] = 1
                     break
         # end annotation dataframe
-    #check variable naming convention
-    [variableNamingScore, variableUsageScore, improperNamedVariable, unusedVariable] = CheckVariableName(df_variable)
 
+
+    # #check variable naming convention
+    # [variableNamingScore, variableUsageScore, improperNamedVariable, unusedVariable] = CheckVariableName(df_variable)
     # #check argument in/out
     # [argumentNamingScore, improperNamedArguments] = checkArgumentName(df_argument)
     #
