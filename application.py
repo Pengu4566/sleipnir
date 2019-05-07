@@ -341,59 +341,58 @@ def __main__():
     #check variable naming convention
     [variableNamingScore, variableUsageScore, improperNamedVariable, unusedVariable] = CheckVariableName(df_variable)
 
-    #check argument in/out
-    [argumentNamingScore, improperNamedArguments] = checkArgumentName(df_argument)
-
-    #check activity names
-    [activityNamingScore, improperNamedActivities] = ActivityNamingCheck(df_activity)
-
-    #screenshot in try/catch block
-    [screenshotScore, noSsException] = CheckSsinTC(df_catches)
-
-    [wfAnnotationScore, notAnnotatedWf] = checkWfAnnotation(df_annotation)
-
-    radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
-              activityNamingScore, screenshotScore, wfAnnotationScore)
-
-
-    if ((len(improperNamedVariable) != 0) or (len(unusedVariable) != 0) or
-        (len(improperNamedArguments) != 0) or (len(improperNamedActivities) != 0)
-        or (len(noSsException) != 0)):
-        print("Result Explanation\n\n")
-    if (len(improperNamedVariable) != 0):
-        print("A proper variable name should start with an abbreviation of " +
-              "data type, following by a hyphen to data name. Variables that" +
-              " are not properly named includes: \n")
-        print(improperNamedVariable)
-        print('-'*110)
-
-    if (len(unusedVariable) != 0):
-        print("An unused variable should be deleted. Variables that are" +
-              " declared but not used includes: \n")
-        print(unusedVariable)
-        print('-'*110)
-
-    if (len(improperNamedArguments) != 0):
-        print("A proper argument name should starts 'in_', 'out_', or" +
-              " 'io_' to annotate the argument's property. Arguments that are" +
-              " not properly named includes: \n")
-        print(improperNamedArguments)
-        print('-'*110)
-
-    if (len(improperNamedActivities) != 0):
-        print("An activity should not use its default name. Activities that" +
-              " are not properly named includes: \n")
-        print(improperNamedActivities)
-        print('-'*110)
-
-    if (len(noSsException) != 0):
-        print("An exception should always be recorded by a screenshot " +
-              "activity. Exceptions that are not handled by" +
-              " screenshot includes: \n")
-        print(noSsException)
-        print('-'*110)
+    # #check argument in/out
+    # [argumentNamingScore, improperNamedArguments] = checkArgumentName(df_argument)
+    #
+    # #check activity names
+    # [activityNamingScore, improperNamedActivities] = ActivityNamingCheck(df_activity)
+    #
+    # #screenshot in try/catch block
+    # [screenshotScore, noSsException] = CheckSsinTC(df_catches)
+    #
+    # [wfAnnotationScore, notAnnotatedWf] = checkWfAnnotation(df_annotation)
+    #
+    # radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
+    #           activityNamingScore, screenshotScore, wfAnnotationScore)
+    #
+    #
+    # if ((len(improperNamedVariable) != 0) or (len(unusedVariable) != 0) or
+    #     (len(improperNamedArguments) != 0) or (len(improperNamedActivities) != 0)
+    #     or (len(noSsException) != 0)):
+    #     print("Result Explanation\n\n")
+    # if (len(improperNamedVariable) != 0):
+    #     print("A proper variable name should start with an abbreviation of " +
+    #           "data type, following by a hyphen to data name. Variables that" +
+    #           " are not properly named includes: \n")
+    #     print(improperNamedVariable)
+    #     print('-'*110)
+    #
+    # if (len(unusedVariable) != 0):
+    #     print("An unused variable should be deleted. Variables that are" +
+    #           " declared but not used includes: \n")
+    #     print(unusedVariable)
+    #     print('-'*110)
+    #
+    # if (len(improperNamedArguments) != 0):
+    #     print("A proper argument name should starts 'in_', 'out_', or" +
+    #           " 'io_' to annotate the argument's property. Arguments that are" +
+    #           " not properly named includes: \n")
+    #     print(improperNamedArguments)
+    #     print('-'*110)
+    #
+    # if (len(improperNamedActivities) != 0):
+    #     print("An activity should not use its default name. Activities that" +
+    #           " are not properly named includes: \n")
+    #     print(improperNamedActivities)
+    #     print('-'*110)
+    #
+    # if (len(noSsException) != 0):
+    #     print("An exception should always be recorded by a screenshot " +
+    #           "activity. Exceptions that are not handled by" +
+    #           " screenshot includes: \n")
+    #     print(noSsException)
+    #     print('-'*110)
 
     return "SOMETHING"
-#make something else to return
 
 __main__()
