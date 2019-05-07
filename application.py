@@ -350,8 +350,8 @@ def __main__():
     # #check activity names
     # [activityNamingScore, improperNamedActivities] = ActivityNamingCheck(df_activity)
     #
-    # #screenshot in try/catch block
-    # [screenshotScore, noSsException] = CheckSsinTC(df_catches)
+    #screenshot in try/catch block
+    [screenshotScore, noSsException] = CheckSsinTC(df_catches)
     #
     # [wfAnnotationScore, notAnnotatedWf] = checkWfAnnotation(df_annotation)
     #
@@ -389,13 +389,10 @@ def __main__():
     #     print(improperNamedActivities)
     #     print('-'*110)
     #
-    # if (len(noSsException) != 0):
-    #     print("An exception should always be recorded by a screenshot " +
-    #           "activity. Exceptions that are not handled by" +
-    #           " screenshot includes: \n")
-    #     print(noSsException)
-    #     print('-'*110)
-
-    return "SOMETHING"
+    if (len(noSsException) != 0):
+        return_string = "An exception should always be recorded by a screenshot activity. " \
+                "Exceptions that are not handled by screenshot includes: \n" + str(noSsException) + '-'*110
+        print(return_string)
+    return return_string
 
 __main__()
