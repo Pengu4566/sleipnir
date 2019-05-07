@@ -101,7 +101,11 @@ def CheckSsinTC(df_catches):
         noSsException = list(df_catches[df_catches['Screenshot Included']
                              == False]['Catch Id'])
     numCatch = len(df_catches['Screenshot Included'])
-    screenshotScore = numWSs / numCatch * 100
+
+    if numWSs == 0:
+        screenshotScore = 0;
+    else:
+        screenshotScore = numWSs / numCatch * 100
 
     return [screenshotScore, noSsException]
 # end screenshot in try catch block
@@ -316,20 +320,20 @@ def __main__():
                     catchId = ''
         # end try catch dataframe
 
-    #     # annotation dataframe e
-    #     with open(filePath, encoding='utf-8', mode='r') as f:
-    #         for line in f:
-    #             if (line.strip(" ").startswith("<ui:InvokeWorkflowFile") and \
-    #                 "WorkflowFileName=" in line.strip(" ")):
-    #                 workflowName = re.search('WorkflowFileName=\"[^\"]*\.xaml\"',
-    #                                          line.strip(" ")).group(0)
-    #                 workflowName = workflowName[(len('WorkflowFileName="')):-1]
-    #                 df_annotation = df_annotation.append({'workflowName':
-    #                                                       workflowName,
-    #                                                       'annotated': False},
-    #                                                      ignore_index = True)
-    #     df_annotation = df_annotation.drop_duplicates()
-    #
+        # annotation dataframe
+        with open(filePath, encoding='utf-8', mode='r') as f:
+            for line in f:
+                if (line.strip(" ").startswith("<ui:InvokeWorkflowFile") and \
+                    "WorkflowFileName=" in line.strip(" ")):
+                    workflowName = re.search('WorkflowFileName=\"[^\"]*\.xaml\"',
+                                             line.strip(" ")).group(0)
+                    workflowName = workflowName[(len('WorkflowFileName="')):-1]
+                    df_annotation = df_annotation.append({'workflowName':
+                                                          workflowName,
+                                                          'annotated': False},
+                                                         ignore_index = True)
+        df_annotation = df_annotation.drop_duplicates()
+
     # for workflowPath in list(df_annotation['workflowName']):
     #     with open("file\\"+workflowPath, encoding='utf-8', mode='r') as workflow:
     #         for line in workflow:
@@ -339,7 +343,7 @@ def __main__():
     #                     df_annotation.loc[df_annotation.workflowName
     #                                   == workflowPath,'annotated'] = 1
     #                 break
-    #     # end annotation dataframe
+        # end annotation dataframe
 
 
     # #check variable naming convention
