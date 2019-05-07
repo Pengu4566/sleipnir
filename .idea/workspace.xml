@@ -2,7 +2,84 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b769883a-a816-42ab-bc07-1ccb3d961c12" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/application.py" beforeDir="false" afterPath="$PROJECT_DIR$/application.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/.local/AllDependencies.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/.local/PackageCache.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/.local/nuget.cache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/.local/nuget.cache.backup" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/Framework/GetAppCredentials.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/Framework/GetQueueMaxRetries.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/Framework/InitAllSettings.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/Framework/InitAllSettingsJSON.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/Framework/TakeScreenshot.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/Framework/ValidateJsonConfiguration.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/Framework/listOfDictToDT.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ProcessLayer/CleanupAndPrep.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ProcessLayer/CloseAllApplications.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ProcessLayer/GetSetTransactionData.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ProcessLayer/InitAllApplications.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ProcessLayer/KillAllProcesses.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ProcessLayer/ProcessTransaction.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/FirstRun/Data/Config.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/FirstRun/Data/Input/JSON Config/DEV_DemoConfiguration.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/FirstRun/Data/Input/JSON Config/QA_DemoConfiguration.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/FirstRun/Data/Input/JSON Config/README.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/FirstRun/Data/Input/JSON Config/TEMPLATE_DemoConfiguration.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/FirstRun/Data/Input/placeholder.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/FirstRun/Data/Output/placeholder.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/FirstRun/Data/Temp/placeholder.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/FirstRun/Main.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/FirstRun/ProcessLayer/CleanupAndPrep.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/FirstRun/ProcessLayer/CloseAllApplications.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/FirstRun/ProcessLayer/GetSetTransactionData.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/FirstRun/ProcessLayer/InitAllApplications.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/FirstRun/ProcessLayer/KillAllProcesses.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/FirstRun/ProcessLayer/ProcessTransaction.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/GetData/Data/Config.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/GetData/Data/Input/JSON Config/DEV_DemoConfiguration.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/GetData/Data/Input/JSON Config/QA_DemoConfiguration.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/GetData/Data/Input/JSON Config/README.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/GetData/Data/Input/JSON Config/TEMPLATE_DemoConfiguration.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/GetData/Data/Input/placeholder.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/GetData/Data/Output/placeholder.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/GetData/Data/Temp/placeholder.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/GetData/Main.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/GetData/ProcessLayer/CleanupAndPrep.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/GetData/ProcessLayer/CloseAllApplications.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/GetData/ProcessLayer/GetSetTransactionData.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/GetData/ProcessLayer/InitAllApplications.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/GetData/ProcessLayer/KillAllProcesses.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/GetData/ProcessLayer/ProcessTransaction.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task1/Data/Config.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task1/Data/Input/JSON Config/DEV_DemoConfiguration.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task1/Data/Input/JSON Config/QA_DemoConfiguration.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task1/Data/Input/JSON Config/README.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task1/Data/Input/JSON Config/TEMPLATE_DemoConfiguration.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task1/Data/Input/placeholder.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task1/Data/Output/placeholder.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task1/Data/Temp/placeholder.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task1/Main.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task1/ProcessLayer/CleanupAndPrep.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task1/ProcessLayer/CloseAllApplications.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task1/ProcessLayer/GetSetTransactionData.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task1/ProcessLayer/InitAllApplications.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task1/ProcessLayer/KillAllProcesses.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task1/ProcessLayer/ProcessTransaction.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task2/Data/Config.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task2/Data/Input/JSON Config/DEV_DemoConfiguration.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task2/Data/Input/JSON Config/QA_DemoConfiguration.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task2/Data/Input/JSON Config/README.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task2/Data/Input/JSON Config/TEMPLATE_DemoConfiguration.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task2/Data/Input/placeholder.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task2/Data/Output/placeholder.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task2/Data/Temp/placeholder.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task2/Main.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task2/ProcessLayer/CleanupAndPrep.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task2/ProcessLayer/CloseAllApplications.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task2/ProcessLayer/GetSetTransactionData.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task2/ProcessLayer/InitAllApplications.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task2/ProcessLayer/KillAllProcesses.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/ServicesLayer/Task2/ProcessLayer/ProcessTransaction.xaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/file/project.json" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -15,8 +92,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/application.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="284">
-              <caret line="396" column="89" selection-start-line="396" selection-start-column="89" selection-end-line="396" selection-end-column="89" />
+            <state relative-caret-position="352">
+              <caret line="400" lean-forward="true" selection-start-line="400" selection-end-line="400" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -148,8 +225,8 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/application.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="284">
-          <caret line="396" column="89" selection-start-line="396" selection-start-column="89" selection-end-line="396" selection-end-column="89" />
+        <state relative-caret-position="352">
+          <caret line="400" lean-forward="true" selection-start-line="400" selection-end-line="400" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
