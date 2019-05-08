@@ -10,7 +10,7 @@ from flask import Flask
 app = Flask(__name__)
 
 
-# check variable's naming conventionn
+# check variable's naming convention
 def CheckVariableName(df_variable):
     numVariables = len(df_variable.variableName)
 
@@ -395,7 +395,7 @@ def __main__():
     #
     if (len(noSsException) != 0):
         return_string = "An exception should always be recorded by a screenshot activityd. " \
-                "Exceptions that are not handled by screenshot includes: \n" + str(noSsException)
+                "Exceptions that are not handled by screenshot includesssssssssssssssss: \n" + str(noSsException)
         print(return_string)
     return return_string
 
