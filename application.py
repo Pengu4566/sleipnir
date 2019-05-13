@@ -468,7 +468,9 @@ def __main__():
                                notAnnotWf=notAnnotWf,
                                noLMExp=noLMExp)
 
+
 # only run this when executing locally
-#app.run()
+if __name__ == "__main__":
+    app.run(debug=True)
 
 __main__()
