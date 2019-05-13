@@ -379,7 +379,7 @@ def __main__():
     completeProject = True
     for workflowPath in list(df_annotation['workflowName']):
         try:            #file\\
-            with open("file" + workflowPath, encoding='utf-8', mode='r') as workflow:
+            with open("file/" + workflowPath, encoding='utf-8', mode='r') as workflow:
                 for line in workflow:
                     if "DisplayName=" in line:
                         if "AnnotationText=" in line:
@@ -468,6 +468,6 @@ def __main__():
                            noLMExp=noLMExp)
 
 
-app.run()
+#app.run()
 
 __main__()
