@@ -377,16 +377,16 @@ def __main__():
         df_annotation = df_annotation.drop_duplicates()
 
     completeProject = True
-    for workflowPath in list(df_annotation['workflowName']):
-        try:
-            with open("file\\" + workflowPath, encoding='utf-8', mode='r') as workflow:
-                for line in workflow:
-                    if "DisplayName=" in line:
-                        if "AnnotationText=" in line:
-                            df_annotation.loc[df_annotation.workflowName == workflowPath, 'annotated'] = 1
-                            break
-        except FileNotFoundError:
-            completeProject = False
+    # for workflowPath in list(df_annotation['workflowName']):
+    #     try:
+    #         with open("file\\" + workflowPath, encoding='utf-8', mode='r') as workflow:
+    #             for line in workflow:
+    #                 if "DisplayName=" in line:
+    #                     if "AnnotationText=" in line:
+    #                         df_annotation.loc[df_annotation.workflowName == workflowPath, 'annotated'] = 1
+    #                         break
+    #     except FileNotFoundError:
+    #         completeProject = False
     # end annotation dataframe
 
     # check variable naming convention
