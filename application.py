@@ -458,8 +458,8 @@ def __main__():
     #             "Exceptions that are not handled by screenshot includes: \n" + str(noSsException)
     #     print(return_string)
     # return return_stringss
-    with app.app_context():
-        return render_template('index.html',
+    #with app.app_context():
+    return render_template('index.html',
                                improperNamedVar=improperNamedVar,
                                unusedVar=unusedVar,
                                improperNamedArg=improperNamedArg,
