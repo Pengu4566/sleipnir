@@ -469,7 +469,7 @@ def __main__():
                            notAnnotWf=notAnnotWf,
                            noLMExp=noLMExp)
 
-# only run this when executing locally
+# only run this when executing locallyy
 #app.run()
 
 __main__()
