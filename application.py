@@ -14,7 +14,6 @@ app = Flask(__name__)
 app.config["CACHE_TYPE"] = "null"
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
-
 # check variable's naming convention
 def CheckVariableName(df_variable):
     numVariables = len(df_variable.variableName)
@@ -188,6 +187,8 @@ def radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
     values = df.loc[1].drop('group').values.flatten().tolist()
     values += values[:1]
     ax.plot(angles, values, linewidth=1, linestyle='--', label="group B")
+
+    # finish up
     plt.savefig('static\\Score.png')
     plt.close()
 
@@ -230,8 +231,8 @@ def __main__():
     numFiles = len(files)
 
     # checks for empty files list, program should end if this gets triggered
-    # if (files == []):
-    #    return "Could not find project files! Did you put them in the right place?"
+    if (files == []):
+       return "Could not find project files! Did you put them in the right place?"
 
     # scans all project files and populates dataframes with relevant info
     for filePath in files:
@@ -467,6 +468,6 @@ def __main__():
                            noLMExp=noLMExp)
 
 
-app.run()
+app.run(host='0.0.0.0', port=5000, debug=False)
 
 __main__()
