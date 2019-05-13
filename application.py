@@ -460,12 +460,16 @@ def __main__():
     # return return_stringss
     #with app.app_context():
     return render_template('index.html',
-                               )
+                               improperNamedVar=improperNamedVar,
+                               unusedVar=unusedVar,
+                               improperNamedArg=improperNamedArg,
+                               improperNamedAct=improperNamedAct,
+                               noSsExp=noSsExp,
+                               notAnnotWf=notAnnotWf,
+                               noLMExp=noLMExp)
 
 
-
-
-# only run this when executing locally
+# only run when executing locally
 if __name__ == "__main__":
     app.run(debug=True)
 
