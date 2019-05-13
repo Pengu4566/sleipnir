@@ -378,9 +378,8 @@ def __main__():
 
     completeProject = True
     for workflowPath in list(df_annotation['workflowName']):
-        try:            #file\\
+        try:
             workflowPath = workflowPath.replace("\\", "/")
-            print(workflowPath)
             with open("file/" + workflowPath, encoding='utf-8', mode='r') as workflow:
                 for line in workflow:
                     if "DisplayName=" in line:
@@ -459,15 +458,15 @@ def __main__():
     #             "Exceptions that are not handled by screenshot includes: \n" + str(noSsException)
     #     print(return_string)
     # return return_string
-
-    return render_template('index.html',
-                           improperNamedVar=improperNamedVar,
-                           unusedVar=unusedVar,
-                           improperNamedArg=improperNamedArg,
-                           improperNamedAct=improperNamedAct,
-                           noSsExp=noSsExp,
-                           notAnnotWf=notAnnotWf,
-                           noLMExp=noLMExp)
+    with app.app_context():
+        return render_template('index.html',
+                               improperNamedVar=improperNamedVar,
+                               unusedVar=unusedVar,
+                               improperNamedArg=improperNamedArg,
+                               improperNamedAct=improperNamedAct,
+                               noSsExp=noSsExp,
+                               notAnnotWf=notAnnotWf,
+                               noLMExp=noLMExp)
 
 # only run this when executing locally
 #app.run()
