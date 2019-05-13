@@ -189,7 +189,7 @@ def radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
     ax.plot(angles, values, linewidth=1, linestyle='--', label="group B")
 
     # finish up
-    plt.savefig('static\\Score.png')
+    plt.savefig('static/Score.png')
     plt.close()
 
 
@@ -377,16 +377,16 @@ def __main__():
         df_annotation = df_annotation.drop_duplicates()
 
     completeProject = True
-    # for workflowPath in list(df_annotation['workflowName']):
-    #     try:
-    #         with open("file\\" + workflowPath, encoding='utf-8', mode='r') as workflow:
-    #             for line in workflow:
-    #                 if "DisplayName=" in line:
-    #                     if "AnnotationText=" in line:
-    #                         df_annotation.loc[df_annotation.workflowName == workflowPath, 'annotated'] = 1
-    #                         break
-    #     except FileNotFoundError:
-    #         completeProject = False
+    for workflowPath in list(df_annotation['workflowName']):
+        try:            #file\\
+            with open("file" + workflowPath, encoding='utf-8', mode='r') as workflow:
+                for line in workflow:
+                    if "DisplayName=" in line:
+                        if "AnnotationText=" in line:
+                            df_annotation.loc[df_annotation.workflowName == workflowPath, 'annotated'] = 1
+                            break
+        except FileNotFoundError:
+            completeProject = False
     # end annotation dataframe
 
     # check variable naming convention
@@ -468,6 +468,6 @@ def __main__():
                            noLMExp=noLMExp)
 
 
-#app.run(host='0.0.0.0', port=8000, debug=False)
+app.run()
 
 __main__()
