@@ -457,7 +457,7 @@ def __main__():
     #     return_string = "An exception should always be recorded by a scree-nshot activityd. " \
     #             "Exceptions that are not handled by screenshot includes: \n" + str(noSsException)
     #     print(return_string)
-    # return return_stringssd
+    # return return_stringss
     #with app.app_context():
     return render_template('index.html',
                                improperNamedVar=improperNamedVar,
@@ -465,10 +465,10 @@ def __main__():
                                improperNamedArg=improperNamedArg,
                                improperNamedAct=improperNamedAct,
                                noSsExp=noSsExp,
-                               notAnnotWf=notAnnotWf,
-                               noLMExp=noLMExp)
+                               notAnnotWf=notAnnotWf
+                               )
 
-
+#noLMExp=noLMExp
 # only run this when executing locally
 if __name__ == "__main__":
     app.run(debug=True)
