@@ -470,6 +470,6 @@ def __main__():
                            noLMExp=noLMExp)
 
 # only run this when executing locally
-app.run()
+#app.run()
 
 __main__()
