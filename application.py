@@ -19,7 +19,7 @@ app.config["CACHE_TYPE"] = "null"
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# check variable's naming convention
+# check variable's naming conventions
 
 
 def CheckVariableName(df_variable):
