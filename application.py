@@ -3,18 +3,21 @@ from builtins import len, open, list
 import pandas as pd
 import untangle
 import re
-import requests
 import matplotlib.pyplot as plt
 from math import pi
+from werkzeug.utils import secure_filename
 
-from flask import Flask, render_template, url_for
+from flask import Flask, request, render_template, redirect, url_for
 
-app = Flask(__name__, static_folder='./static/dist',
-            template_folder="./static")
+UPLOAD_FOLDER = '/file/'
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'xaml'])
+
+app = Flask(__name__, static_folder='./static/dist', template_folder="./static")
 
 # dont save cache in web browser (updating results image correctly)
 app.config["CACHE_TYPE"] = "null"
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # check variable's naming convention
 
@@ -211,18 +214,28 @@ def radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
     plt.close()
 # end radar chart
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/handle_form', methods=['POST'])
-def handle_form():
-    print("Posted file: {}".format(requests.files['file']))
-    file = requests.files['file']
-    files = {'file': file.read()}
-    r = requests.post("http://127.0.0.1:8000/file/", files=files)
-
-    if r.ok:
-        return "File uploaded!"
-    else:
-        return "Error uploading file!"
+@app.route("/handle_upload", methods=['GET', 'POST'])
+def handle_upload():
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            return "no file found! this is bad"
+        file = request.files['file']
+        # if user does not select file, browser also
+        # submit an empty part without filename
+        if file.filename == '':
+            return('No selected file')
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            print(os.path)
+            filename = filename.replace("\\", "/")
+            file.save("C:/Users/Michael/Documents/sleipnir" + app.config['UPLOAD_FOLDER'] + filename)
+            # definitely dont leave this url hard-coded
+            return redirect("/")
 
 
 @app.route("/")
