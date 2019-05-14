@@ -8,7 +8,7 @@ from math import pi
 
 from flask import Flask, render_template, url_for
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder = './static/dist', template_folder = "./static")
 
 # dont save cache in web browser (updating results image correctly)
 app.config["CACHE_TYPE"] = "null"
@@ -189,7 +189,7 @@ def radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
     ax.plot(angles, values, linewidth=1, linestyle='--', label="group B")
 
     # finish up
-    plt.savefig('static/Score.png')
+    plt.savefig('static/dist/Score.png')
     plt.close()
 
 
@@ -414,13 +414,13 @@ def __main__():
               wfAnnotationScore=wfAnnotationScore,
               logMessageScore=logMessageScore)
 
-    improperNamedVar = str(improperNamedVariable)
-    unusedVar = str(unusedVariable)
-    improperNamedArg = str(improperNamedArguments)
-    improperNamedAct = str(improperNamedActivities)
-    noSsExp = str(noSsException)
-    notAnnotWf = str(notAnnotatedWf) if completeProject else "The file you uploaded is not completed."
-    noLMExp = str(noLMException)
+    improperNamedVar = str(improperNamedVariable).replace("'","")
+    unusedVar = str(unusedVariable).replace("'","")
+    improperNamedArg = str(improperNamedArguments).replace("'","")
+    improperNamedAct = str(improperNamedActivities).replace("'","")
+    noSsExp = str(noSsException).replace("'","")
+    notAnnotWf = str(notAnnotatedWf).replace("'","") if completeProject else "The file you uploaded is not completed."
+    noLMExp = str(noLMException).replace("'","")
 
     # previous hard coded result messages, probably dont need delete eventually
     # if ((len(improperNamedVariable) != 0) or (len(unusedVariable) != 0) or
