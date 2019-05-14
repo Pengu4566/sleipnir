@@ -3,18 +3,22 @@ from builtins import len, open, list
 import pandas as pd
 import untangle
 import re
+import requests
 import matplotlib.pyplot as plt
 from math import pi
 
 from flask import Flask, render_template, url_for
 
-app = Flask(__name__, static_folder = './static/dist', template_folder = "./static")
+app = Flask(__name__, static_folder='./static/dist',
+            template_folder="./static")
 
 # dont save cache in web browser (updating results image correctly)
 app.config["CACHE_TYPE"] = "null"
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 # check variable's naming convention
+
+
 def CheckVariableName(df_variable):
     numVariables = len(df_variable.variableName)
 
@@ -26,10 +30,10 @@ def CheckVariableName(df_variable):
                                  'List': 'lst', 'Dictionary': 'dic',
                                  'Exception': 'ept', 'QueueItem': 'qi'}
         if (df_variable_row['variableType'] in dic_type_abbreviation.keys()) and (df_variable_row['variableName']
-                .startswith(dic_type_abbreviation[df_variable_row['variableType']] + '_')):
+                                                                                  .startswith(dic_type_abbreviation[df_variable_row['variableType']] + '_')):
             return True
         elif (not df_variable_row['variableType']
-                  in dic_type_abbreviation.keys()) and ('_' in df_variable_row['variableName']):
+              in dic_type_abbreviation.keys()) and ('_' in df_variable_row['variableName']):
             ind = 0
             abb = True
             for j in df_variable_row['variableName'].split('_')[0]:
@@ -43,13 +47,18 @@ def CheckVariableName(df_variable):
         else:
             return False
 
-    df_variable['properNamed'] = df_variable.apply(ProperVariableNaming, axis=1)
+    df_variable['properNamed'] = df_variable.apply(
+        ProperVariableNaming, axis=1)
 
     # return lists
-    improperNamedVariable = list(df_variable.loc[df_variable.properNamed == False].variableName)
-    unusedVariable = list(df_variable.loc[df_variable['count'] == 1].variableName)
-    variableUsageScore = len(df_variable.loc[df_variable['count'] > 1]['count']) / numVariables * 100
-    variableNamingScore = len(df_variable.loc[df_variable.properNamed == True].variableName) / numVariables * 100
+    improperNamedVariable = list(
+        df_variable.loc[df_variable.properNamed == False].variableName)
+    unusedVariable = list(
+        df_variable.loc[df_variable['count'] == 1].variableName)
+    variableUsageScore = len(
+        df_variable.loc[df_variable['count'] > 1]['count']) / numVariables * 100
+    variableNamingScore = len(
+        df_variable.loc[df_variable.properNamed == True].variableName) / numVariables * 100
 
     return [variableNamingScore, variableUsageScore, improperNamedVariable, unusedVariable]
 
@@ -75,10 +84,13 @@ def checkArgumentName(df_argument):
     df_argument['properNamed'] = df_argument.apply(proper, axis=1)
 
     # return lists
-    argumentNamingScore = len(df_argument[df_argument['properNamed'] == True]) / numArgument
+    argumentNamingScore = len(
+        df_argument[df_argument['properNamed'] == True]) / numArgument
     # improperNamedArguments = list(df_argument[df_argument['properNamed']!= True].argumentName)
-    temp_improperNamedArguments = list(df_argument[df_argument['properNamed'] != True].argumentName)
-    improperNamedArguments = [x for x in temp_improperNamedArguments if x is not None]
+    temp_improperNamedArguments = list(
+        df_argument[df_argument['properNamed'] != True].argumentName)
+    improperNamedArguments = [
+        x for x in temp_improperNamedArguments if x is not None]
 
     return [argumentNamingScore, improperNamedArguments]
 
@@ -88,10 +100,12 @@ def checkArgumentName(df_argument):
 # activity naming
 def ActivityNamingCheck(df_activity):
     # return lists
-    df_activity['customizedName'] = (df_activity['activityName'] != df_activity['activityType'])
+    df_activity['customizedName'] = (
+        df_activity['activityName'] != df_activity['activityType'])
     activityNamingScore = len(df_activity[df_activity['customizedName'] == True].customizedName) / len(
         df_activity.customizedName) * 100
-    improperNamedActivities = list(df_activity[df_activity['customizedName'] != True].activityName)
+    improperNamedActivities = list(
+        df_activity[df_activity['customizedName'] != True].activityName)
 
     return [activityNamingScore, improperNamedActivities]
 
@@ -107,7 +121,8 @@ def CheckSsinTC(df_catches):
         numWSs = 0
 
     if False in df_catches.groupby(['Screenshot Included']).size().index:
-        noSsException = list(df_catches[df_catches['Screenshot Included'] == False]['Catch Id'])
+        noSsException = list(
+            df_catches[df_catches['Screenshot Included'] == False]['Catch Id'])
 
     numCatch = len(df_catches['Screenshot Included'])
 
@@ -124,7 +139,8 @@ def CheckSsinTC(df_catches):
 # check invoke workflow annotation
 def checkWfAnnotation(df_annotation):
     numWf = len(df_annotation.workflowName)
-    notAnnotatedWf = list(df_annotation[df_annotation.annotated == 0].workflowName)
+    notAnnotatedWf = list(
+        df_annotation[df_annotation.annotated == 0].workflowName)
     wfAnnotationScore = 100 - (len(notAnnotatedWf) / numWf * 100)
 
     return [wfAnnotationScore, notAnnotatedWf]
@@ -141,7 +157,8 @@ def CheckLMinTC(df_catches):
         numWLM = 0
 
     if False in df_catches.groupby(['Log Message Included']).size().index:
-        noLMException = list(df_catches[df_catches['Log Message Included'] == False]['Catch Id'])
+        noLMException = list(
+            df_catches[df_catches['Log Message Included'] == False]['Catch Id'])
 
     numCatch = len(df_catches['Log Message Included'])
     logMessageScore = numWLM / numCatch * 100
@@ -174,7 +191,8 @@ def radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
     ax = plt.subplot(111, polar=True)
     plt.xticks(angles[:-1], categories, color='Blue', size=12)
     ax.set_rlabel_position(0)
-    plt.yticks([20, 40, 60, 80, 100], ["20", "40", "60", "80", "100"], color="grey", size=10)
+    plt.yticks([20, 40, 60, 80, 100], ["20", "40", "60",
+                                       "80", "100"], color="grey", size=10)
     plt.ylim(0, 100)
 
     # Actual
@@ -191,9 +209,21 @@ def radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
     # finish up
     plt.savefig('static/dist/Score.png')
     plt.close()
-
-
 # end radar chart
+
+
+@app.route('/handle_form', methods=['POST'])
+def handle_form():
+    print("Posted file: {}".format(requests.files['file']))
+    file = requests.files['file']
+    files = {'file': file.read()}
+    r = requests.post("http://127.0.0.1:8000/file/", files=files)
+
+    if r.ok:
+        return "File uploaded!"
+    else:
+        return "Error uploading file!"
+
 
 @app.route("/")
 def __main__():
@@ -232,7 +262,7 @@ def __main__():
 
     # checks for empty files list, program should end if this gets triggered
     if (files == []):
-       return "Could not find project files! Did you put them in the right place?"
+        return "Could not find project files! Did you put them in the right place?"
 
     # scans all project files and populates dataframes with relevant info
     for filePath in files:
@@ -310,7 +340,7 @@ def __main__():
                 if 'DisplayName=' in line:
                     name = re.search('DisplayName=\"[^\"]*\"',
                                      line.strip(' ')) \
-                               .group(0)[len("DisplayName=\""):-1]
+                        .group(0)[len("DisplayName=\""):-1]
                     activity = line.strip(' ').split(' ')[0].strip('<')
                     activity = activity if 'ui:' not in activity else activity[3:]
                     df_activity = df_activity.append({'activityName': name,
@@ -332,7 +362,8 @@ def __main__():
                     if 'sap2010:WorkflowViewState.IdRef' in line:
                         name = re.search("sap2010:WorkflowViewState.IdRef=\"[^\"]*\"",
                                          line.strip(" ")).group(0)
-                        catchId = name[len("sap2010:WorkflowViewState.IdRef=\""):-1]
+                        catchId = name[len(
+                            "sap2010:WorkflowViewState.IdRef=\""):-1]
                 if '</Catch>' in line.strip(" "):
                     printLine = not printLine
                     evaluate = True
@@ -340,9 +371,11 @@ def __main__():
                     if ('<sap2010:WorkflowViewState.IdRef>' in line.strip(" ")) and \
                             ('</sap2010:WorkflowViewState.IdRef>' in line.strip(" ")) and \
                             ('Catch`' in line.strip(" ")):
-                        catchId = re.search("Catch[^<]*", line.strip(" ")).group(0)
+                        catchId = re.search(
+                            "Catch[^<]*", line.strip(" ")).group(0)
                 if printLine and ('<Catch x:' not in line.strip(" ")):
-                    activityList.append(line.strip(" ").split(" ")[0].strip("<"))
+                    activityList.append(line.strip(
+                        " ").split(" ")[0].strip("<"))
                 if evaluate:
                     evaluate = False
                     screenshotIncluded = False
@@ -365,13 +398,13 @@ def __main__():
         # annotation dataframe
         with open(filePath, encoding='utf-8', mode='r') as f:
             for line in f:
-                if (line.strip(" ").startswith("<ui:InvokeWorkflowFile") and \
+                if (line.strip(" ").startswith("<ui:InvokeWorkflowFile") and
                         "WorkflowFileName=" in line.strip(" ")):
                     workflowName = re.search('WorkflowFileName=\"[^\"]*\.xaml\"',
                                              line.strip(" ")).group(0)
                     workflowName = workflowName[(len('WorkflowFileName="')):-1]
                     df_annotation = df_annotation.append({'workflowName':
-                                                              workflowName,
+                                                          workflowName,
                                                           'annotated': False},
                                                          ignore_index=True)
         df_annotation = df_annotation.drop_duplicates()
@@ -384,18 +417,22 @@ def __main__():
                 for line in workflow:
                     if "DisplayName=" in line:
                         if "AnnotationText=" in line:
-                            df_annotation.loc[df_annotation.workflowName == workflowPath, 'annotated'] = 1
+                            df_annotation.loc[df_annotation.workflowName ==
+                                              workflowPath, 'annotated'] = 1
                             break
         except FileNotFoundError:
             completeProject = False
     # end annotation dataframe
 
     # check variable naming convention
-    [variableNamingScore, variableUsageScore, improperNamedVariable, unusedVariable] = CheckVariableName(df_variable)
+    [variableNamingScore, variableUsageScore, improperNamedVariable,
+        unusedVariable] = CheckVariableName(df_variable)
     # check argument in/out
-    [argumentNamingScore, improperNamedArguments] = checkArgumentName(df_argument)
+    [argumentNamingScore, improperNamedArguments] = checkArgumentName(
+        df_argument)
     # check activity names
-    [activityNamingScore, improperNamedActivities] = ActivityNamingCheck(df_activity)
+    [activityNamingScore, improperNamedActivities] = ActivityNamingCheck(
+        df_activity)
     # screenshot in try/catch block
     [screenshotScore, noSsException] = CheckSsinTC(df_catches)
     # log message in try/catch block
@@ -414,13 +451,14 @@ def __main__():
               wfAnnotationScore=wfAnnotationScore,
               logMessageScore=logMessageScore)
 
-    improperNamedVar = str(improperNamedVariable).replace("'","")
-    unusedVar = str(unusedVariable).replace("'","")
-    improperNamedArg = str(improperNamedArguments).replace("'","")
-    improperNamedAct = str(improperNamedActivities).replace("'","")
-    noSsExp = str(noSsException).replace("'","")
-    notAnnotWf = str(notAnnotatedWf).replace("'","") if completeProject else "The file you uploaded is not completed."
-    noLMExp = str(noLMException).replace("'","")
+    improperNamedVar = str(improperNamedVariable).replace("'", "")
+    unusedVar = str(unusedVariable).replace("'", "")
+    improperNamedArg = str(improperNamedArguments).replace("'", "")
+    improperNamedAct = str(improperNamedActivities).replace("'", "")
+    noSsExp = str(noSsException).replace("'", "")
+    notAnnotWf = str(notAnnotatedWf).replace(
+        "'", "") if completeProject else "The file you uploaded is not completed."
+    noLMExp = str(noLMException).replace("'", "")
 
     # previous hard coded result messages, probably dont need delete eventually
     # if ((len(improperNamedVariable) != 0) or (len(unusedVariable) != 0) or
@@ -458,15 +496,15 @@ def __main__():
     #             "Exceptions that are not handled by screenshot includes: \n" + str(noSsException)
     #     print(return_string)
     # return return_stringsss
-    #with app.app_context():
+    # with app.app_context():
     return render_template('index.html',
-                               improperNamedVar=improperNamedVar,
-                               unusedVar=unusedVar,
-                               improperNamedArg=improperNamedArg,
-                               improperNamedAct=improperNamedAct,
-                               noSsExp=noSsExp,
-                               notAnnotWf=notAnnotWf,
-                               noLMExp=noLMExp)
+                           improperNamedVar=improperNamedVar,
+                           unusedVar=unusedVar,
+                           improperNamedArg=improperNamedArg,
+                           improperNamedAct=improperNamedAct,
+                           noSsExp=noSsExp,
+                           notAnnotWf=notAnnotWf,
+                           noLMExp=noLMExp)
 
 
 # only run when executing locally
