@@ -457,7 +457,7 @@ def __main__():
     #     return_string = "An exception should always be recorded by a scree-nshot activityd. " \
     #             "Exceptions that are not handled by screenshot includes: \n" + str(noSsException)
     #     print(return_string)
-    # return return_strings
+    # return return_stringss
     #with app.app_context():
     return render_template('index.html',
                                improperNamedVar=improperNamedVar,
