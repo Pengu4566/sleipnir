@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b769883a-a816-42ab-bc07-1ccb3d961c12" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/file/GetAppCredentials.xaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/file/GetQueueMaxRetries.xaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/file/InitAllSettings.xaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/dist/Score.png" beforeDir="false" afterPath="$PROJECT_DIR$/static/dist/Score.png" afterDir="false" />
-    </list>
+    <list default="true" id="b769883a-a816-42ab-bc07-1ccb3d961c12" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,11 +13,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/application.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="331">
-              <caret line="49" column="13" selection-start-line="49" selection-start-column="13" selection-end-line="49" selection-end-column="13" />
-              <folding>
-                <element signature="e#0#9#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="153">
+              <caret line="9" column="32" selection-start-line="9" selection-start-column="25" selection-end-line="9" selection-end-column="32" />
             </state>
           </provider>
         </entry>
@@ -72,8 +64,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="710" />
-    <option name="width" value="1217" />
+    <option name="x" value="603" />
+    <option name="width" value="1324" />
     <option name="height" value="1057" />
   </component>
   <component name="ProjectView">
@@ -148,10 +140,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="710" y="0" width="1217" height="1057" extended-state="0" />
+    <frame x="603" y="0" width="1324" height="1057" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12298558" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.11275272" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -187,11 +179,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/application.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="331">
-          <caret line="49" column="13" selection-start-line="49" selection-start-column="13" selection-end-line="49" selection-end-column="13" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="153">
+          <caret line="9" column="32" selection-start-line="9" selection-start-column="25" selection-end-line="9" selection-end-column="32" />
         </state>
       </provider>
     </entry>
