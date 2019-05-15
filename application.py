@@ -10,16 +10,13 @@ from math import pi
 import zipfile
 from flask import Flask, render_template, url_for, request
 
-UPLOAD_FOLDER = '/file/'
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'xaml'])
-
 app = Flask(__name__, static_folder='./static/dist', template_folder="./static")
 
 # dont save cache in web browser (updating results image correctly)
 app.config["CACHE_TYPE"] = "null"
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-app.config['UPLOAD_PATH'] = 'file/'
-app.config['ALLOWED_EXTENSIONS'] = set(['zip'])
+app.config['UPLOAD_PATH'] = '/file/'
+app.config['ALLOWED_EXTENSIONS'] = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'xaml', 'zip'])
 
 # check variable's naming conventions
 
@@ -230,7 +227,12 @@ def allowed_file(filename):
 @app.route('/uploader', methods = ['GET', 'POST'])
 def upload_file():
    shutil.rmtree("./file")
-   os.mkdir("./file")
+
+   #os.chmod("./file", 0o777)
+   os.mkdirs("./file")
+
+   #os.system("sudo mkdir ./file")
+
    if request.method == 'POST':
       f = request.files['file']
       if allowed_file(f.filename):
