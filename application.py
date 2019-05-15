@@ -3,11 +3,12 @@ from builtins import len, open, list
 import pandas as pd
 import untangle
 import re
-import requests
 import matplotlib.pyplot as plt
+from werkzeug import secure_filename
+import shutil
 from math import pi
-
-from flask import Flask, render_template, url_for
+import zipfile
+from flask import Flask, render_template, url_for, request
 
 app = Flask(__name__, static_folder='./static/dist',
             template_folder="./static")
@@ -15,6 +16,8 @@ app = Flask(__name__, static_folder='./static/dist',
 # dont save cache in web browser (updating results image correctly)
 app.config["CACHE_TYPE"] = "null"
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.config['UPLOAD_PATH'] = 'file/'
+app.config['ALLOWED_EXTENSIONS'] = set(['zip'])
 
 # check variable's naming convention
 
@@ -212,20 +215,30 @@ def radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
 # end radar chart
 
 
-@app.route('/handle_form', methods=['POST'])
-def handle_form():
-    print("Posted file: {}".format(requests.files['file']))
-    file = requests.files['file']
-    files = {'file': file.read()}
-    r = requests.post("http://127.0.0.1:8000/file/", files=files)
-
-    if r.ok:
-        return "File uploaded!"
-    else:
-        return "Error uploading file!"
+@app.route('/')
+def upload():
+    return render_template('fileUpload.html')
 
 
-@app.route("/")
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
+
+
+@app.route('/uploader', methods = ['GET', 'POST'])
+def upload_file():
+   shutil.rmtree("./file")
+   os.mkdir("./file")
+   if request.method == 'POST':
+      f = request.files['file']
+      f.save(os.path.join(app.config['UPLOAD_PATH'],secure_filename(f.filename)))
+      f = zipfile.ZipFile(os.path.join(app.config['UPLOAD_PATH'],secure_filename(f.filename)))
+      f.extractall("./file")
+      #f.save(os.path.join(app.config['UPLOAD_PATH'],secure_filename(f.filename)))
+      return render_template('uploader.html')
+
+
+@app.route("/score")
 def __main__():
     # testing file structure
     # import os
@@ -508,7 +521,7 @@ def __main__():
 
 
 # only run when executing locally
-if __name__ == "__main__":
-    app.run(debug=True)
-
+#if __name__ == "__main__":
+#    app.run(debug=True)
+app.run()
 __main__()
