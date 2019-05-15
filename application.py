@@ -233,11 +233,14 @@ def upload_file():
    os.mkdir("./file")
    if request.method == 'POST':
       f = request.files['file']
-      f.save(os.path.join(app.config['UPLOAD_PATH'],secure_filename(f.filename)))
-      f = zipfile.ZipFile(os.path.join(app.config['UPLOAD_PATH'],secure_filename(f.filename)))
-      f.extractall("./file")
-      #f.save(os.path.join(app.config['UPLOAD_PATH'],secure_filename(f.filename)))
-      return render_template('uploader.html')
+      if allowed_file(f.filename):
+          f.save(os.path.join(app.config['UPLOAD_PATH'],secure_filename(f.filename)))
+          f = zipfile.ZipFile(os.path.join(app.config['UPLOAD_PATH'],secure_filename(f.filename)))
+          f.extractall("./file")
+          #f.save(os.path.join(app.config['UPLOAD_PATH'],secure_filename(f.filename)))
+          return render_template('uploader.html')
+      else:
+          return render_template('wrongFile.html')
 
 
 @app.route("/score")

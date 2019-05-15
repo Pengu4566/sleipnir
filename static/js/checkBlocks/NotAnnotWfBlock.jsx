@@ -12,6 +12,20 @@ export default class NotAnnotWfBlock extends React.Component {
           </p>
         </div>
       );
+    } else if (this.props.name == "The file you uploaded is not completed.") {
+      return (
+        <div>
+          <p>
+            An invoked workflow should always be annotated. However, the file
+            you uploaded is not completed, so we cannot analyze workflow
+            annotation for you.
+          </p>
+          <p>
+            {" "}
+            --------------------------------------------------------------------------------------------------------------{" "}
+          </p>
+        </div>
+      );
     } else {
       return (
         <div>
