@@ -12,12 +12,12 @@ from flask import Flask, request, render_template, redirect, url_for
 UPLOAD_FOLDER = '/file/'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'xaml'])
 
-app = Flask(__name__, static_folder='./static/dist', template_folder="./static")
+application = Flask(__name__, static_folder='./static/dist', template_folder="./static")
 
 # dont save cache in web browser (updating results image correctly)
-app.config["CACHE_TYPE"] = "null"
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+application.config["CACHE_TYPE"] = "null"
+application.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+application.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # check variable's naming conventions
 
@@ -218,7 +218,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route("/handle_upload", methods=['GET', 'POST'])
+@application.route("/handle_upload", methods=['GET', 'POST'])
 def handle_upload():
     if request.method == 'POST':
         # check if the post request has the file part
@@ -233,12 +233,12 @@ def handle_upload():
             filename = secure_filename(file.filename)
             print(os.path)
             filename = filename.replace("\\", "/")
-            file.save("C:/Users/Michael/Documents/sleipnir" + app.config['UPLOAD_FOLDER'] + filename)
+            file.save("C:/Users/Michael/Documents/sleipnir" + application.config['UPLOAD_FOLDER'] + filename)
             # definitely dont leave this url hard-coded
             return redirect("/")
 
 
-@app.route("/")
+@application.route("/")
 def __main__():
     # testing file structure
     # import os
@@ -521,7 +521,7 @@ def __main__():
 
 
 # only run when executing locally
-#if __name__ == "__main__":
-#    app.run(debug=True)
+if __name__ == "__main__":
+    application.run(debug=True)
 
 __main__()
