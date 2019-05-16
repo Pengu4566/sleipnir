@@ -1,12 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import ImproperNamedVarBlock from "./ImproperNamedVarBlock";
-import UnusedVarBlock from "./UnusedVarBlock";
-import ImproperNamedArgBlock from "./ImproperNamedArgBlock";
-import ImproperNamedActBlock from "./ImproperNamedActBlock";
-import NoSsExpBlock from "./NoSsExpBlock";
-import NotAnnotWfBlock from "./NotAnnotWfBlock";
-import NoLMExpBlock from "./NoLMExpBlock";
+import ImproperNamedVarBlock from "./checkBlocks/ImproperNamedVarBlock";
+import UnusedVarBlock from "./checkBlocks/UnusedVarBlock";
+import ImproperNamedArgBlock from "./checkBlocks/ImproperNamedArgBlock";
+import ImproperNamedActBlock from "./checkBlocks/ImproperNamedActBlock";
+import NoSsExpBlock from "./checkBlocks/NoSsExpBlock";
+import NotAnnotWfBlock from "./checkBlocks/NotAnnotWfBlock";
+import NoLMExpBlock from "./checkBlocks/NoLMExpBlock";
 
 ReactDOM.render(
   <ImproperNamedVarBlock name={window.improperNamedVar} />,
