@@ -102,7 +102,7 @@ def checkArgumentName(df_argument):
 
 # activity naming
 def ActivityNamingCheck(df_activity):
-    # return lists
+    # return listss
     df_activity['customizedName'] = (
         df_activity['activityName'] != df_activity['activityType'])
     activityNamingScore = len(df_activity[df_activity['customizedName'] == True].customizedName) / len(
