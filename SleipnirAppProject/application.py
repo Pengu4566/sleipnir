@@ -6,13 +6,16 @@ import re
 import matplotlib.pyplot as plt
 from math import pi
 from werkzeug.utils import secure_filename
-
-from flask import Flask, request, render_template, redirect, url_for
+from SleipnirAppProject import app
+from flask import render_template
 
 UPLOAD_FOLDER = '/file/'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'xaml'])
 
+
+from flask import Flask, request, render_template, redirect, url_for
 app = Flask(__name__, static_folder='./static/dist', template_folder="./static")
+
 
 # dont save cache in web browser (updating results image correctly)
 app.config["CACHE_TYPE"] = "null"
@@ -20,8 +23,6 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # check variable's naming conventions
-
-
 def CheckVariableName(df_variable):
     numVariables = len(df_variable.variableName)
 
@@ -521,9 +522,10 @@ def __main__():
                            noSsExp=noSsExp,
                            notAnnotWf=notAnnotWf,
                            noLMExp=noLMExp)
+    #return "This is a webpage with text"
 
 # only run when executing locally
-#if __name__ == "__main__":
-app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
 
 __main__()
