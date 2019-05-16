@@ -6,7 +6,7 @@ import re
 import matplotlib.pyplot as plt
 from math import pi
 from werkzeug.utils import secure_filename
-from SleipnirAppProject import app
+from importss import app
 
 UPLOAD_FOLDER = '/file/'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'xaml'])
