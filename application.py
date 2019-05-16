@@ -4,10 +4,9 @@ import pandas as pd
 import untangle
 import re
 import matplotlib.pyplot as plt
-#from werkzeug import secure_filename
 import shutil
 from math import pi
-from werkzeug.utils import secure_filename\
+from werkzeug.utils import secure_filename
 
 from flask import Flask, request, render_template, redirect, url_for
 app = Flask(__name__, static_folder='./static/dist', template_folder="./static")
@@ -24,24 +23,33 @@ def CheckVariableName(df_variable):
 
     # check if variable name is proper in df_variable
     def ProperVariableNaming(df_variable_row):
-        dic_type_abbreviation = {'String': 'str', 'Int32': 'int',
-                                 'DataColumn': 'dclm', 'Double': 'dbl',
-                                 'DateTime': 'date', 'Array': 'arr',
-                                 'List': 'lst', 'Dictionary': 'dic',
-                                 'Exception': 'ept', 'QueueItem': 'qi'}
-        if (df_variable_row['variableType'] in dic_type_abbreviation.keys()) and (df_variable_row['variableName']
-                                                                                  .startswith(dic_type_abbreviation[df_variable_row['variableType']] + '_')):
+        dic_type_abbreviation = {'String': 'str',
+                                 'Int32': 'int',
+                                 'DataColumn': 'dclm',
+                                 'Double': 'dbl',
+                                 'DateTime': 'date',
+                                 'Array': 'arr',
+                                 'List': 'lst',
+                                 'Dictionary': 'dic',
+                                 'Exception': 'ept',
+                                 'QueueItem': 'qi'}
+
+        # variable type is in dict above and format matches ['abbreviation''_''anything'] i.e.(int_counter, str_thing)
+        if (df_variable_row['variableType'] in dic_type_abbreviation.keys()) and \
+                (df_variable_row['variableName'].startswith(dic_type_abbreviation[df_variable_row['variableType']] + '_')):
             return True
-        elif (not df_variable_row['variableType']
-              in dic_type_abbreviation.keys()) and ('_' in df_variable_row['variableName']):
+        # variable type is not in above dict but format still matches ['abbreviation''_''anything']
+        elif (not df_variable_row['variableType'] in dic_type_abbreviation.keys()) and \
+                ('_' in df_variable_row['variableName']):
             ind = 0
             abb = True
             for j in df_variable_row['variableName'].split('_')[0]:
-                if (j in df_variable_row[df_variable_row['variableName']]) \
-                        and (df_variable_row[df_variable_row['variableName']].find(j) <= ind):
+                if (j in df_variable_row[df_variable_row['variableName']]) and \
+                        (df_variable_row[df_variable_row['variableName']].find(j) <= ind):
                     abb = (abb and True)
                 else:
                     abb = (abb and False)
+
                 ind = df_variable_row[df_variable_row['variableName']].find(j)
                 return abb
         else:
@@ -481,43 +489,6 @@ def __main__():
         "'", "") if completeProject else "The file you uploaded is not completed."
     noLMExp = str(noLMException).replace("'", "")
 
-    # previous hard coded result messages, probably dont need delete eventually
-    # if ((len(improperNamedVariable) != 0) or (len(unusedVariable) != 0) or
-    #     (len(improperNamedArguments) != 0) or (len(improperNamedActivities) != 0)
-    #     or (len(noSsException) != 0)):
-    #     print("Result Explanation\n\n")
-    # if (len(improperNamedVariable) != 0):
-    #     print("A proper variable name should start with an abbreviation of " +
-    #           "data type, following by a hyphen to data name. Variables that" +
-    #           " are not properly named includes: \n")
-    #     print(improperNamedVariable)
-    #     print('-'*110)
-
-    # if (len(unusedVariable) != 0):
-    #     print("An unused variable should be deleted. Variables that are" +
-    #           " declared but not used includes: \n")
-    #     print(unusedVariable)
-    #     print('-'*110)
-
-    # if (len(improperNamedArguments) != 0):
-    #     print("A proper argument name should starts 'in_', 'out_', or" +
-    #           " 'io_' to annotate the argument's property. Arguments that are" +
-    #           " not properly named includes: \n")
-    #     print(improperNamedArguments)
-    #     print('-'*110)
-
-    # if (len(improperNamedActivities) != 0):
-    #     print("An activity should not use its default name. Activities that" +
-    #           " are not properly named includes: \n")
-    #     print(improperNamedActivities)
-    #     print('-'*110)
-
-    # if (len(noSsException) != 0):
-    #     return_string = "An exception should always be recorded by a scree-nshot activityd. " \
-    #             "Exceptions that are not handled by screenshot includes: \n" + str(noSsException)
-    #     print(return_string)
-    # return return_stringssss
-    # with app.app_context():
     #app.redirect("/something")
     with app.app_context():
         return render_template('index.html',
