@@ -242,7 +242,7 @@ def handle_upload():
 
 @app.route("/")
 def __main__():
-
+    print(os.path.dirname(os.path.abspath("application.py")))
 
     # testing file structure
     # import os
