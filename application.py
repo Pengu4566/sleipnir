@@ -6,15 +6,12 @@ import re
 import matplotlib.pyplot as plt
 from math import pi
 from werkzeug.utils import secure_filename
-from importss import app
-
-UPLOAD_FOLDER = '/file/'
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'xaml'])
-
 
 from flask import Flask, request, render_template, redirect, url_for
 app = Flask(__name__, static_folder='./static/dist', template_folder="./static")
 
+UPLOAD_FOLDER = '/file/'
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'xaml'])
 
 # dont save cache in web browser (updating results image correctly)
 app.config["CACHE_TYPE"] = "null"
@@ -524,7 +521,7 @@ def __main__():
     return "This is a webpage with text"
 
 # only run when executing locally
-#if __name__ == "__main__":
-app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
 
 __main__()
