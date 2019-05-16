@@ -6,8 +6,8 @@ import re
 import matplotlib.pyplot as plt
 from math import pi
 from werkzeug.utils import secure_filename
-
 from flask import Flask, request, render_template, redirect, url_for
+
 app = Flask(__name__, static_folder='./static/dist', template_folder="./static")
 
 UPLOAD_FOLDER = '/file/'
@@ -17,6 +17,11 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'xam
 app.config["CACHE_TYPE"] = "null"
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
+def create_app():
+    app = Flask(__name__, static_folder='./static/dist', template_folder="./static")
+    return app
 
 # check variable's naming conventions
 def CheckVariableName(df_variable):
