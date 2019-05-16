@@ -234,7 +234,7 @@ def handle_upload():
             if __name__ == "__main__":
                 file.save("C:/Users/Michael/Documents/sleipnir" + app.config['UPLOAD_FOLDER'] + filename)
             else:
-                file.save(app.config['UPLOAD_FOLDER'] + filename)
+                file.save("/site/repository/" +app.config['UPLOAD_FOLDER'] + filename)
             # definitely dont leave this url hard-coded
             return redirect("/")
 
