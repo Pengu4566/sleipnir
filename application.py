@@ -513,15 +513,15 @@ def __main__():
     # return return_stringsss
     # with app.app_context():
     #app.redirect("/something")
-    return render_template('index.html',
-                           improperNamedVar=improperNamedVar,
-                           unusedVar=unusedVar,
-                           improperNamedArg=improperNamedArg,
-                           improperNamedAct=improperNamedAct,
-                           noSsExp=noSsExp,
-                           notAnnotWf=notAnnotWf,
-                           noLMExp=noLMExp)
-    #return "This is a webpage with text"
+    # return render_template('index.html',
+    #                        improperNamedVar=improperNamedVar,
+    #                        unusedVar=unusedVar,
+    #                        improperNamedArg=improperNamedArg,
+    #                        improperNamedAct=improperNamedAct,
+    #                        noSsExp=noSsExp,
+    #                        notAnnotWf=notAnnotWf,
+    #                        noLMExp=noLMExp)
+    return "This is a webpage with text"
 
 # only run when executing locally
 if __name__ == "__main__":

@@ -27,8 +27,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/application.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="107" column="103" lean-forward="true" selection-start-line="107" selection-start-column="103" selection-end-line="107" selection-end-column="103" />
+            <state relative-caret-position="482">
+              <caret line="523" column="4" lean-forward="true" selection-start-line="523" selection-start-column="4" selection-end-line="523" selection-end-column="4" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -176,7 +176,7 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32900432" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3560606" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.17207792" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -248,8 +248,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/application.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="107" column="103" lean-forward="true" selection-start-line="107" selection-start-column="103" selection-end-line="107" selection-end-column="103" />
+        <state relative-caret-position="482">
+          <caret line="523" column="4" lean-forward="true" selection-start-line="523" selection-start-column="4" selection-end-line="523" selection-end-column="4" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>
