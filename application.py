@@ -12,12 +12,12 @@ from flask import Flask, request, render_template, redirect, url_for
 UPLOAD_FOLDER = '/file/'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'xaml'])
 
-application = Flask(__name__, static_folder='./static/dist', template_folder="./static")
+app = Flask(__name__, static_folder='./static/dist', template_folder="./static")
 
 # dont save cache in web browser (updating results image correctly)
-application.config["CACHE_TYPE"] = "null"
-application.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-application.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config["CACHE_TYPE"] = "null"
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # check variable's naming conventions
 
@@ -218,7 +218,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@application.route("/handle_upload", methods=['GET', 'POST'])
+@app.route("/handle_upload", methods=['GET', 'POST'])
 def handle_upload():
     if request.method == 'POST':
         # check if the post request has the file part
@@ -233,13 +233,15 @@ def handle_upload():
             filename = secure_filename(file.filename)
             print(os.path)
             filename = filename.replace("\\", "/")
-            file.save("C:/Users/Michael/Documents/sleipnir" + application.config['UPLOAD_FOLDER'] + filename)
+            file.save("C:/Users/Michael/Documents/sleipnir" + app.config['UPLOAD_FOLDER'] + filename)
             # definitely dont leave this url hard-coded
             return redirect("/")
 
 
-@application.route("/")
+@app.route("/")
 def __main__():
+
+
     # testing file structure
     # import os
     # files = os.listdir('file')
@@ -510,6 +512,7 @@ def __main__():
     #     print(return_string)
     # return return_stringsss
     # with app.app_context():
+    #app.redirect("/something")
     return render_template('index.html',
                            improperNamedVar=improperNamedVar,
                            unusedVar=unusedVar,
@@ -519,9 +522,8 @@ def __main__():
                            notAnnotWf=notAnnotWf,
                            noLMExp=noLMExp)
 
-
 # only run when executing locally
-if __name__ == "__main__":
-    application.run(debug=True)
+#if __name__ == "__main__":
+app.run(debug=True)
 
 __main__()
