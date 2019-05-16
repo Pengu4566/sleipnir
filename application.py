@@ -4,16 +4,13 @@ import pandas as pd
 import untangle
 import re
 import matplotlib.pyplot as plt
-from werkzeug import secure_filename
+#from werkzeug import secure_filename
 import shutil
 from math import pi
 from werkzeug.utils import secure_filename\
 
 from flask import Flask, request, render_template, redirect, url_for
 app = Flask(__name__, static_folder='./static/dist', template_folder="./static")
-
-UPLOAD_FOLDER = '/file/'
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'xaml'])
 
 # dont save cache in web browser (updating results image correctly)
 app.config["CACHE_TYPE"] = "null"
@@ -215,6 +212,7 @@ def radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
 # end radar chart
 
 
+
 @app.route('/')
 def upload():
     return render_template('fileUpload.html')
@@ -223,12 +221,13 @@ def upload():
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
 
-@app.route("/handle_upload", methods=['GET', 'POST'])
+
+@app.route("/uploader", methods=['GET', 'POST'])
 def handle_upload():
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
-            return "no file found! this is bad"
+            return "You must pick a file! Use your browser's back button and try again."
         file = request.files['file']
         # if user does not select file, browser also
         # submit an empty part without filename
@@ -239,18 +238,15 @@ def handle_upload():
             print(os.path)
             filename = filename.replace("\\", "/")
 
-            print(os.path.dirname(os.path.abspath("application.py")))
-
-            # top will run locally, bottom will run on Azure
+            # top will run locally (saving to michael's computer), bottom will run on Azure (linux)
             if __name__ == "__main__":
-                file.save("C:/Users/Michael/Documents/sleipnir" + app.config['UPLOAD_FOLDER'] + filename)
+                file.save("C:/Users/Michael/Documents/sleipnir" + app.config['UPLOAD_PATH'] + filename)
             else:
-                file.save("/home/site/wwwroot" + app.config['UPLOAD_FOLDER'] + filename)
-            # definitely dont leave this url hard-coded
-            return redirect("/")
+                file.save("/home/site/wwwroot" + app.config['UPLOAD_PATH'] + filename)
+            return redirect("/analyze")
 
 
-@app.route("/")
+@app.route("/analyze")
 def __main__():
     # testing file structure
     # import os
@@ -533,8 +529,8 @@ def __main__():
                                notAnnotWf=notAnnotWf,
                                noLMExp=noLMExp)
 
-# only run when executing locally
-#if __name__ == "__main__":
-#    app.run(debug=True)
-app.run()
+# only run when executing locally (if this doesnt run then remove the if statement)
+if __name__ == "__main__":
+    app.run(debug=True)
+
 __main__()
