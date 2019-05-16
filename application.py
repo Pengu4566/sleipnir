@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 from math import pi
 from werkzeug.utils import secure_filename
 from SleipnirAppProject import app
-from flask import render_template
 
 UPLOAD_FOLDER = '/file/'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'xaml'])
