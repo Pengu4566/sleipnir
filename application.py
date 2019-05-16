@@ -257,7 +257,7 @@ def __main__():
     # old local filepath
     # filePath = "file\\"
 
-    # azure filepath
+    # azure filepaths
     filePath = "file"
     files = []
 
