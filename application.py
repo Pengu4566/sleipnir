@@ -521,7 +521,7 @@ def __main__():
     return "This is a webpage with text"
 
 # only run when executing locally
-#if __name__ == "__main__":
-app.run('0.0.0.0', 8000,  debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
 
 __main__()
