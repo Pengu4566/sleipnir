@@ -231,6 +231,8 @@ def handle_upload():
             print(os.path)
             filename = filename.replace("\\", "/")
 
+            print(os.path.dirname(os.path.abspath("application.py")))
+
             # top will run locally, bottom will run on Azure
             if __name__ == "__main__":
                 file.save("C:/Users/Michael/Documents/sleipnir" + app.config['UPLOAD_FOLDER'] + filename)
@@ -242,8 +244,6 @@ def handle_upload():
 
 @app.route("/")
 def __main__():
-    print(os.path.dirname(os.path.abspath("application.py")))
-
     # testing file structure
     # import os
     # files = os.listdir('file')
