@@ -3,10 +3,9 @@ from builtins import len, open, list
 import pandas as pd
 import untangle
 import re
-import sys
 import matplotlib.pyplot as plt
 #from werkzeug import secure_filename
-import shutil
+import zipfile
 from math import pi
 from werkzeug.utils import secure_filename\
 
@@ -262,6 +261,16 @@ def allowed_file(filename):
 @app.route("/uploader", methods=['GET', 'POST'])
 def handle_upload():
     if request.method == 'POST':
+        # clear out content in file folder
+        for r, d, f in os.walk(app.config['UPLOAD_PATH'].strip("/")):
+            for file in f:
+                os.remove((os.getcwd() + "/" + r + "/" + file).replace("\\", "/"))
+        folders = []
+        for r, d, f in os.walk(app.config['UPLOAD_PATH'].strip("/")):
+            folders = [(os.getcwd() + "/" + r).replace("\\", "/")] + folders
+        folders = folders[:-1]
+        for folder in folders:
+            os.rmdir(folder)
         # check if the post request has the file part
         if 'file' not in request.files:
             return "You must pick a file! Use your browser's back button and try again."
@@ -270,16 +279,23 @@ def handle_upload():
         # submit an empty part without filename
         if file.filename == '':
             return('No selected file')
-        if file and allowed_file(file.filename):
+        if not allowed_file(file.filename):
+            with app.app_context():
+                return render_template("wrongFile.html")
+        elif file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             print(os.path)
             filename = filename.replace("\\", "/")
 
             # top will run locally (saving to michael's computer), bottom will run on Azure (linux)
             if __name__ == "__main__":
-                file.save("C:/Users/Michael/Documents/sleipnir" + app.config['UPLOAD_PATH'] + filename)
+                file.save((os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\", "/"))
+                zipFile = zipfile.ZipFile((os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\","/"))
+                zipFile.extractall((os.getcwd() + app.config['UPLOAD_PATH']).replace("\\", "/"))
             else:
                 file.save("/home/site/wwwroot" + app.config['UPLOAD_PATH'] + filename)
+                zipFile = zipfile.ZipFile("/home/site/wwwroot" + app.config['UPLOAD_PATH'] + filename)
+                zipFile.extractall("/home/site/wwwroot" + app.config['UPLOAD_PATH'])
             return redirect("/analyze")
 
 
