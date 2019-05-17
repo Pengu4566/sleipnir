@@ -17,7 +17,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['UPLOAD_PATH'] = '/file/'
 app.config['ALLOWED_EXTENSIONS'] = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'xaml', 'zip'])
 
-# check variable's naming conventions
+# check variable's naming conventionss
 def CheckVariableName(df_variable):
     numVariables = len(df_variable.variableName)
 
