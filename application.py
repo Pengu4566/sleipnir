@@ -545,5 +545,3 @@ def __main__():
 # only run when executing locally (if this doesnt run then remove the if statement)
 if __name__ == "__main__":
     app.run(debug=True)
-
-__main__()
