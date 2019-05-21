@@ -3,9 +3,11 @@ from builtins import len, open, list
 import pandas as pd
 import untangle
 import re
+import sys
 import matplotlib.pyplot as plt
-#from werkzeug import secure_filename
+from werkzeug import secure_filename
 import shutil
+import zipfile
 from math import pi
 from werkzeug.utils import secure_filename\
 
@@ -22,43 +24,83 @@ app.config['ALLOWED_EXTENSIONS'] = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif
 def CheckVariableName(df_variable):
     numVariables = len(df_variable.variableName)
 
-    # check if variable name is proper in df_variable
+    print("[DEBUG MESSAGE] - length of df_variable: " + str(numVariables), file=sys.stderr)
+
+    # check if variable name is proper in df_variable ['variableType', 'variableName', 'count', 'filePath']
     def ProperVariableNaming(df_variable_row):
-        dic_type_abbreviation = {'String': 'str', 'Int32': 'int',
-                                 'DataColumn': 'dclm', 'Double': 'dbl',
-                                 'DateTime': 'date', 'Array': 'arr',
-                                 'List': 'lst', 'Dictionary': 'dic',
-                                 'Exception': 'ept', 'QueueItem': 'qi'}
-        if (df_variable_row['variableType'] in dic_type_abbreviation.keys()) and (df_variable_row['variableName']
-                                                                                  .startswith(dic_type_abbreviation[df_variable_row['variableType']] + '_')):
+        dic_type_abbreviation = {'String': 'str',
+                                 'Int32': 'int',
+                                 'DataColumn': 'dclm',
+                                 'Double': 'dbl',
+                                 'DateTime': 'date',
+                                 'Array': 'arr',
+                                 'List': 'lst',
+                                 'Dictionary': 'dic',
+                                 'Exception': 'ept',
+                                 'QueueItem': 'qi'}
+
+        # check camel case naming for everything right of the '_'
+        # For everything right of "_" apply:
+        # 	First character may not be upper
+        # 	If > 2 upper case character
+        #     Any upper case may be not be next to another upper case
+        for j in df_variable['variableName']:
+            print(j, file=sys.stderr)
+
+            # if it contains a "_", split on it and extract everything after
+            if "_" in j:
+                afterUnderscoreString = j.split('_')[1]
+                print(afterUnderscoreString, file=sys.stderr)
+
+                # first char must not be upper
+                if afterUnderscoreString[0].isupper():
+                    return False
+
+                # uppercase letters must not be next to each other
+                counter = 0
+                previousLetterUpper = False
+                while counter < len(afterUnderscoreString):
+                    currentLetterUpper = afterUnderscoreString[counter].isupper()
+                    if previousLetterUpper & currentLetterUpper:
+                        return False
+                    else:
+                        previousLetterUpper = currentLetterUpper
+                        currentLetterUpper = False
+                    #print(afterUnderscoreString[counter] + " " + afterUnderscoreString[counter - 1], file=sys.stderr)
+                    counter = counter + 1
             return True
-        elif (not df_variable_row['variableType']
-              in dic_type_abbreviation.keys()) and ('_' in df_variable_row['variableName']):
+
+        #always
+        #print("hello", file=sys.stderr)
+
+        # variable type is in dict above and format matches ['abbreviation''_''anything'] i.e.(int_counter, str_thing)
+        if (df_variable_row['variableType'] in dic_type_abbreviation.keys()) and \
+                (df_variable_row['variableName'].startswith(dic_type_abbreviation[df_variable_row['variableType']] + '_')):
+            return True
+        # variable type is not in above dict but format still matches ['abbreviation''_''anything']
+        elif (not df_variable_row['variableType'] in dic_type_abbreviation.keys()) and \
+                ('_' in df_variable_row['variableName']):
             ind = 0
             abb = True
             for j in df_variable_row['variableName'].split('_')[0]:
-                if (j in df_variable_row[df_variable_row['variableName']]) \
-                        and (df_variable_row[df_variable_row['variableName']].find(j) <= ind):
+                if (j in df_variable_row[df_variable_row['variableName']]) and \
+                        (df_variable_row[df_variable_row['variableName']].find(j) <= ind):
                     abb = (abb and True)
                 else:
                     abb = (abb and False)
+
                 ind = df_variable_row[df_variable_row['variableName']].find(j)
                 return abb
         else:
             return False
 
-    df_variable['properNamed'] = df_variable.apply(
-        ProperVariableNaming, axis=1)
+    df_variable['properNamed'] = df_variable.apply(ProperVariableNaming, axis=1)
 
     # return lists
-    improperNamedVariable = list(
-        df_variable.loc[df_variable.properNamed == False].variableName)
-    unusedVariable = list(
-        df_variable.loc[df_variable['count'] == 1].variableName)
-    variableUsageScore = len(
-        df_variable.loc[df_variable['count'] > 1]['count']) / numVariables * 100
-    variableNamingScore = len(
-        df_variable.loc[df_variable.properNamed == True].variableName) / numVariables * 100
+    improperNamedVariable = list(df_variable.loc[df_variable.properNamed == False].variableName)
+    unusedVariable = list(df_variable.loc[df_variable['count'] == 1].variableName)
+    variableUsageScore = len(df_variable.loc[df_variable['count'] > 1]['count']) / numVariables * 100
+    variableNamingScore = len(df_variable.loc[df_variable.properNamed == True].variableName) / numVariables * 100
 
     return [variableNamingScore, variableUsageScore, improperNamedVariable, unusedVariable]
 
@@ -225,6 +267,16 @@ def allowed_file(filename):
 @app.route("/uploader", methods=['GET', 'POST'])
 def handle_upload():
     if request.method == 'POST':
+        # clear out content in file folder
+        for r, d, f in os.walk(app.config['UPLOAD_PATH'].strip("/")):
+            for file in f:
+                os.remove((os.getcwd() + "/" + r + "/" + file).replace("\\", "/"))
+        folders = []
+        for r, d, f in os.walk(app.config['UPLOAD_PATH'].strip("/")):
+            folders = [(os.getcwd() + "/" + r).replace("\\", "/")] + folders
+        folders = folders[:-1]
+        for folder in folders:
+            os.rmdir(folder)
         # check if the post request has the file part
         if 'file' not in request.files:
             return "You must pick a file! Use your browser's back button and try again."
@@ -233,16 +285,23 @@ def handle_upload():
         # submit an empty part without filename
         if file.filename == '':
             return('No selected file')
-        if file and allowed_file(file.filename):
+        if not allowed_file(file.filename):
+            with app.app_context():
+                return render_template("wrongFile.html")
+        elif file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             print(os.path)
             filename = filename.replace("\\", "/")
 
             # top will run locally (saving to michael's computer), bottom will run on Azure (linux)
             if __name__ == "__main__":
-                file.save("C:/Users/Michael/Documents/sleipnir" + app.config['UPLOAD_PATH'] + filename)
+                file.save((os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\", "/"))
+                zipFile = zipfile.ZipFile((os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\","/"))
+                zipFile.extractall((os.getcwd() + app.config['UPLOAD_PATH']).replace("\\", "/"))
             else:
                 file.save("/home/site/wwwroot" + app.config['UPLOAD_PATH'] + filename)
+                zipFile = zipfile.ZipFile("/home/site/wwwroot" + app.config['UPLOAD_PATH'] + filename)
+                zipFile.extractall("/home/site/wwwroot" + app.config['UPLOAD_PATH'])
             return redirect("/analyze")
 
 
@@ -267,14 +326,10 @@ def __main__():
                 files.append(os.path.join(r, file))
 
     # dataframe initiation
-    df_variable = pd.DataFrame(columns=['variableType', 'variableName',
-                                        'count', 'filePath'])
-    df_argument = pd.DataFrame(columns=['argumentName', 'argumentType',
-                                        'filePath'])
-    df_activity = pd.DataFrame(columns=['activityName', 'activityType',
-                                        'filePath'])
-    df_catches = pd.DataFrame(columns=['Catch Id', 'Screenshot Included',
-                                       'filePath', 'Log Message Included'])
+    df_variable = pd.DataFrame(columns=['variableType', 'variableName', 'count', 'filePath'])
+    df_argument = pd.DataFrame(columns=['argumentName', 'argumentType', 'filePath'])
+    df_activity = pd.DataFrame(columns=['activityName', 'activityType', 'filePath'])
+    df_catches = pd.DataFrame(columns=['Catch Id', 'Screenshot Included', 'filePath', 'Log Message Included'])
     df_annotation = pd.DataFrame(columns=['workflowName', 'filePath'])
     # end dataframe initiation
 
@@ -291,6 +346,8 @@ def __main__():
         fileCount += 1
 
         # variables dataframe
+
+        # Variables as arguments or Try/Catch elements
         with open(filePath, encoding='utf-8', mode='r') as f:
             for line in f:
                 if line.strip(" ").startswith('<Variable x:'):
@@ -303,12 +360,23 @@ def __main__():
                         dataType = 'Array'
                     if (filePath not in list(df_variable[df_variable.variableName
                                                          == variableName].filePath)):
-                        df_variable = df_variable.append({'variableType': dataType,
-                                                          'variableName':
-                                                              variableName,
-                                                          'count': 1,
-                                                          'filePath': filePath},
-                                                         ignore_index=True)
+                        df_variable = df_variable.append({'variableType': dataType, 'variableName':variableName,
+                                                          'count': 1, 'filePath': filePath}, ignore_index=True)
+
+        # Property Names for assigned variables
+        with open(filePath, encoding='utf-8', mode='r') as f:
+            for line in f:
+                if line.strip(" ").startswith('<x:Property Name'):
+                    variableName = untangle.parse(line.strip(" ")).children[0]['Name']
+                    dataType = untangle.parse(line.strip(" ")).children[0]['Type'].split(":")[1].split(")")[0]
+
+                    if '[]' in dataType:
+                        dataType = 'Array'
+                    if (filePath not in list(df_variable[df_variable.variableName == variableName].filePath)):
+                        df_variable = df_variable.append({'variableType': dataType, 'variableName':variableName,
+                                                          'count': 1, 'filePath': filePath}, ignore_index=True)
+                        print(str(df_variable))
+
         with open(filePath, encoding='utf-8', mode='r') as f:
             for line in f:
                 for index, row in df_variable.iterrows():
@@ -446,14 +514,11 @@ def __main__():
     # end annotation dataframe
 
     # check variable naming convention
-    [variableNamingScore, variableUsageScore, improperNamedVariable,
-        unusedVariable] = CheckVariableName(df_variable)
+    [variableNamingScore, variableUsageScore, improperNamedVariable,unusedVariable] = CheckVariableName(df_variable)
     # check argument in/out
-    [argumentNamingScore, improperNamedArguments] = checkArgumentName(
-        df_argument)
+    [argumentNamingScore, improperNamedArguments] = checkArgumentName(df_argument)
     # check activity names
-    [activityNamingScore, improperNamedActivities] = ActivityNamingCheck(
-        df_activity)
+    [activityNamingScore, improperNamedActivities] = ActivityNamingCheck(df_activity)
     # screenshot in try/catch block
     [screenshotScore, noSsException] = CheckSsinTC(df_catches)
     # log message in try/catch block
@@ -480,45 +545,6 @@ def __main__():
     notAnnotWf = str(notAnnotatedWf).replace(
         "'", "") if completeProject else "The file you uploaded is not completed."
     noLMExp = str(noLMException).replace("'", "")
-
-    # previous hard coded result messages, probably dont need delete eventually
-    # if ((len(improperNamedVariable) != 0) or (len(unusedVariable) != 0) or
-    #     (len(improperNamedArguments) != 0) or (len(improperNamedActivities) != 0)
-    #     or (len(noSsException) != 0)):
-    #     print("Result Explanation\n\n")
-    # if (len(improperNamedVariable) != 0):
-    #     print("A proper variable name should start with an abbreviation of " +
-    #           "data type, following by a hyphen to data name. Variables that" +
-    #           " are not properly named includes: \n")
-    #     print(improperNamedVariable)
-    #     print('-'*110)
-
-    # if (len(unusedVariable) != 0):
-    #     print("An unused variable should be deleted. Variables that are" +
-    #           " declared but not used includes: \n")
-    #     print(unusedVariable)
-    #     print('-'*110)
-
-    # if (len(improperNamedArguments) != 0):
-    #     print("A proper argument name should starts 'in_', 'out_', or" +
-    #           " 'io_' to annotate the argument's property. Arguments that are" +
-    #           " not properly named includes: \n")
-    #     print(improperNamedArguments)
-    #     print('-'*110)
-
-    # if (len(improperNamedActivities) != 0):
-    #     print("An activity should not use its default name. Activities that" +
-    #           " are not properly named includes: \n")
-    #     print(improperNamedActivities)
-    #     print('-'*110)
-
-    # if (len(noSsException) != 0):
-    #     return_string = "An exception should always be recorded by a scree-nshot activityd. " \
-    #             "Exceptions that are not handled by screenshot includes: \n" + str(noSsException)
-    #     print(return_string)
-    # return return_stringssss
-    # with app.app_context():
-    #app.redirect("/something")
     with app.app_context():
         return render_template('index.html',
                                improperNamedVar=improperNamedVar,
@@ -534,3 +560,5 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 __main__()
+#upload()
+
