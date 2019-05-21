@@ -3,6 +3,7 @@ from builtins import len, open, list
 import pandas as pd
 import untangle
 import re
+import sys
 import matplotlib.pyplot as plt
 #from werkzeug import secure_filename
 import zipfile
@@ -22,7 +23,9 @@ app.config['ALLOWED_EXTENSIONS'] = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif
 def CheckVariableName(df_variable):
     numVariables = len(df_variable.variableName)
 
-    # check if variable name is proper in df_variable
+    print("[DEBUG MESSAGE] - length of df_variable: " + str(numVariables), file=sys.stderr)
+
+    # check if variable name is proper in df_variable ['variableType', 'variableName', 'count', 'filePath']
     def ProperVariableNaming(df_variable_row):
         dic_type_abbreviation = {'String': 'str',
                                  'Int32': 'int',
@@ -41,10 +44,12 @@ def CheckVariableName(df_variable):
         # 	If > 2 upper case character
         #     Any upper case may be not be next to another upper case
         for j in df_variable['variableName']:
+            print(j, file=sys.stderr)
+
             # if it contains a "_", split on it and extract everything after
             if "_" in j:
                 afterUnderscoreString = j.split('_')[1]
-                #print(afterUnderscoreString,file=sys.stderr)
+                print(afterUnderscoreString, file=sys.stderr)
 
                 # first char must not be upper
                 if afterUnderscoreString[0].isupper():
@@ -60,7 +65,7 @@ def CheckVariableName(df_variable):
                     else:
                         previousLetterUpper = currentLetterUpper
                         currentLetterUpper = False
-                    # print(afterUnderscoreString[counter] + " " + afterUnderscoreString[counter - 1], file=sys.stderr)
+                    #print(afterUnderscoreString[counter] + " " + afterUnderscoreString[counter - 1], file=sys.stderr)
                     counter = counter + 1
             return True
 
@@ -320,14 +325,10 @@ def __main__():
                 files.append(os.path.join(r, file))
 
     # dataframe initiation
-    df_variable = pd.DataFrame(columns=['variableType', 'variableName',
-                                        'count', 'filePath'])
-    df_argument = pd.DataFrame(columns=['argumentName', 'argumentType',
-                                        'filePath'])
-    df_activity = pd.DataFrame(columns=['activityName', 'activityType',
-                                        'filePath'])
-    df_catches = pd.DataFrame(columns=['Catch Id', 'Screenshot Included',
-                                       'filePath', 'Log Message Included'])
+    df_variable = pd.DataFrame(columns=['variableType', 'variableName', 'count', 'filePath'])
+    df_argument = pd.DataFrame(columns=['argumentName', 'argumentType', 'filePath'])
+    df_activity = pd.DataFrame(columns=['activityName', 'activityType', 'filePath'])
+    df_catches = pd.DataFrame(columns=['Catch Id', 'Screenshot Included', 'filePath', 'Log Message Included'])
     df_annotation = pd.DataFrame(columns=['workflowName', 'filePath'])
     # end dataframe initiation
 
@@ -344,6 +345,8 @@ def __main__():
         fileCount += 1
 
         # variables dataframe
+
+        # Variables as arguments or Try/Catch elements
         with open(filePath, encoding='utf-8', mode='r') as f:
             for line in f:
                 if line.strip(" ").startswith('<Variable x:'):
@@ -356,12 +359,23 @@ def __main__():
                         dataType = 'Array'
                     if (filePath not in list(df_variable[df_variable.variableName
                                                          == variableName].filePath)):
-                        df_variable = df_variable.append({'variableType': dataType,
-                                                          'variableName':
-                                                              variableName,
-                                                          'count': 1,
-                                                          'filePath': filePath},
-                                                         ignore_index=True)
+                        df_variable = df_variable.append({'variableType': dataType, 'variableName':variableName,
+                                                          'count': 1, 'filePath': filePath}, ignore_index=True)
+
+        # Property Names for assigned variables
+        with open(filePath, encoding='utf-8', mode='r') as f:
+            for line in f:
+                if line.strip(" ").startswith('<x:Property Name'):
+                    variableName = untangle.parse(line.strip(" ")).children[0]['Name']
+                    dataType = untangle.parse(line.strip(" ")).children[0]['Type'].split(":")[1].split(")")[0]
+
+                    if '[]' in dataType:
+                        dataType = 'Array'
+                    if (filePath not in list(df_variable[df_variable.variableName == variableName].filePath)):
+                        df_variable = df_variable.append({'variableType': dataType, 'variableName':variableName,
+                                                          'count': 1, 'filePath': filePath}, ignore_index=True)
+                        print(str(df_variable))
+
         with open(filePath, encoding='utf-8', mode='r') as f:
             for line in f:
                 for index, row in df_variable.iterrows():
