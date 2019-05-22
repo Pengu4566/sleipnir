@@ -32,10 +32,8 @@ def populate_variables_dataframe(filePath):
                     row['count'] += 1
 
     return df_variable
-    # end variables dataframe
 
 
-# grade variable's naming conventions
 def grade_variable_name(df_variable):
     numVariables = len(df_variable.variableName)
 
@@ -54,9 +52,9 @@ def grade_variable_name(df_variable):
                                  'Exception': 'ept',
                                  'QueueItem': 'qi'}
 
-        # checks if df_variable length is zero and returns false if true
+        # checks if df_variable length is zero and returns zeros for all scores
         if len(df_variable) == 0:
-            return False
+            return [0, 0, 0, 0]
 
         # check camel case naming for everything right of the '_'
         # For everything right of "_" apply:

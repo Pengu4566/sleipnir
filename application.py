@@ -137,12 +137,6 @@ def __main__():
             if '.xaml' in file:
                 files.append(os.path.join(r, file))
 
-    # dataframe initiation
-    df_activity = pd.DataFrame(columns=['activityName', 'activityType', 'filePath'])
-    df_catches = pd.DataFrame(columns=['Catch Id', 'Screenshot Included', 'filePath', 'Log Message Included'])
-    df_annotation = pd.DataFrame(columns=['workflowName', 'filePath'])
-    # end dataframe initiation
-
     fileCount = 1
     numFiles = len(files)
 
@@ -159,32 +153,32 @@ def __main__():
         # populate dataframes
         df_variable = variable_naming.populate_variables_dataframe(filePath)
         df_argument = arguments_io.populate_args_dataframe(filePath)
-        # df_activity = activity_naming.populate_activity_dataframe()
-        # try/catch populating (2)
-        # df_annotation = workflow_annotation.populate_workflow_annotation_dataframe()
-
-        print(str(df_argument), file=sys.stderr)
+        df_activity = activity_naming.populate_activity_dataframe(filePath)
+        df_trycatch = try_catch.populate_try_catch_dataframe(filePath)
+        [df_annotation, completeProject] = workflow_annotation.populate_workflow_annotation_dataframe(filePath)
 
     # grade variable naming convention
-    [variableNamingScore, variableUsageScore, improperNamedVariable,unusedVariable] = \
+    [variableNamingScore, variableUsageScore, improperNamedVariable, unusedVariable] = \
         variable_naming.grade_variable_name(df_variable)
 
     # grade argument in/out
     [argumentNamingScore, improperNamedArguments] = arguments_io.grade_arguments_io(df_argument)
 
     # grade activity names
-    #[activityNamingScore, improperNamedActivities] = activity_naming.activity_naming_check(df_activity)
+    [activityNamingScore, improperNamedActivities] = activity_naming.grade_activity_naming(df_activity)
 
     # screenshot in try/catch block
-    #[screenshotScore, noSsException] = CheckSsinTC(df_catches)
+    [screenshotScore, noSsException] = try_catch.grade_screenshot_in_trycatch(df_trycatch)
     # log message in try/catch block
-    #[logMessageScore, noLMException] = CheckLMinTC(df_catches)
+    [logMessageScore, noLMException] = try_catch.grade_log_message_in_trycatch(df_trycatch)
 
     # workflow annotation
-    #if completeProject:
-    #    [wfAnnotationScore, notAnnotatedWf] = checkWfAnnotation(df_annotation)
-    #else:
-    #    [wfAnnotationScore, notAnnotatedWf] = [0, []]
+    if completeProject:
+        [wfAnnotationScore, notAnnotatedWf] = workflow_annotation.grade_workflow_annotation(df_annotation)
+    else:
+        [wfAnnotationScore, notAnnotatedWf] = [0, []]
+
+    print(str(variableNamingScore), str(variableUsageScore), file=sys.stderr)
 
     radarPlot(variableNamingScore=variableNamingScore,
               variableUsageScore=variableUsageScore,
@@ -199,8 +193,7 @@ def __main__():
     improperNamedArg = str(improperNamedArguments).replace("'", "")
     improperNamedAct = str(improperNamedActivities).replace("'", "")
     noSsExp = str(noSsException).replace("'", "")
-    notAnnotWf = str(notAnnotatedWf).replace(
-        "'", "") if completeProject else "The file you uploaded is not completed."
+    notAnnotWf = str(notAnnotatedWf).replace("'", "") if completeProject else "The file you uploaded is not completed."
     noLMExp = str(noLMException).replace("'", "")
 
 
