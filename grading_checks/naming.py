@@ -3,18 +3,6 @@
 # 2. argument naming
 # 3. activity naming
 
-# package import
-import os
-from builtins import len, open, list
-import pandas as pd
-import untangle
-import re
-import matplotlib.pyplot as plt
-import zipfile
-from math import pi
-from werkzeug.utils import secure_filename
-# end package import
-
 # 1. variable naming: camelcase, abbreviation ahead of name
 
 def grade_variable_name(df_variable):
@@ -96,7 +84,7 @@ def grade_variable_name(df_variable):
 # end 1. variable naming
 
 
-# 2. argument naming: in/out/io, abbreviation
+# 2. argument naming: in/out/io, abbreviation, camel case
 
 def grade_argument_name(df_argument):
     numArgument = len(df_argument) / 100
@@ -124,19 +112,40 @@ def grade_argument_name(df_argument):
                                      'Exception': 'ept',
                                      'QueueItem': 'qi'}
             if (len(df_argument_row['argumentName']) -
-                len(df_argument_row['argumentName'].replace("_",""))) >= 2:
+                len(df_argument_row['argumentName'].replace("_", ""))) >= 2:
                 substring = df_argument_row['argumentName'].split("_")[1]
                 if (df_argument_row['dataType'] in dic_type_abbreviation.keys()) and \
                         (substring == dic_type_abbreviation[df_argument_row['dataType']]):
                     return True
-                # variable type is not in above dict but format still matches ['abbreviation''_''anything']
+                # argument type is not in above dict but format still matches ['abbreviation''_''anything']
                 elif df_argument_row['dataType'] not in dic_type_abbreviation.keys():
                     dataType = df_argument_row['dataType']
                     for j in substring:
                         if j not in dataType:
                             return False
                         dataType = dataType[(dataType.find(j)+1):]
-                    return True
+                    # check camelcase
+                    sublist = df_argument_row['argumentName'].split("_")[2:]
+                    substring = ''
+                    for i in sublist:
+                        substring += i
+
+                    # first char must not be upper
+                    if substring[0].isupper():
+                        return False
+                    else:
+                        # Any upper case may be not be next to another upper case
+                        previousLetterUpper = False
+                        for i in substring[1:]:
+                            currentLetterUpper = i.isupper()
+                            if currentLetterUpper and (not previousLetterUpper):
+                                previousLetterUpper = True
+                            elif (not currentLetterUpper):
+                                previousLetterUpper = False
+                            elif currentLetterUpper and previousLetterUpper:
+                                return False
+                        return True
+                    # end check camel case
                 else:
                     return False
             else:

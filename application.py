@@ -9,7 +9,7 @@ from dataframes import variable_dataframe, argument_dataframe, activity_datafram
 #functions
 from charts import radar_plot
 from grading_checks import naming, usage, documentation_logging, error_handling
-from soft_checks import activity_stats, project_folder_structure
+from soft_checks import activity_stats, project_folder_structure, project_structure
 
 from flask import Flask, request, render_template, redirect, url_for
 app = Flask(__name__, static_folder='./static/dist', template_folder="./static")
@@ -90,7 +90,7 @@ def __main__():
     df_argument = pd.DataFrame(columns=['argumentName', 'argumentType', 'filePath', 'dataType', 'count'])
     df_activity = pd.DataFrame(columns=['activityName', 'activityType', 'filePath'])
     df_catches = pd.DataFrame(columns=['Catch Id', 'Screenshot Included', 'filePath', 'Log Message Included'])
-    df_annotation = pd.DataFrame(columns=['workflowName', 'filePath'])
+    df_annotation = pd.DataFrame(columns=['workflowName', 'invokedBy'])
     # end dataframe initiation
 
     fileCount = 1
@@ -117,6 +117,7 @@ def __main__():
         df_annotation = annotation_dataframe.populate_annotation_dataframe(df_annotation=df_annotation, filePath=filePath)
 
     # level 1: grading checks
+
     # level 2: name
     # level 3: variable naming
     [variableNamingScore, improperNamedVariable] = naming.grade_variable_name(df_variable)
@@ -124,11 +125,17 @@ def __main__():
     [argumentNamingScore, improperNamedArguments] = naming.grade_argument_name(df_argument)
     # level 3: activity naming
     [activityNamingScore, improperNamedActivities] = naming.grade_activity_name(df_activity)
+    # level 2: naming score
+    namingScore = (variableNamingScore + argumentNamingScore + activityNamingScore)/2
+
     # level 2: usage
     # level 3: variable usage
     [variableUsageScore, unusedVariable] = usage.grade_variable_usage(df_variable)
     # level 3: argument usage
     [argumentUsageScore, unusedArgument] = usage.grade_argument_usage(df_argument)
+    # level 2: usage score
+    usageScore = (variableUsageScore + argumentUsageScore)/2
+
     # level 2: documentation_logging
     # level 3: workflow annotation
     [wfAnnotationScore, notAnnotatedWf] = documentation_logging.grade_annotation_in_workflow(df_annotation=df_annotation)
@@ -136,6 +143,13 @@ def __main__():
     [logMessageScore, noLMException] = documentation_logging.grade_log_message_in_catches(df_catches=df_catches)
     # level 3: screenshot in catches
     [screenshotScore, noSsException] = documentation_logging.grade_screenshot_in_catches(df_catches=df_catches)
+    # level 2: documentation_logging score
+    docScore = (wfAnnotationScore + logMessageScore + screenshotScore)/3
+
+    # establish score list and name list
+    lst_score = [namingScore, usageScore, docScore]
+    lst_tolerance = [90, 90, 100]
+    lst_checkName = ['Naming', 'Usage', 'Documentation']
 
 
     # level 1: soft checks
@@ -146,16 +160,11 @@ def __main__():
         folderStructure = project_folder_structure.list_files(os.getcwd() + app.config['UPLOAD_PATH'])
     else:
         folderStructure = project_folder_structure.list_files("/home/site/wwwroot" + app.config['UPLOAD_PATH'])
+    # level 2: project structure
+    project_structure.get_project_structure(df_annotation)
 
     # radar plot
-    radar_plot.radarPlot(variableNamingScore=variableNamingScore,
-                         variableUsageScore=variableUsageScore,
-                         argumentNamingScore=argumentNamingScore,
-                         argumentUsageScore=argumentUsageScore,
-                         activityNamingScore=activityNamingScore,
-                         wfAnnotationScore=wfAnnotationScore,
-                         screenshotScore=screenshotScore,
-                         logMessageScore=logMessageScore)
+    radar_plot.radarPlot(lst_score=lst_score, lst_tolerance=lst_tolerance, lst_checkName=lst_checkName)
 
     improperNamedVar = str(improperNamedVariable).replace("'", "")
     unusedVar = str(unusedVariable).replace("'", "")

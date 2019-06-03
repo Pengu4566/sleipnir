@@ -3,20 +3,12 @@ from math import pi
 import matplotlib.pyplot as plt
 
 # radar chart
-def radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore, argumentUsageScore,
-              activityNamingScore, screenshotScore, wfAnnotationScore, logMessageScore):
+def radarPlot(lst_score, lst_tolerance, lst_checkName):
     # Set data
-    df = pd.DataFrame({
-        'group': ['Score', 'tolerance'],
-        'Variable Naming': [variableNamingScore, 90],
-        'Variable Usage': [variableUsageScore, 100],
-        'Argument Naming': [argumentNamingScore, 90],
-        'Argument Usage': [argumentUsageScore, 100],
-        'Activity Naming': [activityNamingScore, 100],
-        'Exception Screenshot': [screenshotScore, 100],
-        'Exception Log Message': [logMessageScore, 100],
-        'Workflow Annotation': [wfAnnotationScore, 100]
-    })
+    dict = {'group': ['Score', 'tolerance']}
+    for i in range(len(lst_score)):
+        dict[lst_checkName[i]] = [lst_score[i], lst_tolerance[i]]
+    df = pd.DataFrame(dict)
 
     categories = list(df)[1:]
     N = len(categories)
@@ -32,7 +24,7 @@ def radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore, argu
     # Actual
     values = df.loc[0].drop('group').values.flatten().tolist()
     values += values[:1]
-    ax.plot(angles, values, linewidth=0, linestyle='solid', label="group A")
+    ax.plot(angles, values, linewidth=1, linestyle='solid', label="group A")
     # for i, v in enumerate(values):
     #     ax.text(i, v, "%d" % v, fontsize=12)
     ax.fill(angles, values, 'b', alpha=0.1)
