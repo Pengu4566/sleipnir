@@ -80,3 +80,7 @@ def grade_annotation_in_workflow(df_annotation):
     return [wfAnnotationScore, notAnnotatedWf]
 
 # end 5. Annotations in invoked workflow
+
+# 6.Arguments should be at least mentioned in annotation
+def grade_annotation_contains_args():
+    
