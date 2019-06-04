@@ -12,6 +12,16 @@ export default class ImproperNamedVarBlock extends React.Component {
           </p>
         </div>
       );
+    } else if (this.props.name == "[There is no variable in your project.]") {
+      return (
+        <div>
+          <p>There is no variable in your project.</p>
+          <p>
+            {" "}
+            --------------------------------------------------------------------------------------------------------------{" "}
+          </p>
+        </div>
+      );
     } else {
       return (
         <div>

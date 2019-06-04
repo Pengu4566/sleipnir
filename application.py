@@ -1,14 +1,15 @@
 import os
-from builtins import len, open, list
 import pandas as pd
-import untangle
-import re
-import sys
-import matplotlib.pyplot as plt
-#from werkzeug import secure_filename
 import zipfile
-from math import pi
-from werkzeug.utils import secure_filename\
+from werkzeug.utils import secure_filename
+
+# dataframes
+from dataframes import variable_dataframe, argument_dataframe, activity_dataframe, catch_dataframe, annotation_dataframe
+
+#functions
+from charts import radar_plot
+from grading_checks import naming, usage, documentation_logging, error_handling
+from soft_checks import activity_stats, project_folder_structure, project_structure
 
 from flask import Flask, request, render_template, redirect, url_for
 app = Flask(__name__, static_folder='./static/dist', template_folder="./static")
@@ -17,250 +18,13 @@ app = Flask(__name__, static_folder='./static/dist', template_folder="./static")
 app.config["CACHE_TYPE"] = "null"
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['UPLOAD_PATH'] = '/file/'
-app.config['ALLOWED_EXTENSIONS'] = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'xaml', 'zip'])
-
-# check variable's naming conventions
-def CheckVariableName(df_variable):
-    numVariables = len(df_variable.variableName)
-
-    print("[DEBUG MESSAGE] - length of df_variable: " + str(numVariables), file=sys.stderr)
-
-    # check if variable name is proper in df_variable ['variableType', 'variableName', 'count', 'filePath']
-    def ProperVariableNaming(df_variable_row):
-        dic_type_abbreviation = {'String': 'str',
-                                 'Int32': 'int',
-                                 'DataColumn': 'dclm',
-                                 'Double': 'dbl',
-                                 'DateTime': 'date',
-                                 'Array': 'arr',
-                                 'List': 'lst',
-                                 'Dictionary': 'dic',
-                                 'Exception': 'ept',
-                                 'QueueItem': 'qi'}
-
-        # check camel case naming for everything right of the '_'
-        # For everything right of "_" apply:
-        # 	First character may not be upper
-        # 	If > 2 upper case character
-        #     Any upper case may be not be next to another upper case
-        for j in df_variable['variableName']:
-            print(j, file=sys.stderr)
-
-            # if it contains a "_", split on it and extract everything after
-            if "_" in j:
-                afterUnderscoreString = j.split('_')[1]
-                print(afterUnderscoreString, file=sys.stderr)
-
-                # first char must not be upper
-                if afterUnderscoreString[0].isupper():
-                    return False
-
-                # uppercase letters must not be next to each other
-                counter = 0
-                previousLetterUpper = False
-                while counter < len(afterUnderscoreString):
-                    currentLetterUpper = afterUnderscoreString[counter].isupper()
-                    if previousLetterUpper & currentLetterUpper:
-                        return False
-                    else:
-                        previousLetterUpper = currentLetterUpper
-                        currentLetterUpper = False
-                    #print(afterUnderscoreString[counter] + " " + afterUnderscoreString[counter - 1], file=sys.stderr)
-                    counter = counter + 1
-            return True
-
-        #always
-        #print("hello", file=sys.stderr)
-
-        # variable type is in dict above and format matches ['abbreviation''_''anything'] i.e.(int_counter, str_thing)
-        if (df_variable_row['variableType'] in dic_type_abbreviation.keys()) and \
-                (df_variable_row['variableName'].startswith(dic_type_abbreviation[df_variable_row['variableType']] + '_')):
-            return True
-        # variable type is not in above dict but format still matches ['abbreviation''_''anything']
-        elif (not df_variable_row['variableType'] in dic_type_abbreviation.keys()) and \
-                ('_' in df_variable_row['variableName']):
-            ind = 0
-            abb = True
-            for j in df_variable_row['variableName'].split('_')[0]:
-                if (j in df_variable_row[df_variable_row['variableName']]) and \
-                        (df_variable_row[df_variable_row['variableName']].find(j) <= ind):
-                    abb = (abb and True)
-                else:
-                    abb = (abb and False)
-
-                ind = df_variable_row[df_variable_row['variableName']].find(j)
-                return abb
-        else:
-            return False
-
-    df_variable['properNamed'] = df_variable.apply(ProperVariableNaming, axis=1)
-
-    # return lists
-    improperNamedVariable = list(df_variable.loc[df_variable.properNamed == False].variableName)
-    unusedVariable = list(df_variable.loc[df_variable['count'] == 1].variableName)
-    variableUsageScore = len(df_variable.loc[df_variable['count'] > 1]['count']) / numVariables * 100
-    variableNamingScore = len(df_variable.loc[df_variable.properNamed == True].variableName) / numVariables * 100
-
-    return [variableNamingScore, variableUsageScore, improperNamedVariable, unusedVariable]
-
-
-# check argument in/out
-def checkArgumentName(df_argument):
-    numArgument = len(df_argument) / 100
-
-    # check if argument name is proper in df_argument
-    def proper(df_argument_row):
-        if (df_argument_row['argumentType'] == 'InArgument') and \
-                (df_argument_row['argumentName'].startswith('in_')):
-            return True
-        elif (df_argument_row['argumentType'] == 'OutArgument') and \
-                (df_argument_row['argumentName'].startswith('out_')):
-            return True
-        elif (df_argument_row['argumentType'] == 'InOutArgument') and \
-                (df_argument_row['argumentName'].startswith('io_')):
-            return True
-        else:
-            return False
-
-    df_argument['properNamed'] = df_argument.apply(proper, axis=1)
-
-    # return lists
-    argumentNamingScore = len(
-        df_argument[df_argument['properNamed'] == True]) / numArgument
-    # improperNamedArguments = list(df_argument[df_argument['properNamed']!= True].argumentName)
-    temp_improperNamedArguments = list(
-        df_argument[df_argument['properNamed'] != True].argumentName)
-    improperNamedArguments = [
-        x for x in temp_improperNamedArguments if x is not None]
-
-    return [argumentNamingScore, improperNamedArguments]
-
-
-# end check argument in/out
-
-# activity naming
-def ActivityNamingCheck(df_activity):
-    # return listss
-    df_activity['customizedName'] = (
-        df_activity['activityName'] != df_activity['activityType'])
-    activityNamingScore = len(df_activity[df_activity['customizedName'] == True].customizedName) / len(
-        df_activity.customizedName) * 100
-    improperNamedActivities = list(
-        df_activity[df_activity['customizedName'] != True].activityName)
-
-    return [activityNamingScore, improperNamedActivities]
-
-
-# end activity naming
-
-# screenshot in try catch block
-def CheckSsinTC(df_catches):
-    # checks if try/catch activities have screenshots within them
-    if True in df_catches.groupby(['Screenshot Included']).size().index:
-        numWSs = df_catches.groupby(['Screenshot Included']).size()[True]
-    else:
-        numWSs = 0
-
-    if False in df_catches.groupby(['Screenshot Included']).size().index:
-        noSsException = list(
-            df_catches[df_catches['Screenshot Included'] == False]['Catch Id'])
-
-    numCatch = len(df_catches['Screenshot Included'])
-
-    if numCatch == 0:
-        screenshotScore = 0
-    else:
-        screenshotScore = numWSs / numCatch * 100
-
-    return [screenshotScore, noSsException]
-
-
-# end screenshot in try catch block
-
-# check invoke workflow annotation
-def checkWfAnnotation(df_annotation):
-    numWf = len(df_annotation.workflowName)
-    notAnnotatedWf = list(
-        df_annotation[df_annotation.annotated == 0].workflowName)
-    wfAnnotationScore = 100 - (len(notAnnotatedWf) / numWf * 100)
-
-    return [wfAnnotationScore, notAnnotatedWf]
-
-
-# end check invoke workflow annotation
-
-# check log message in try catch
-def CheckLMinTC(df_catches):
-    # checks if try/catch activities have log messages within them
-    if True in df_catches.groupby(['Log Message Included']).size().index:
-        numWLM = df_catches.groupby(['Log Message Included']).size()[True]
-    else:
-        numWLM = 0
-
-    if False in df_catches.groupby(['Log Message Included']).size().index:
-        noLMException = list(
-            df_catches[df_catches['Log Message Included'] == False]['Catch Id'])
-
-    numCatch = len(df_catches['Log Message Included'])
-    logMessageScore = numWLM / numCatch * 100
-
-    return [logMessageScore, noLMException]
-
-
-# end check log message in try catch
-
-# radar chart
-def radarPlot(variableNamingScore, variableUsageScore, argumentNamingScore,
-              activityNamingScore, screenshotScore, wfAnnotationScore, logMessageScore):
-    # Set data
-    df = pd.DataFrame({
-        'group': ['Score', 'tolerance'],
-        'Variable Naming': [variableNamingScore, 90],
-        'Variable Usage': [variableUsageScore, 100],
-        'Argument Naming': [argumentNamingScore, 90],
-        'Activity Naming': [activityNamingScore, 100],
-        'Exception Screenshot': [screenshotScore, 100],
-        'Exception Log Message': [logMessageScore, 100],
-        'Workflow Annotation': [wfAnnotationScore, 100]
-    })
-
-    categories = list(df)[1:]
-    N = len(categories)
-    angles = [n / float(N) * 2 * pi for n in range(N)]
-    angles += angles[:1]
-    plt.figure(figsize=(10, 10))
-    ax = plt.subplot(111, polar=True)
-    plt.xticks(angles[:-1], categories, color='Blue', size=12)
-    ax.set_rlabel_position(0)
-    plt.yticks([20, 40, 60, 80, 100], ["20", "40", "60",
-                                       "80", "100"], color="grey", size=10)
-    plt.ylim(0, 100)
-
-    # Actual
-    values = df.loc[0].drop('group').values.flatten().tolist()
-    values += values[:1]
-    ax.plot(angles, values, linewidth=0, linestyle='solid', label="group A")
-    ax.fill(angles, values, 'b', alpha=0.1)
-
-    # Tolerance
-    values = df.loc[1].drop('group').values.flatten().tolist()
-    values += values[:1]
-    ax.plot(angles, values, linewidth=1, linestyle='--', label="group B")
-
-    # finish up
-    plt.savefig('static/dist/Score.png')
-    plt.close()
-# end radar chart
-
+app.config['ALLOWED_EXTENSIONS'] = set(['zip'])
 
 
 @app.route('/')
 def upload():
-    return render_template('fileUpload.html')
-
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
+    with app.app_context():
+        return render_template('fileUpload.html')
 
 
 @app.route("/uploader", methods=['GET', 'POST'])
@@ -283,13 +47,16 @@ def handle_upload():
         # if user does not select file, browser also
         # submit an empty part without filename
         if file.filename == '':
-            return('No selected file')
+            return'No selected file'
+
+        def allowed_file(file_name):
+            return '.' in file_name and file_name.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
+
         if not allowed_file(file.filename):
             with app.app_context():
                 return render_template("wrongFile.html")
         elif file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            print(os.path)
             filename = filename.replace("\\", "/")
 
             # top will run locally (saving to michael's computer), bottom will run on Azure (linux)
@@ -306,12 +73,6 @@ def handle_upload():
 
 @app.route("/analyze")
 def __main__():
-    # testing file structure
-    # import os
-    # files = os.listdir('file')
-    # print(files)
-    # return str(files)
-
     # old local filepath
     # filePath = "file\\"
 
@@ -326,10 +87,10 @@ def __main__():
 
     # dataframe initiation
     df_variable = pd.DataFrame(columns=['variableType', 'variableName', 'count', 'filePath'])
-    df_argument = pd.DataFrame(columns=['argumentName', 'argumentType', 'filePath'])
+    df_argument = pd.DataFrame(columns=['argumentName', 'argumentType', 'filePath', 'dataType', 'count'])
     df_activity = pd.DataFrame(columns=['activityName', 'activityType', 'filePath'])
     df_catches = pd.DataFrame(columns=['Catch Id', 'Screenshot Included', 'filePath', 'Log Message Included'])
-    df_annotation = pd.DataFrame(columns=['workflowName', 'filePath'])
+    df_annotation = pd.DataFrame(columns=['workflowName', 'invokedBy'])
     # end dataframe initiation
 
     fileCount = 1
@@ -345,206 +106,76 @@ def __main__():
         fileCount += 1
 
         # variables dataframe
-
-        # Variables as arguments or Try/Catch elements
-        with open(filePath, encoding='utf-8', mode='r') as f:
-            for line in f:
-                if line.strip(" ").startswith('<Variable x:'):
-                    variableName = untangle.parse(line.strip(" ")) \
-                        .children[0]['Name']
-                    dataType = untangle.parse(line.strip(" ")) \
-                        .children[0]['x:TypeArguments'] \
-                        .split(":")[1].split("(")[0]
-                    if '[]' in dataType:
-                        dataType = 'Array'
-                    if (filePath not in list(df_variable[df_variable.variableName
-                                                         == variableName].filePath)):
-                        df_variable = df_variable.append({'variableType': dataType, 'variableName':variableName,
-                                                          'count': 1, 'filePath': filePath}, ignore_index=True)
-
-        # Property Names for assigned variables
-        with open(filePath, encoding='utf-8', mode='r') as f:
-            for line in f:
-                if line.strip(" ").startswith('<x:Property Name'):
-                    variableName = untangle.parse(line.strip(" ")).children[0]['Name']
-                    dataType = untangle.parse(line.strip(" ")).children[0]['Type'].split(":")[1].split(")")[0]
-
-                    if '[]' in dataType:
-                        dataType = 'Array'
-                    if (filePath not in list(df_variable[df_variable.variableName == variableName].filePath)):
-                        df_variable = df_variable.append({'variableType': dataType, 'variableName':variableName,
-                                                          'count': 1, 'filePath': filePath}, ignore_index=True)
-                        print(str(df_variable))
-
-        with open(filePath, encoding='utf-8', mode='r') as f:
-            for line in f:
-                for index, row in df_variable.iterrows():
-                    if (re.search(('\[.*' + row['variableName'] + '.*\]'), line) is not None) and \
-                            (filePath == row['filePath']):
-                        row['count'] += 1
-        # end variables dataframe
-
+        df_variable = variable_dataframe.populate_variables_dataframe(df_variable = df_variable, filePath = filePath)
         # argument dataframe
-        with open(filePath, encoding='utf-8', mode='r') as f:
-            printLine = False
-            style = 1
-            for line in f:
-                if 'ui:InvokeWorkflowFile.Arguments>' in line.strip(" "):
-                    printLine = not printLine
-                    style = 1
-                if printLine and \
-                        ('ui:InvokeWorkflowFile.Arguments>' not in line.strip(" ")) and \
-                        (style == 1):
-                    argumentName = untangle.parse(line.strip(" ")) \
-                        .children[0]['x:Key']
-                    argumentType = untangle.parse(line.strip(" ")) \
-                        .children[0]._name
-                    df_argument = df_argument.append({'argumentName': argumentName,
-                                                      'argumentType':
-                                                          argumentType,
-                                                      'filePath': filePath},
-                                                     ignore_index=True)
-                if ('<x:Members>' in line.strip(" ")) or \
-                        ('</x:Members>' in line.strip(" ")):
-                    printLine = not printLine
-                    style = 2
-                if printLine and \
-                        ('<x:Members>' not in line.strip(" ")) and (style == 2):
-                    argumentName = untangle.parse(line.strip(" ")) \
-                        .children[0]['Name']
-                    argumentType = untangle.parse(line.strip(" ")) \
-                        .children[0]['Type']
-                    argumentType = argumentType[:argumentType.index('(')]
-                    df_argument = df_argument.append({'argumentName': argumentName,
-                                                      'argumentType':
-                                                          argumentType,
-                                                      'filePath': filePath},
-                                                     ignore_index=True)
-        # end argument dataframe
-
+        df_argument = argument_dataframe.populate_argument_dataframe(df_argument = df_argument, filePath = filePath)
         # activity dataframe
-        with open(filePath, encoding='utf-8', mode='r') as f:
-            for line in f:
-                if 'DisplayName=' in line:
-                    name = re.search('DisplayName=\"[^\"]*\"',
-                                     line.strip(' ')) \
-                        .group(0)[len("DisplayName=\""):-1]
-                    activity = line.strip(' ').split(' ')[0].strip('<')
-                    activity = activity if 'ui:' not in activity else activity[3:]
-                    df_activity = df_activity.append({'activityName': name,
-                                                      'activityType': activity,
-                                                      'filePath': filePath},
-                                                     ignore_index=True)
-        # end activity dataframe
-
+        df_activity = activity_dataframe.populate_activity_dataframe(df_activity=df_activity, filePath=filePath)
         # try catch dataframe
-        with open(filePath, encoding='utf-8', mode='r') as f:
-            printLine = False
-            activityList = []
-            evaluate = False
-            catchId = ''
-            for line in f:
-                if line.strip(" ").startswith('<Catch x:'):
-                    activityList = []
-                    printLine = not printLine
-                    if 'sap2010:WorkflowViewState.IdRef' in line:
-                        name = re.search("sap2010:WorkflowViewState.IdRef=\"[^\"]*\"",
-                                         line.strip(" ")).group(0)
-                        catchId = name[len(
-                            "sap2010:WorkflowViewState.IdRef=\""):-1]
-                if '</Catch>' in line.strip(" "):
-                    printLine = not printLine
-                    evaluate = True
-                if printLine and (catchId == ''):
-                    if ('<sap2010:WorkflowViewState.IdRef>' in line.strip(" ")) and \
-                            ('</sap2010:WorkflowViewState.IdRef>' in line.strip(" ")) and \
-                            ('Catch`' in line.strip(" ")):
-                        catchId = re.search(
-                            "Catch[^<]*", line.strip(" ")).group(0)
-                if printLine and ('<Catch x:' not in line.strip(" ")):
-                    activityList.append(line.strip(
-                        " ").split(" ")[0].strip("<"))
-                if evaluate:
-                    evaluate = False
-                    screenshotIncluded = False
-                    logMessageIncluded = False
-                    for i in activityList:
-                        if 'ui:TakeScreenshot' == i:
-                            screenshotIncluded = True
-                        if 'ui:LogMessage' == i:
-                            logMessageIncluded = True
-                    df_catches = df_catches.append({'Catch Id': catchId,
-                                                    'Screenshot Included':
-                                                        screenshotIncluded,
-                                                    'filePath': filePath,
-                                                    'Log Message Included':
-                                                        logMessageIncluded},
-                                                   ignore_index=True)
-                    catchId = ''
-        # end try catch dataframe
-
+        df_catches = catch_dataframe.populate_catch_dataframe(df_catches=df_catches, filePath=filePath)
         # annotation dataframe
-        with open(filePath, encoding='utf-8', mode='r') as f:
-            for line in f:
-                if (line.strip(" ").startswith("<ui:InvokeWorkflowFile") and
-                        "WorkflowFileName=" in line.strip(" ")):
-                    workflowName = re.search('WorkflowFileName=\"[^\"]*\.xaml\"',
-                                             line.strip(" ")).group(0)
-                    workflowName = workflowName[(len('WorkflowFileName="')):-1]
-                    df_annotation = df_annotation.append({'workflowName':
-                                                          workflowName,
-                                                          'annotated': False},
-                                                         ignore_index=True)
-        df_annotation = df_annotation.drop_duplicates()
+        df_annotation = annotation_dataframe.populate_annotation_dataframe(df_annotation=df_annotation, filePath=filePath)
 
-    completeProject = True
-    for workflowPath in list(df_annotation['workflowName']):
-        try:
-            workflowPath = workflowPath.replace("\\", "/")
-            with open("file/" + workflowPath, encoding='utf-8', mode='r') as workflow:
-                for line in workflow:
-                    if "DisplayName=" in line:
-                        if "AnnotationText=" in line:
-                            df_annotation.loc[df_annotation.workflowName ==
-                                              workflowPath, 'annotated'] = 1
-                            break
-        except FileNotFoundError:
-            completeProject = False
-    # end annotation dataframe
+    # level 1: grading checks
 
-    # check variable naming convention
-    [variableNamingScore, variableUsageScore, improperNamedVariable,unusedVariable] = CheckVariableName(df_variable)
-    # check argument in/out
-    [argumentNamingScore, improperNamedArguments] = checkArgumentName(df_argument)
-    # check activity names
-    [activityNamingScore, improperNamedActivities] = ActivityNamingCheck(df_activity)
-    # screenshot in try/catch block
-    [screenshotScore, noSsException] = CheckSsinTC(df_catches)
-    # log message in try/catch block
-    [logMessageScore, noLMException] = CheckLMinTC(df_catches)
-    # workflow annotation
-    if completeProject:
-        [wfAnnotationScore, notAnnotatedWf] = checkWfAnnotation(df_annotation)
+    # level 2: name
+    # level 3: variable naming
+    [variableNamingScore, improperNamedVariable] = naming.grade_variable_name(df_variable)
+    # level 3: argument naming
+    [argumentNamingScore, improperNamedArguments] = naming.grade_argument_name(df_argument)
+    # level 3: activity naming
+    [activityNamingScore, improperNamedActivities] = naming.grade_activity_name(df_activity)
+    # level 2: naming score
+    namingScore = (variableNamingScore + argumentNamingScore + activityNamingScore)/2
+
+    # level 2: usage
+    # level 3: variable usage
+    [variableUsageScore, unusedVariable] = usage.grade_variable_usage(df_variable)
+    # level 3: argument usage
+    [argumentUsageScore, unusedArgument] = usage.grade_argument_usage(df_argument)
+    # level 2: usage score
+    usageScore = (variableUsageScore + argumentUsageScore)/2
+
+    # level 2: documentation_logging
+    # level 3: workflow annotation
+    [wfAnnotationScore, notAnnotatedWf] = documentation_logging.grade_annotation_in_workflow(df_annotation=df_annotation)
+    # level 3: log message in catches
+    [logMessageScore, noLMException] = documentation_logging.grade_log_message_in_catches(df_catches=df_catches)
+    # level 3: screenshot in catches
+    [screenshotScore, noSsException] = documentation_logging.grade_screenshot_in_catches(df_catches=df_catches)
+    # level 2: documentation_logging score
+    docScore = (wfAnnotationScore + logMessageScore + screenshotScore)/3
+
+    # outputs a perfentage score of the number of correct arguments and a list of missing arguments
+    [AnnotationArgumentScore, missing_arguments_list] = documentation_logging.grade_annotation_contains_arguments(df_annotation=df_annotation)
+
+    # establish score list and name list
+    lst_score = [namingScore, usageScore, docScore]
+    lst_tolerance = [90, 90, 100]
+    lst_checkName = ['Naming', 'Usage', 'Documentation']
+
+    # level 1: soft checks
+    # level 2: activity stats
+    activityStats = activity_stats.get_activity_stats(df_activity=df_activity)
+    # level 2: folder structure
+    if __name__ == "__main__":
+        folderStructure = project_folder_structure.list_files(os.getcwd() + app.config['UPLOAD_PATH'])
     else:
-        [wfAnnotationScore, notAnnotatedWf] = [0, []]
+        folderStructure = project_folder_structure.list_files("/home/site/wwwroot" + app.config['UPLOAD_PATH'])
+    # level 2: project structure
+    project_structure.get_project_structure(df_annotation)
 
-    radarPlot(variableNamingScore=variableNamingScore,
-              variableUsageScore=variableUsageScore,
-              argumentNamingScore=argumentNamingScore,
-              activityNamingScore=activityNamingScore,
-              screenshotScore=screenshotScore,
-              wfAnnotationScore=wfAnnotationScore,
-              logMessageScore=logMessageScore)
+    # radar plot
+    radar_plot.radarPlot(lst_score=lst_score, lst_tolerance=lst_tolerance, lst_checkName=lst_checkName)
 
     improperNamedVar = str(improperNamedVariable).replace("'", "")
     unusedVar = str(unusedVariable).replace("'", "")
     improperNamedArg = str(improperNamedArguments).replace("'", "")
     improperNamedAct = str(improperNamedActivities).replace("'", "")
     noSsExp = str(noSsException).replace("'", "")
-    notAnnotWf = str(notAnnotatedWf).replace(
-        "'", "") if completeProject else "The file you uploaded is not completed."
+    notAnnotWf = str(notAnnotatedWf).replace("'", "")
     noLMExp = str(noLMException).replace("'", "")
-
+    unusedArgument = str(unusedArgument).replace("'", "")
 
     with app.app_context():
         return render_template('index.html',
@@ -552,12 +183,15 @@ def __main__():
                                unusedVar=unusedVar,
                                improperNamedArg=improperNamedArg,
                                improperNamedAct=improperNamedAct,
+                               activityStats=activityStats,
                                noSsExp=noSsExp,
                                notAnnotWf=notAnnotWf,
-                               noLMExp=noLMExp)
+                               noLMExp=noLMExp,
+                               folderStructure=folderStructure,
+                               unusedArgument=unusedArgument)
+
 
 # only run when executing locally (if this doesnt run then remove the if statement)
 if __name__ == "__main__":
     app.run(debug=True)
-
-upload()
+    upload()

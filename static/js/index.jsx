@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import ImproperNamedVarBlock from "./checkBlocks/ImproperNamedVarBlock";
 import UnusedVarBlock from "./checkBlocks/UnusedVarBlock";
 import ImproperNamedArgBlock from "./checkBlocks/ImproperNamedArgBlock";
+import UnusedArgBlock from "./checkBlocks/UnusedArgBlock";
 import ImproperNamedActBlock from "./checkBlocks/ImproperNamedActBlock";
 import NoSsExpBlock from "./checkBlocks/NoSsExpBlock";
 import NotAnnotWfBlock from "./checkBlocks/NotAnnotWfBlock";
@@ -10,22 +11,27 @@ import NoLMExpBlock from "./checkBlocks/NoLMExpBlock";
 
 ReactDOM.render(
   <ImproperNamedVarBlock name={window.improperNamedVar} />,
-  document.getElementById("varname")
+  document.getElementById("VarName")
 );
 
 ReactDOM.render(
   <UnusedVarBlock name={window.unusedVar} />,
-  document.getElementById("varusage")
+  document.getElementById("VarUsage")
 );
 
 ReactDOM.render(
   <ImproperNamedArgBlock name={window.improperNamedArg} />,
-  document.getElementById("argname")
+  document.getElementById("ArgName")
+);
+
+ReactDOM.render(
+  <UnusedArgBlock name={window.unusedArg} />,
+  document.getElementById("ArgUsage")
 );
 
 ReactDOM.render(
   <ImproperNamedActBlock name={window.improperNamedAct} />,
-  document.getElementById("actname")
+  document.getElementById("ActName")
 );
 
 ReactDOM.render(
@@ -40,5 +46,5 @@ ReactDOM.render(
 
 ReactDOM.render(
   <NoLMExpBlock name={window.noLMExp} />,
-  document.getElementById("expLM")
+  document.getElementById("ExpLM")
 );
