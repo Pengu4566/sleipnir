@@ -146,11 +146,13 @@ def __main__():
     # level 2: documentation_logging score
     docScore = (wfAnnotationScore + logMessageScore + screenshotScore)/3
 
+    # outputs a perfentage score of the number of correct arguments and a list of missing arguments
+    [AnnotationArgumentScore, missing_arguments_list] = documentation_logging.grade_annotation_contains_arguments(df_annotation=df_annotation)
+
     # establish score list and name list
     lst_score = [namingScore, usageScore, docScore]
     lst_tolerance = [90, 90, 100]
     lst_checkName = ['Naming', 'Usage', 'Documentation']
-
 
     # level 1: soft checks
     # level 2: activity stats
