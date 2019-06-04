@@ -12,6 +12,16 @@ export default class ImproperNamedActBlock extends React.Component {
           </p>
         </div>
       );
+    } else if (this.props.name == "[There is no activity in your project.]") {
+      return (
+        <div>
+          <p>There is no activity in your project.</p>
+          <p>
+            {" "}
+            --------------------------------------------------------------------------------------------------------------{" "}
+          </p>
+        </div>
+      );
     } else {
       return (
         <div>

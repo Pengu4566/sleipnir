@@ -12,7 +12,7 @@ export default class NotAnnotWfBlock extends React.Component {
           </p>
         </div>
       );
-    } else if (this.props.name == "The file you uploaded is not completed.") {
+    } else if (this.props.name == "[The file you uploaded is not completed.]") {
       return (
         <div>
           <p>
@@ -20,6 +20,18 @@ export default class NotAnnotWfBlock extends React.Component {
             you uploaded is not completed, so we cannot analyze workflow
             annotation for you.
           </p>
+          <p>
+            {" "}
+            --------------------------------------------------------------------------------------------------------------{" "}
+          </p>
+        </div>
+      );
+    } else if (
+      this.props.name == "[There is no invoked workflow in your project.]"
+    ) {
+      return (
+        <div>
+          <p>There is no invoked workflow in your project.</p>
           <p>
             {" "}
             --------------------------------------------------------------------------------------------------------------{" "}

@@ -10,3 +10,5 @@ matplotlib==3.0.3
 greenlet==0.4.15
 eventlet==0.24.1
 requests==2.21.0
+treelib==1.5.5
+networkx==2.3
