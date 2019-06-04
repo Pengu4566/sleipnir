@@ -143,3 +143,9 @@ def grade_annotation_contains_arguments(df_annotation):
 
     return [AnnotationArgumentScore, missing_arguments_list]
 # end 6.Arguments should be at least mentioned in annotation
+
+# 4. Project.json (name and description)
+def comments_structure():
+
+
+# end 4. Project.json (name and description)
