@@ -59,6 +59,7 @@ def project_json_name_desc():
 
     fileName = "project.json"
     project_name = "NO PROJECT FOUND"
+    project_description = "NO DESCRIPTION FOUND"
     json_name_score = 0
     json_description_score = 0
 
@@ -66,11 +67,21 @@ def project_json_name_desc():
         if fileName in file:
             project_name = root.split("/", 1)[1]
 
-            print("file/" + project_name + "/" + fileName, file=sys.stderr)
+            # open file and collect data
+            with open("file/" + project_name + "/" + fileName, encoding='utf-8', mode='r') as project_json:
+                for line in project_json:
+                    if "\"name\":" in line:
+                        project_name = line.split(":")[1].split("\"")[1]
 
-            #with open("file/" + projectName + fileName, encoding='utf-8', mode='r') as workflow:
+                    if "\"description\":" in line:
+                        project_description = line.split(":")[1].split("\"")[1]
 
+                #print("PROJECT NAME-" + project_name, file=sys.stderr)
+                #print("PROJECT DESCRIPTION-" + project_description, file=sys.stderr)
 
+            # perform json grading checks
+            if project_description != "Blank Process":
+                json_description_score = 1
 
     return [json_name_score, json_description_score]
 # end 4. Project.json (name and description)
@@ -82,7 +93,7 @@ def grade_annotation_in_workflow(df_annotation):
     for workflowPath in list(df_annotation['workflowName']):
         try:
             workflowPath = workflowPath.replace("\\", "/")
-            print("ANNOT IN WORKFLOW - " + workflowPath, file=sys.stderr)
+            #print("ANNOT IN WORKFLOW - " + workflowPath, file=sys.stderr)
             with open("file/" + workflowPath, encoding='utf-8', mode='r') as workflow:
                 for line in workflow:
                     if "DisplayName=" in line:
