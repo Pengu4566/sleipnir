@@ -54,6 +54,26 @@ def grade_screenshot_in_catches(df_catches):
     return [screenshotScore, noSsException]
 # end 3. Screenshot in catches
 
+# 4. Project.json (name and description)
+def project_json_name_desc():
+
+    fileName = "project.json"
+    project_name = "NO PROJECT FOUND"
+    json_name_score = 0
+    json_description_score = 0
+
+    for root, dirs, file in os.walk("file/"):
+        if fileName in file:
+            project_name = root.split("/", 1)[1]
+
+            print("file/" + project_name + "/" + fileName, file=sys.stderr)
+
+            #with open("file/" + projectName + fileName, encoding='utf-8', mode='r') as workflow:
+
+
+
+    return [json_name_score, json_description_score]
+# end 4. Project.json (name and description)
 
 # 5. Annotations in invoked workflow
 def grade_annotation_in_workflow(df_annotation):
@@ -62,7 +82,7 @@ def grade_annotation_in_workflow(df_annotation):
     for workflowPath in list(df_annotation['workflowName']):
         try:
             workflowPath = workflowPath.replace("\\", "/")
-            # print("ANNOT IN WORKFLOW - " + workflowPath, file=sys.stderr)
+            print("ANNOT IN WORKFLOW - " + workflowPath, file=sys.stderr)
             with open("file/" + workflowPath, encoding='utf-8', mode='r') as workflow:
                 for line in workflow:
                     if "DisplayName=" in line:
@@ -94,10 +114,9 @@ def grade_annotation_contains_arguments(df_annotation):
     AnnotationArgumentScore = 0
 
     # get project name for accurate filepath during grading
-    fileName = "project.json"
     project_name = "NO PROJECT FOUND"
     for root, dirs, file in os.walk("file/"):
-        if fileName in file:
+        if "project.json" in file:
             project_name = root.split("/", 1)[1]
 
     for workflowPath in list(df_annotation['workflowName']):

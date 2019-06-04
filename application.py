@@ -146,8 +146,12 @@ def __main__():
     # level 2: documentation_logging score
     docScore = (wfAnnotationScore + logMessageScore + screenshotScore)/3
 
+    #7. Arguments should be at least mentioned in annotation
     # outputs a perfentage score of the number of correct arguments and a list of missing arguments
-    [AnnotationArgumentScore, missing_arguments_list] = documentation_logging.grade_annotation_contains_arguments(df_annotation=df_annotation)
+    #[AnnotationArgumentScore, missing_arguments_list] = documentation_logging.grade_annotation_contains_arguments(df_annotation=df_annotation)
+
+    #4. Project.json (name and description)
+    [json_name_score, json_description_score] = documentation_logging.project_json_name_desc()
 
     # establish score list and name list
     lst_score = [namingScore, usageScore, docScore]
