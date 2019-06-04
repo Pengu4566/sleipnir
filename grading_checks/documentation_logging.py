@@ -55,7 +55,7 @@ def grade_screenshot_in_catches(df_catches):
 # end 3. Screenshot in catches
 
 # 4. Project.json (name and description)
-def project_json_name_desc():
+def grade_project_json_name_desc():
 
     fileName = "project.json"
     project_name = "NO PROJECT FOUND"
@@ -163,7 +163,7 @@ def grade_annotation_contains_arguments(df_annotation):
             completeProject = False
 
     if completeProject:
-        # score is number of arguments in annotation out of total number of args
+        # score is number of arguments in annotation out of total number of args mobile
         if num_args_in_annotation != 0:
             AnnotationArgumentScore = (num_args_in_annotation / (len(missing_arguments_list) + num_args_in_annotation)) * 100
 
@@ -173,3 +173,33 @@ def grade_annotation_contains_arguments(df_annotation):
 
     return [AnnotationArgumentScore, missing_arguments_list]
 # end 6.Arguments should be at least mentioned in annotation
+
+
+# 7. Comments
+def grade_comments(df_annotation):
+
+    completeProject = True
+    commentsScore = 0
+
+    # get project name for accurate filepath during grading
+    comment_contents = "NO COMMENTS FOUND"
+    for root, dirs, file in os.walk("file/"):
+        if "project.json" in file:
+            project_name = root.split("/", 1)[1]
+
+    for workflowPath in list(df_annotation['workflowName']):
+        try:
+            print(workflowPath, file=sys.stderr)
+            workflowPath = workflowPath.replace("\\", "/")
+            with open("file/" + project_name + "/" + workflowPath, encoding='utf-8', mode='r') as workflow:
+                for line in workflow:
+                    if "ui:Comment" in line:
+                        print(line.split("Text=")[0], file=sys.stderr)
+
+
+        except FileNotFoundError:
+            completeProject = False
+
+    return commentsScore
+
+# end 7. Comments
