@@ -193,9 +193,11 @@ def grade_comments(df_annotation):
             workflowPath = workflowPath.replace("\\", "/")
             with open("file/" + project_name + "/" + workflowPath, encoding='utf-8', mode='r') as workflow:
                 for line in workflow:
-                    if "ui:Comment" in line:
-                        print(line.split("Text=")[0], file=sys.stderr)
-
+                    if "<ui:Comment" in line:
+                        #try:
+                            print(workflowPath, file=sys.stderr)
+                            print(line.split("Text=")[1].split("\"")[1], file=sys.stderr)
+                        #except IndexError:
 
         except FileNotFoundError:
             completeProject = False

@@ -1,0 +1,323 @@
+﻿<Activity mc:Ignorable="sap sap2010 sads" x:Class="ScrapeCandidateData"
+ xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities"
+ xmlns:s="clr-namespace:System;assembly=mscorlib"
+ xmlns:sads="http://schemas.microsoft.com/netfx/2010/xaml/activities/debugger"
+ xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation"
+ xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation"
+ xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib"
+ xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=mscorlib"
+ xmlns:sd="clr-namespace:System.Data;assembly=System.Data"
+ xmlns:ui="http://schemas.uipath.com/workflow/activities"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="chromeBrowser" Type="InArgument(ui:Browser)" />
+  </x:Members>
+  <mva:VisualBasic.Settings>
+    <x:Null />
+  </mva:VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>ScrapeCandidateData_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>System.Xml.Serialization</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System.Data.DataSetExtensions</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>System.Data.Entity</AssemblyReference>
+      <AssemblyReference>UiPath.Studio.Plugin.Workflow</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>System.ValueTuple</AssemblyReference>
+      <AssemblyReference>UiPath.Excel</AssemblyReference>
+      <AssemblyReference>UiPath.Mail</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+      <AssemblyReference>System.Runtime.WindowsRuntime</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence sap2010:WorkflowViewState.IdRef="Sequence_8">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="sd:DataTable" Default="[New System.Data.DataTable]" Name="extracted" />
+      <Variable x:TypeArguments="x:Int32" Name="counter" />
+      <Variable x:TypeArguments="s:Char[]" Name="roleDelimiters" />
+    </Sequence.Variables>
+    <Sequence sap2010:Annotation.AnnotationText="Gathers data for the first page of linkedin results and appends a csv with the results&#xA;&#xA;inputs:&#xA;UIpath.core.browser - browser variable&#xA;&#xA;outputs:&#xA;csv - candidate information" DisplayName="ScrapeCandidateData" sap2010:WorkflowViewState.IdRef="Sequence_1">
+      <Sequence DisplayName="Data Scraping" sap2010:WorkflowViewState.IdRef="Sequence_17">
+        <Sequence.Variables>
+          <Variable x:TypeArguments="scg:IEnumerable(ui:UiElement)" Name="myChildren" />
+        </Sequence.Variables>
+        <ui:BrowserScope Browser="{x:Null}" SearchScope="{x:Null}" TimeoutMS="{x:Null}" UiBrowser="{x:Null}" BrowserType="Chrome" DisplayName="Attach Browser 'oneSearch Page'" sap2010:WorkflowViewState.IdRef="BrowserScope_6" InformativeScreenshot="f2b910b06f30607674754f9f6505bbb6" Selector="&lt;html app='chrome.exe' title='&amp;quot;*&amp;quot; | Search | LinkedIn' /&gt;">
+          <ui:BrowserScope.Body>
+            <ActivityAction x:TypeArguments="x:Object">
+              <ActivityAction.Argument>
+                <DelegateInArgument x:TypeArguments="x:Object" Name="ContextTarget" />
+              </ActivityAction.Argument>
+              <Sequence DisplayName="Do" sap2010:WorkflowViewState.IdRef="Sequence_16">
+                <ui:ExtractData NextLinkSelector="{x:Null}" ContinueOnError="True" DataTable="[extracted]" DelayBetweenPagesMS="300" DisplayName="Extract Structured Data 'UL'" ExtractMetadata="&lt;extract&gt;&lt;row exact='1'&gt;&lt;webctrl tag='li' class='search-result search-result__occluded-item ember-view'/&gt;&lt;webctrl tag='div' class='search-entity search-result search-result--person search-result--occlusion-enabled ember-view' idx='1'/&gt;&lt;webctrl tag='div' class='search-result__wrapper' idx='1'/&gt;&lt;webctrl tag='div' class='search-result__info pt3 pb4 ph0' idx='1'/&gt;&lt;/row&gt;&lt;column exact='1' name='Name' attr='text'&gt;&lt;webctrl tag='li' class='search-result search-result__occluded-item ember-view'/&gt;&lt;webctrl tag='div' class='search-entity search-result search-result--person search-result--occlusion-enabled ember-view' idx='1'/&gt;&lt;webctrl tag='div' class='search-result__wrapper' idx='1'/&gt;&lt;webctrl tag='div' class='search-result__info pt3 pb4 ph0' idx='1'/&gt;&lt;webctrl tag='a' class='search-result__result-link ember-view' idx='1'/&gt;&lt;webctrl tag='h3' class='actor-name-with-distance search-result__title single-line-truncate ember-view' idx='1'/&gt;&lt;webctrl tag='span' class='name-and-icon' idx='1'/&gt;&lt;webctrl tag='span' class='name-and-distance' idx='1'/&gt;&lt;webctrl tag='span' class='name actor-name' idx='1'/&gt;&lt;/column&gt;&lt;column exact='1' name='Role' attr='text'&gt;&lt;webctrl tag='li' class='search-result search-result__occluded-item ember-view'/&gt;&lt;webctrl tag='div' class='search-entity search-result search-result--person search-result--occlusion-enabled ember-view' idx='1'/&gt;&lt;webctrl tag='div' class='search-result__wrapper' idx='1'/&gt;&lt;webctrl tag='div' class='search-result__info pt3 pb4 ph0' idx='1'/&gt;&lt;webctrl tag='p' class='subline-level-1 t-14 t-black t-normal search-result__truncate' idx='1'/&gt;&lt;webctrl tag='span' idx='1'/&gt;&lt;/column&gt;&lt;/extract&gt;" sap2010:WorkflowViewState.IdRef="ExtractData_7" MaxNumberOfResults="100">
+                  <ui:ExtractData.Target>
+                    <ui:Target ClippingRegion="{x:Null}" Element="{x:Null}" TimeoutMS="{x:Null}" InformativeScreenshot="5970d8996cd3d214c33df0e3476b9c74" Selector="&lt;webctrl parentid='ember53' tag='UL' /&gt;" WaitForReady="COMPLETE" />
+                  </ui:ExtractData.Target>
+                </ui:ExtractData>
+                <Assign sap2010:WorkflowViewState.IdRef="Assign_5">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:Int32">[counter]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:Int32">0</InArgument>
+                  </Assign.Value>
+                </Assign>
+                <If Condition="[extracted.Rows.Count = 0]" sap2010:WorkflowViewState.IdRef="If_3">
+                  <If.Then>
+                    <Sequence sap2010:WorkflowViewState.IdRef="Sequence_20">
+                      <Sequence.Variables>
+                        <Variable x:TypeArguments="x:Boolean" Name="shouldStop" />
+                      </Sequence.Variables>
+                      <ui:MessageBox Caption="{x:Null}" ChosenButton="{x:Null}" Buttons="Ok" DisplayName="Message Box" sap2010:WorkflowViewState.IdRef="MessageBox_3" Text="[&quot;no names were captured!&quot;]" TopMost="True" />
+                    </Sequence>
+                  </If.Then>
+                </If>
+                <ui:ForEachRow CurrentIndex="{x:Null}" DataTable="[extracted]" DisplayName="For Each candidate that was captured" sap2010:WorkflowViewState.IdRef="ForEachRow_1">
+                  <ui:ForEachRow.Body>
+                    <ActivityAction x:TypeArguments="sd:DataRow">
+                      <ActivityAction.Argument>
+                        <DelegateInArgument x:TypeArguments="sd:DataRow" Name="candidateInfo" />
+                      </ActivityAction.Argument>
+                      <Sequence DisplayName="Body" sap2010:WorkflowViewState.IdRef="Sequence_13">
+                        <Sequence.Variables>
+                          <Variable x:TypeArguments="x:String" Name="candidate" />
+                          <Variable x:TypeArguments="x:String" Name="role" />
+                          <Variable x:TypeArguments="x:String" Name="location" />
+                          <Variable x:TypeArguments="x:String" Name="substring" />
+                        </Sequence.Variables>
+                        <ui:AddQueueItem ServiceBaseAddress="{x:Null}" TimeoutMS="{x:Null}" DisplayName="Add candidate to orchestrator queue" sap2010:WorkflowViewState.IdRef="AddQueueItem_1" Priority="Normal" QueueType="candidateQueue">
+                          <ui:AddQueueItem.ItemInformation>
+                            <scg:Dictionary x:TypeArguments="x:String, InArgument" />
+                          </ui:AddQueueItem.ItemInformation>
+                        </ui:AddQueueItem>
+                        <ui:LogMessage DisplayName="Log Message" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[candidateInfo(0).ToString]" />
+                        <Assign sap2010:WorkflowViewState.IdRef="Assign_2">
+                          <Assign.To>
+                            <OutArgument x:TypeArguments="x:String">[candidate]</OutArgument>
+                          </Assign.To>
+                          <Assign.Value>
+                            <InArgument x:TypeArguments="x:String">[candidateInfo(0).ToString.Replace("'", "*")]</InArgument>
+                          </Assign.Value>
+                        </Assign>
+                        <Assign sap2010:WorkflowViewState.IdRef="Assign_3">
+                          <Assign.To>
+                            <OutArgument x:TypeArguments="x:String">[role]</OutArgument>
+                          </Assign.To>
+                          <Assign.Value>
+                            <InArgument x:TypeArguments="x:String">[candidateInfo(1).ToString]</InArgument>
+                          </Assign.Value>
+                        </Assign>
+                        <If Condition="[counter = 6]" sap2010:WorkflowViewState.IdRef="If_2">
+                          <If.Then>
+                            <ui:SendHotkey DelayBefore="{x:Null}" DelayBetweenKeys="{x:Null}" DelayMS="{x:Null}" Activate="True" ClickBeforeTyping="False" DisplayName="Send Hotkey 'DIV'" EmptyField="False" sap2010:WorkflowViewState.IdRef="SendHotkey_1" Key="pgdn" KeyModifiers="None" SendWindowMessages="False" SpecialKey="True">
+                              <ui:SendHotkey.Target>
+                                <ui:Target ClippingRegion="{x:Null}" Element="{x:Null}" TimeoutMS="{x:Null}" InformativeScreenshot="7614dfce24ba4785b856cbd1384626dc" Selector="&lt;webctrl omit:css-selector='body&amp;gt;div&amp;gt;div&amp;gt;div&amp;gt;div' omit:parentid='ember17' tag='DIV' /&gt;" WaitForReady="INTERACTIVE" />
+                              </ui:SendHotkey.Target>
+                            </ui:SendHotkey>
+                          </If.Then>
+                        </If>
+                        <Assign DisplayName="Create a substring for the highlight below " sap2010:WorkflowViewState.IdRef="Assign_8">
+                          <Assign.To>
+                            <OutArgument x:TypeArguments="x:String">[substring]</OutArgument>
+                          </Assign.To>
+                          <Assign.Value>
+                            <InArgument x:TypeArguments="x:String">[role.Replace("&amp;", "?")]</InArgument>
+                          </Assign.Value>
+                        </Assign>
+                        <ui:LogMessage DisplayName="Log Message" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[substring]" />
+                        <ui:CommentOut DisplayName="Comment Out highlighting">
+                          <ui:CommentOut.Body>
+                            <Sequence DisplayName="Ignored Activities">
+                              <ui:Highlight Color="Red" ContinueOnError="False" DisplayName="highlight name" HighlightTime="200" sap2010:WorkflowViewState.IdRef="Highlight_1">
+                                <ui:Highlight.Target>
+                                  <ui:Target ClippingRegion="{x:Null}" Element="{x:Null}" TimeoutMS="{x:Null}" InformativeScreenshot="6ea942eda73fcc578bc7ae9b5a274788" Selector="[&quot;&lt;html app='chrome.exe' title='&amp;quot;*&amp;quot; | Search | LinkedIn' /&gt;&lt;webctrl aaname='&quot;+candidate+&quot;' tag='SPAN' class='name actor-name' /&gt;&quot;]" WaitForReady="INTERACTIVE" />
+                                </ui:Highlight.Target>
+                              </ui:Highlight>
+                              <ui:Highlight Color="Red" ContinueOnError="False" DisplayName="highlight role" HighlightTime="200" sap2010:WorkflowViewState.IdRef="Highlight_4">
+                                <ui:Highlight.Target>
+                                  <ui:Target ClippingRegion="{x:Null}" Element="{x:Null}" TimeoutMS="{x:Null}" InformativeScreenshot="ef4b62813260ec2e296abc79181e212a" Selector="[&quot;&lt;html app='chrome.exe' title='&amp;quot;*&amp;quot; | Search | LinkedIn' /&gt;&lt;webctrl tag='SPAN' aaname='&quot;+substring+&quot;' parentclass='subline-level-1 t-14 t-black t-normal search-result__truncate' /&gt;&quot;]" WaitForReady="INTERACTIVE" />
+                                </ui:Highlight.Target>
+                              </ui:Highlight>
+                              <sap2010:WorkflowViewState.IdRef>Sequence_26</sap2010:WorkflowViewState.IdRef>
+                            </Sequence>
+                          </ui:CommentOut.Body>
+                          <sap2010:WorkflowViewState.IdRef>CommentOut_4</sap2010:WorkflowViewState.IdRef>
+                        </ui:CommentOut>
+                        <Assign sap2010:WorkflowViewState.IdRef="Assign_6">
+                          <Assign.To>
+                            <OutArgument x:TypeArguments="x:Int32">[counter]</OutArgument>
+                          </Assign.To>
+                          <Assign.Value>
+                            <InArgument x:TypeArguments="x:Int32">[counter + 1]</InArgument>
+                          </Assign.Value>
+                        </Assign>
+                      </Sequence>
+                    </ActivityAction>
+                  </ui:ForEachRow.Body>
+                </ui:ForEachRow>
+                <Assign sap2010:WorkflowViewState.IdRef="Assign_7">
+                  <Assign.To>
+                    <OutArgument x:TypeArguments="x:Int32">[counter]</OutArgument>
+                  </Assign.To>
+                  <Assign.Value>
+                    <InArgument x:TypeArguments="x:Int32">0</InArgument>
+                  </Assign.Value>
+                </Assign>
+                <If Condition="[extracted isnot nothing]" sap2010:WorkflowViewState.IdRef="If_1">
+                  <If.Then>
+                    <Sequence sap2010:WorkflowViewState.IdRef="Sequence_25">
+                      <ui:AppendCsvFile DataTable="[extracted]" Delimitator="Comma" DisplayName="Append To CSV" Encoding="utf-16" FilePath="test.csv" sap2010:WorkflowViewState.IdRef="AppendCsvFile_1" />
+                    </Sequence>
+                  </If.Then>
+                  <If.Else>
+                    <ui:MessageBox Caption="{x:Null}" ChosenButton="{x:Null}" Buttons="Ok" DisplayName="Message Box" sap2010:WorkflowViewState.IdRef="MessageBox_2" Text="[&quot;candidate list is NULL!&quot;]" TopMost="True" />
+                  </If.Else>
+                </If>
+              </Sequence>
+            </ActivityAction>
+          </ui:BrowserScope.Body>
+        </ui:BrowserScope>
+      </Sequence>
+    </Sequence>
+    <sads:DebugSymbol.Symbol>d0pDOlxVc2Vyc1xNaWNoYWVsXERvY3VtZW50c1xVaVBhdGhcQW1hem9uQ2FydE1ha2VyXFNjcmFwZUNhbmRpZGF0ZURhdGEueGFtbD1LA+ABDgIBAU04TVUCAQJRBd4BEAIBA1IH3QESAgEEVgncARsCAQVWpAJW9wICAUpcD9kBGgIBBl0RYSICAUJiEWkaAgE+ahFzFgIBOXQRxgEhAgEVxwERzgEaAgERzwER2AEWAgEHXYIQXYcQAgFJX6QBX9MBAgFIXYABXYUBAgFHXU1dUwIBRl1eXWsCAURdwQFdvg8CAUNnO2c8AgFBZDxkRQIBP2ofajsCATpsFXEgAgE7dEJ0TwIBN3oXwwEiAgEWzAE7zAE8AgEUyQE8yQFFAgESzwEfzwE6AgEI0QEV0wEgAgEL1gEV1gHjAQIBCXAXcOUBAgE8gQEZhQErAgE1hgEZhgGmAQIBM4cBGY4BIgIBL48BGZYBIgIBK5cBGZ8BHgIBJaABGacBIgIBIKgBGagBlgECAR2pARm6ASkCARy7ARnCASICARfSARfSAcsBAgEM1gGqAdYB0QECAQpwrAFw0wECAT2BAdwBgQHsAQIBNoYBhgGGAaMBAgE0jAFEjAFxAgEyiQFFiQFQAgEwlAFElAFfAgEukQFFkQFLAgEslwEnlwE2AgEmmQEdnQEtAgEopQFEpQFgAgEjogFFogFQAgEhqAGGAagBkwECAR7AAUPAAVACARq9AUS9AU0CARjSAXrSAYIBAgEQ0gEz0gFAAgEO0gGMAdIBlgECAQ2bAbABmwGqAgIBKpkBggKZAYgCAgEp</sads:DebugSymbol.Symbol>
+  </Sequence>
+  <sap2010:WorkflowViewState.ViewStateManager>
+    <sap2010:ViewStateManager>
+      <sap2010:ViewStateData Id="ExtractData_7" sap:VirtualizedContainerService.HintSize="675,106" />
+      <sap2010:ViewStateData Id="Assign_5" sap:VirtualizedContainerService.HintSize="675,60" />
+      <sap2010:ViewStateData Id="MessageBox_3" sap:VirtualizedContainerService.HintSize="314,59" />
+      <sap2010:ViewStateData Id="Sequence_20" sap:VirtualizedContainerService.HintSize="336,183">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="If_3" sap:VirtualizedContainerService.HintSize="675,330" />
+      <sap2010:ViewStateData Id="AddQueueItem_1" sap:VirtualizedContainerService.HintSize="464,22" />
+      <sap2010:ViewStateData Id="LogMessage_1" sap:VirtualizedContainerService.HintSize="464,91" />
+      <sap2010:ViewStateData Id="Assign_2" sap:VirtualizedContainerService.HintSize="464,60" />
+      <sap2010:ViewStateData Id="Assign_3" sap:VirtualizedContainerService.HintSize="464,60" />
+      <sap2010:ViewStateData Id="SendHotkey_1" sap:VirtualizedContainerService.HintSize="314,154" />
+      <sap2010:ViewStateData Id="If_2" sap:VirtualizedContainerService.HintSize="464,301" />
+      <sap2010:ViewStateData Id="Assign_8" sap:VirtualizedContainerService.HintSize="464,60" />
+      <sap2010:ViewStateData Id="LogMessage_2" sap:VirtualizedContainerService.HintSize="464,91" />
+      <sap2010:ViewStateData Id="Highlight_1" sap:VirtualizedContainerService.HintSize="314,106" />
+      <sap2010:ViewStateData Id="Highlight_4" sap:VirtualizedContainerService.HintSize="314,106" />
+      <sap2010:ViewStateData Id="Sequence_26" sap:VirtualizedContainerService.HintSize="336,376">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="CommentOut_4" sap:VirtualizedContainerService.HintSize="464,454" />
+      <sap2010:ViewStateData Id="Assign_6" sap:VirtualizedContainerService.HintSize="464,60" />
+      <sap2010:ViewStateData Id="Sequence_13" sap:VirtualizedContainerService.HintSize="486,1643">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="ForEachRow_1" sap:VirtualizedContainerService.HintSize="675,1790">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Assign_7" sap:VirtualizedContainerService.HintSize="675,60" />
+      <sap2010:ViewStateData Id="AppendCsvFile_1" sap:VirtualizedContainerService.HintSize="314,87" />
+      <sap2010:ViewStateData Id="Sequence_25" sap:VirtualizedContainerService.HintSize="336,211">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="MessageBox_2" sap:VirtualizedContainerService.HintSize="314,59" />
+      <sap2010:ViewStateData Id="If_1" sap:VirtualizedContainerService.HintSize="675,358" />
+      <sap2010:ViewStateData Id="Sequence_16" sap:VirtualizedContainerService.HintSize="697,3028">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="BrowserScope_6" sap:VirtualizedContainerService.HintSize="711,3174">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_17" sap:VirtualizedContainerService.HintSize="733,3298">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_1" sap:VirtualizedContainerService.HintSize="755,3539">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_8" sap:VirtualizedContainerService.HintSize="777,3663">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="ScrapeCandidateData_1" sap:VirtualizedContainerService.HintSize="817,3743" />
+    </sap2010:ViewStateManager>
+  </sap2010:WorkflowViewState.ViewStateManager>
+</Activity>
