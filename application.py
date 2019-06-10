@@ -1,5 +1,11 @@
 import os
 import pandas as pd
+import untangle
+import re
+import sys
+import matplotlib.pyplot as plt
+from werkzeug import secure_filename
+import shutil
 import zipfile
 from werkzeug.utils import secure_filename
 
@@ -185,7 +191,6 @@ def __main__():
     noSsExp = str(noSsException).replace("'", "")
     notAnnotWf = str(notAnnotatedWf).replace("'", "")
     noLMExp = str(noLMException).replace("'", "")
-    unusedArgument = str(unusedArgument).replace("'", "")
 
     with app.app_context():
         return render_template('index.html',
@@ -204,4 +209,9 @@ def __main__():
 # only run when executing locally (if this doesnt run then remove the if statement)
 if __name__ == "__main__":
     app.run(debug=True)
-    upload()
+
+    #upload()
+
+__main__()
+#upload()
+
