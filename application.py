@@ -159,7 +159,7 @@ def __main__():
     # outputs a perfentage score of the number of correct arguments and a list of missing arguments
     #[AnnotationArgumentScore, missing_arguments_list] = documentation_logging.grade_annotation_contains_arguments(df_annotation=df_annotation)
 
-    # 7. Comments
+    # 7. Commentsd
     commentScore = documentation_logging.grade_comments(df_annotation=df_annotation)
 
 
