@@ -165,7 +165,7 @@ def grade_annotation_contains_arguments(df_annotation, main_location):
             completeProject = False
             break
     if completeProject:
-        # score is number of arguments in annotation out of total number of args mobile
+        # score is number of arguments in annotation out of total number of args mobiles
         if (len(missing_arguments_list) + num_args_in_annotation) != 0:
             AnnotationArgumentScore = (num_args_in_annotation / (len(missing_arguments_list) + num_args_in_annotation)) * 100
         else:
