@@ -380,6 +380,18 @@ def handle_upload():
 
             ##########################################################################################################
 
+            # clear out content in file folder
+            for r, d, f in os.walk(app.config['UPLOAD_PATH'].strip("/")):
+                for file in f:
+                    os.remove((os.getcwd() + "/" + r + "/" + file).replace("\\", "/"))
+            folders = []
+            for r, d, f in os.walk(app.config['UPLOAD_PATH'].strip("/")):
+                folders = [(os.getcwd() + "/" + r).replace("\\", "/")] + folders
+            folders = folders[:-1]
+            for folder in folders:
+                os.rmdir(folder)
+
+
             return redirect(url_for('.__main__'))
 
 
