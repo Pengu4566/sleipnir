@@ -94,15 +94,16 @@ def handle_upload():
 
 
         # clear out content in file folder
-        for r, d, f in os.walk(app.config['UPLOAD_PATH'].strip("/")):
+        for r, d, f in os.walk((os.getcwd() + app.config['UPLOAD_PATH']).replace("\\","/").strip("/")):
             for file in f:
                 os.remove((os.getcwd() + "/" + r + "/" + file).replace("\\", "/"))
         folders = []
-        for r, d, f in os.walk(app.config['UPLOAD_PATH'].strip("/")):
+        for r, d, f in os.walk((os.getcwd() + app.config['UPLOAD_PATH']).replace("\\","/").strip("/")):
             folders = [(os.getcwd() + "/" + r).replace("\\", "/")] + folders
         folders = folders[:-1]
         for folder in folders:
             os.rmdir(folder)
+        
         # check if the post request has the file part
         if 'file' not in request.files:
             return "You must pick a file! Use your browser's back button and try again."
@@ -381,11 +382,11 @@ def handle_upload():
             ##########################################################################################################
 
             # clear out content in file folder
-            for r, d, f in os.walk(app.config['UPLOAD_PATH'].strip("/")):
+            for r, d, f in os.walk((os.getcwd() + app.config['UPLOAD_PATH']).replace("\\","/").strip("/")):
                 for file in f:
                     os.remove((os.getcwd() + "/" + r + "/" + file).replace("\\", "/"))
             folders = []
-            for r, d, f in os.walk(app.config['UPLOAD_PATH'].strip("/")):
+            for r, d, f in os.walk((os.getcwd() + app.config['UPLOAD_PATH']).replace("\\","/").strip("/")):
                 folders = [(os.getcwd() + "/" + r).replace("\\", "/")] + folders
             folders = folders[:-1]
             for folder in folders:
