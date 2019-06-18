@@ -156,7 +156,7 @@ def grade_annotation_contains_arguments(df_annotation, main_location):
                             else:
                                 missing_arguments_list.append(arg)
                         break
-                # search for arguments in invoke activity annotation
+                # search for arguments in invoke activity annotations
                 # (there is no easy way to obtain the calling method from a workflow. )
                 #argument_list = df_argument.loc[:, "argumentName"]
                 # print("ARGUMENTS - " + str(argument_list), file=sys.stderr)
