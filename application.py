@@ -94,11 +94,11 @@ def handle_upload():
 
 
         # clear out content in file folder
-        for r, d, f in os.walk((os.getcwd() + app.config['UPLOAD_PATH']).replace("\\","/").strip("/")):
+        for r, d, f in os.walk("/home/site/wwwroot/file/".strip("/")):
             for file in f:
                 os.remove((os.getcwd() + "/" + r + "/" + file).replace("\\", "/"))
         folders = []
-        for r, d, f in os.walk((os.getcwd() + app.config['UPLOAD_PATH']).replace("\\","/").strip("/")):
+        for r, d, f in os.walk("/home/site/wwwroot/file/".strip("/")):
             folders = [(os.getcwd() + "/" + r).replace("\\", "/")] + folders
         folders = folders[:-1]
         for folder in folders:
@@ -382,11 +382,11 @@ def handle_upload():
             ##########################################################################################################
 
             # clear out content in file folder
-            for r, d, f in os.walk((os.getcwd() + app.config['UPLOAD_PATH']).replace("\\","/").strip("/")):
+            for r, d, f in os.walk("/home/site/wwwroot/file/".strip("/")):
                 for file in f:
                     os.remove((os.getcwd() + "/" + r + "/" + file).replace("\\", "/"))
             folders = []
-            for r, d, f in os.walk((os.getcwd() + app.config['UPLOAD_PATH']).replace("\\","/").strip("/")):
+            for r, d, f in os.walk("/home/site/wwwroot/file/".strip("/")):
                 folders = [(os.getcwd() + "/" + r).replace("\\", "/")] + folders
             folders = folders[:-1]
             for folder in folders:
