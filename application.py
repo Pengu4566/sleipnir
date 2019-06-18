@@ -104,7 +104,7 @@ def __main__():
 
     # checks for empty files list, program should end if this gets triggered
     if (files == []):
-        return "Could not find project files! Did you put them in the right place?"
+        return "Could not find project files! Did you put them in the right places?"
 
     # scans all project files and populates dataframes with relevant info
     for filePath in files:
