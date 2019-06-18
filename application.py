@@ -96,17 +96,15 @@ def handle_upload():
 
 
         # clear out content in file folder
-        # for r, d, f in os.walk("/home/site/wwwroot/file"):
-        #     for file in f:
-        #         os.remove((os.getcwd() + "/" + r + "/" + file).replace("\\", "/"))
-        # folders = []
-        # for r, d, f in os.walk("/home/site/wwwroot/file/".strip("/")):
-        #     folders = [(os.getcwd() + "/" + r).replace("\\", "/")] + folders
-        # folders = folders[:-1]
-        # for folder in folders:
-        #     os.rmdir(folder)
-        shutil.rmtree("/home/site/wwwroot/file")
-        os.mkdir("/home/site/wwwroot/file")
+        for r, d, f in os.walk((os.getcwd()+app.config['UPLOAD_PATH']).replace("\\","/").strip("/")):
+            for file in f:
+                os.remove((os.getcwd() + "/" + r + "/" + file).replace("\\", "/"))
+        folders = []
+        for r, d, f in os.walk((os.getcwd()+app.config['UPLOAD_PATH']).replace("\\","/").strip("/")):
+            folders = [(os.getcwd() + "/" + r).replace("\\", "/")] + folders
+        folders = folders[:-1]
+        for folder in folders:
+            os.rmdir(folder)
 
         
         # check if the post request has the file part
@@ -386,9 +384,7 @@ def handle_upload():
 
             ##########################################################################################################
 
-            # clear out content in file folder
-            shutil.rmtree("/home/site/wwwroot/file")
-            os.mkdir("/home/site/wwwroot/file")
+
 
 
             return redirect(url_for('.__main__'))
