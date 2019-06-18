@@ -13,6 +13,7 @@ import re
 
 # 2. Log messages in catches
 def grade_log_message_in_catches(df_catches):
+    df_catches_dup = df_catches.loc[:, :]
     numCatch = len(df_catches['Log Message Included'])
     if numCatch > 0:
         # checks if try/catch activities have log messages within them
@@ -177,7 +178,6 @@ def grade_annotation_contains_arguments(df_annotation, main_location):
     # print("NUM ARGS OK " + str(num_args_in_annotation), file=sys.stderr)
     return [AnnotationArgumentScore, missing_arguments_list]
 # end 6.Arguments should be at least mentioned in annotation
-#####
 # 7. Comments
 def grade_comments(df_annotation):
     completeProject = True
