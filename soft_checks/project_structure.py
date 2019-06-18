@@ -4,7 +4,10 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 
-def get_project_structure(df_annotation):
+def get_project_structure(df_annotation, main_location):
+    str_replace = main_location + "/"
+    df_annotation['workflowName'] = df_annotation['workflowName'].str.replace(str_replace, "")
+    df_annotation['invokedBy'] = df_annotation['invokedBy'].str.replace(str_replace, "")
     # Create tree object
     df_invokeWf = df_annotation.loc[:, ['workflowName', 'invokedBy']].drop_duplicates()
     # Assuming the starting xaml file is not invoked by anything else

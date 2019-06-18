@@ -1,7 +1,9 @@
 
 .idea/
 env/
+__pycache__/
 .vscode/
 __pycache__
 .venv/
-
+static/node_modules/
+# change

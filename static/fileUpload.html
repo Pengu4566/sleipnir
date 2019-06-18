@@ -9,9 +9,35 @@
   </head>
   <body>
     <h1>Sleipnir - Upload Project</h1>
+
     <form action="uploader" method="post" enctype="multipart/form-data">
+      <div id="checkboxes">
+          <p>Please uncheck the checks you don't want.</p>
+            <ul>
+                <li><input type="checkbox" name="Naming" value="Naming" checked>Naming</li>
+              <ul>
+                  <li><input type="checkbox" name="VariableNaming" value="VariableNaming" checked>Variable Naming</li>
+                  <li><input type="checkbox" name="ArgumentNaming" value="ArgumentNaming" checked>Argument Naming</li>
+                  <li><input type="checkbox" name="ActivityNaming" value="ActivityNaming" checked>Activity Naming</li>
+              </ul>
+              <li><input type="checkbox" name="Usage" value="Usage" checked>Usage</li>
+              <ul>
+                  <li><input type="checkbox" name="VariableUsage" value="VariableUsage" checked>Variable Usage</li>
+                  <li><input type="checkbox" name="ArgumentUsage" value="ArgumentUsage" checked>Argument Usage</li>
+              </ul>
+              <li><input type="checkbox" name="Documentation" value="Documentation" checked>Documentation</li>
+              <ul>
+                  <li><input type="checkbox" name="WorkflowAnnotation" value="WorkflowAnnotation" checked>Workflow Annotation</li>
+                  <li><input type="checkbox" name="TryCatchLogging" value="TryCatchLogging" checked>Try Catch Logging</li>
+                  <li><input type="checkbox" name="TryCatchScreenshot" value="TryCatchScreenshot" checked>Try Catch Screenshot</li>
+                  <li><input type="checkbox" name="JsonLogging" value="JsonLogging" checked>Project.Json Logging</li>
+                  <li><input type="checkbox" name="ArgExpAnnot" value="ArgExpAnnot" checked>Argument Explanation in Annotation</li>
+              </ul>
+            </ul>
+      </div>
         <input type="file" name="file">
         <input type="submit" value="Upload">
     </form>
+    <script src="dist/fileUpload.js" type="text/javascript"></script>
   </body>
 </html>

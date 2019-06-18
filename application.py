@@ -1,11 +1,5 @@
 import os
 import pandas as pd
-import untangle
-import re
-import sys
-import matplotlib.pyplot as plt
-from werkzeug import secure_filename
-import shutil
 import zipfile
 from werkzeug.utils import secure_filename
 
@@ -17,7 +11,7 @@ from charts import radar_plot
 from grading_checks import naming, usage, documentation_logging, error_handling
 from soft_checks import activity_stats, project_folder_structure, project_structure
 
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, session
 app = Flask(__name__, static_folder='./static/dist', template_folder="./static")
 
 # dont save cache in web browser (updating results image correctly)
@@ -25,6 +19,7 @@ app.config["CACHE_TYPE"] = "null"
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['UPLOAD_PATH'] = '/file/'
 app.config['ALLOWED_EXTENSIONS'] = set(['zip'])
+app.config['SECRET_KEY'] = 'super secret key'
 
 
 @app.route('/')
@@ -36,6 +31,81 @@ def upload():
 @app.route("/uploader", methods=['GET', 'POST'])
 def handle_upload():
     if request.method == 'POST':
+        # get value of checkboxes
+        naming = False
+        varNaming = False
+        argNaming = False
+        actNaming = False
+
+        usage = False
+        varUsage = False
+        argUsage = False
+
+        documentation = False
+        wfAnnot = False
+        tcLog = False
+        tcSs = False
+        jsonLog = False
+        arginAnnot = False
+
+        # naming
+        if request.form.get('Naming') == "Naming":
+            naming = True
+
+        if request.form.get('VariableNaming') == "VariableNaming":
+            varNaming = True
+
+        if request.form.get('ArgumentNaming') == "ArgumentNaming":
+            argNaming = True
+
+        if request.form.get('ActivityNaming') == "ActivityNaming":
+            actNaming = True
+
+        session['naming'] = naming
+        session['varNaming'] = varNaming
+        session['argNaming'] = argNaming
+        session['actNaming'] = actNaming
+
+        # usage
+        if request.form.get('Usage') == "Usage":
+            usage = True
+
+        if request.form.get('VariableUsage') == "VariableUsage":
+            varUsage = True
+
+        if request.form.get('ArgumentUsage') == "ArgumentUsage":
+            argUsage = True
+
+        session['usage'] = usage
+        session['varUsage'] = varUsage
+        session['argUsage'] = argUsage
+
+        #documentation
+        if request.form.get('Documentation') == "Documentation":
+            documentation = True
+
+        if request.form.get('WorkflowAnnotation') == "WorkflowAnnotation":
+            wfAnnot = True
+
+        if request.form.get('TryCatchLogging') == "TryCatchLogging":
+            tcLog = True
+
+        if request.form.get('TryCatchScreenshot') == "TryCatchScreenshot":
+            tcSs = True
+
+        if request.form.get('JsonLogging') == "JsonLogging":
+            jsonLog = True
+
+        if request.form.get('ArgExpAnnot') == "ArgExpAnnot":
+            arginAnnot = True
+
+        session['documentation'] = documentation
+        session['wfAnnot'] = wfAnnot
+        session['tcLog'] = tcLog
+        session['tcSs'] = tcSs
+        session['jsonLog'] = jsonLog
+        session['arginAnnot'] = arginAnnot
+
         # clear out content in file folder
         for r, d, f in os.walk(app.config['UPLOAD_PATH'].strip("/")):
             for file in f:
@@ -71,10 +141,12 @@ def handle_upload():
                 zipFile = zipfile.ZipFile((os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\","/"))
                 zipFile.extractall((os.getcwd() + app.config['UPLOAD_PATH']).replace("\\", "/"))
             else:
-                file.save("/home/site/wwwroot" + app.config['UPLOAD_PATH'] + filename)
-                zipFile = zipfile.ZipFile("/home/site/wwwroot" + app.config['UPLOAD_PATH'] + filename)
-                zipFile.extractall("/home/site/wwwroot" + app.config['UPLOAD_PATH'])
-            return redirect("/analyze")
+                print(os.getcwd())
+                file.save(os.getcwd() + app.config['UPLOAD_PATH'] + filename)
+                zipFile = zipfile.ZipFile(os.getcwd() + app.config['UPLOAD_PATH'] + filename)
+                zipFile.extractall(os.getcwd() + app.config['UPLOAD_PATH'])
+            return redirect(url_for('.__main__'))
+
 
 
 @app.route("/analyze")
@@ -89,7 +161,7 @@ def __main__():
     for r, d, f in os.walk(filePath):
         for file in f:
             if '.xaml' in file:
-                files.append(os.path.join(r, file))
+                files.append(os.path.join(r, file).replace("\\", "/"))
 
     # dataframe initiation
     df_variable = pd.DataFrame(columns=['variableType', 'variableName', 'count', 'filePath'])
@@ -104,7 +176,7 @@ def __main__():
 
     # checks for empty files list, program should end if this gets triggered
     if (files == []):
-        return "Could not find project files! Did you put them in the right places?"
+        return "Could not find project files! Did you put them in the right place?"
 
     # scans all project files and populates dataframes with relevant info
     for filePath in files:
@@ -122,53 +194,177 @@ def __main__():
         # annotation dataframe
         df_annotation = annotation_dataframe.populate_annotation_dataframe(df_annotation=df_annotation, filePath=filePath)
 
+    dict_score = {}
     # level 1: grading checks
 
     # level 2: name
-    # level 3: variable naming
-    [variableNamingScore, improperNamedVariable] = naming.grade_variable_name(df_variable)
-    # level 3: argument naming
-    [argumentNamingScore, improperNamedArguments] = naming.grade_argument_name(df_argument)
-    # level 3: activity naming
-    [activityNamingScore, improperNamedActivities] = naming.grade_activity_name(df_activity)
-    # level 2: naming score
-    namingScore = (variableNamingScore + argumentNamingScore + activityNamingScore)/2
+    if session["naming"]:
+        # level 3: variable naming
+        if session['varNaming']:
+            [variableNamingScore, improperNamedVariable] = naming.grade_variable_name(df_variable)
+            improperNamedVar = str(improperNamedVariable).replace("'", "")
+        else:
+            improperNamedVar = "[Not evaluated]"
+            variableNamingScore = "[Not evaluated]"
+
+        # level 3: argument naming
+        if session['argNaming']:
+            [argumentNamingScore, improperNamedArguments] = naming.grade_argument_name(df_argument)
+            improperNamedArg = str(improperNamedArguments).replace("'", "")
+        else:
+            improperNamedArg = "[Not evaluated]"
+            argumentNamingScore = "[Not evaluated]"
+
+        # level 3: activity naming
+        if session['actNaming']:
+            [activityNamingScore, improperNamedActivities] = naming.grade_activity_name(df_activity)
+            improperNamedAct = str(improperNamedActivities).replace("'", "")
+        else:
+            improperNamedAct = "[Not evaluated]"
+            activityNamingScore = "[Not evaluated]"
+
+        lt_namingScore = [variableNamingScore, argumentNamingScore, activityNamingScore]
+        namingScore = 0
+        count = 0
+        for i in lt_namingScore:
+            if i != "[Not evaluated]":
+                namingScore += i
+                count += 1
+        namingScore = int(namingScore/count)
+
+    else:
+        improperNamedVar = "[Not evaluated]"
+        improperNamedArg = "[Not evaluated]"
+        improperNamedAct = "[Not evaluated]"
+        namingScore = "[Not evaluated]"
+
+    dict_score['naming'] = namingScore
 
     # level 2: usage
-    # level 3: variable usage
-    [variableUsageScore, unusedVariable] = usage.grade_variable_usage(df_variable)
-    # level 3: argument usage
-    [argumentUsageScore, unusedArgument] = usage.grade_argument_usage(df_argument)
-    # level 2: usage score
-    usageScore = (variableUsageScore + argumentUsageScore)/2
+    if session["usage"]:
+        # level 3: variable usage
+        if session['varUsage']:
+            [variableUsageScore, unusedVariable] = usage.grade_variable_usage(df_variable)
+            unusedVar = str(unusedVariable).replace("'", "")
+        else:
+            unusedVar = "[Not evaluated]"
+            variableUsageScore = "[Not evaluated]"
+
+        # level 3: argument usage
+        if session['argUsage']:
+            [argumentUsageScore, unusedArgument] = usage.grade_argument_usage(df_argument)
+            unusedArgument = str(unusedArgument).replace("'", "")
+        else:
+            unusedArgument = "[Not evaluated]"
+            argumentUsageScore = "[Not evaluated]"
+
+        # level 2: usage score
+        lt_usageScore = [variableUsageScore, argumentUsageScore]
+        usageScore = 0
+        count = 0
+        for i in lt_usageScore:
+            if i != "[Not evaluated]":
+                usageScore += i
+                count += 1
+        usageScore = int(usageScore / count)
+
+    else:
+        unusedVar = "[Not evaluated]"
+        unusedArgument = "[Not evaluated]"
+        usageScore = "[Not evaluated]"
+
+    dict_score['usage'] = usageScore
 
     # level 2: documentation_logging
-    # level 3: workflow annotation
-    [wfAnnotationScore, notAnnotatedWf] = documentation_logging.grade_annotation_in_workflow(df_annotation=df_annotation)
-    # level 3: log message in catches
-    [logMessageScore, noLMException] = documentation_logging.grade_log_message_in_catches(df_catches=df_catches)
-    # level 3: screenshot in catches
-    [screenshotScore, noSsException] = documentation_logging.grade_screenshot_in_catches(df_catches=df_catches)
-    # level 2: documentation_logging score
-    docScore = (wfAnnotationScore + logMessageScore + screenshotScore)/3
+    if session["documentation"]:
 
-    # 4. Project.json (name and description)
-    # [json_name_score, json_description_score] = documentation_logging.grade_project_json_name_desc()
+        # level 3: log message in catches
+        if session['tcLog']:
+            [logMessageScore, noLMException] = documentation_logging.grade_log_message_in_catches(df_catches=df_catches)
 
-    # 6.Arguments should be at least mentioned in annotation
-    # outputs a perfentage score of the number of correct arguments and a list of missing arguments
-    #[AnnotationArgumentScore, missing_arguments_list] = documentation_logging.grade_annotation_contains_arguments(df_annotation=df_annotation)
+            noLMExp = str(noLMException).replace("'", "")
+        else:
+            logMessageScore = "[Not evaluated]"
+            noLMExp = "[Not evaluated]"
 
-    # 7. Comments
-    commentScore = documentation_logging.grade_comments(df_annotation=df_annotation)
+        # level 3: screenshot in catches
+        if session['tcSs']:
+            [screenshotScore, noSsException] = documentation_logging.grade_screenshot_in_catches(df_catches=df_catches)
+            noSsExp = str(noSsException).replace("'", "")
+        else:
+            screenshotScore = "[Not evaluated]"
+            noSsExp = "[Not evaluated]"
 
+        # level 3: Project.json (name and description)
+        if session['jsonLog']:
+            [json_name_score, json_description_score, project_detail, main_location] = \
+                documentation_logging.grade_project_json_name_desc()
+            project_detail = str(project_detail).replace("'", "")
+        else:
+            json_name_score = "[Not evaluated]"
+            json_description_score = "[Not evaluated]"
+            project_detail = "[Not evaluated]"
 
+        # level 3: workflow annotation
+        if session['wfAnnot']:
+            [wfAnnotationScore, notAnnotatedWf] = documentation_logging.grade_annotation_in_workflow(df_annotation=df_annotation,
+                                                                                                     main_location=main_location)
+            notAnnotWf = str(notAnnotatedWf).replace("'", "")
+        else:
+            wfAnnotationScore = "[Not evaluated]"
+            notAnnotWf = "[Not evaluated]"
+
+        # level 3: Arguments should be at least mentioned in annotation
+        # outputs a percentage score of the number of correct arguments and a list of missing arguments
+        if session['arginAnnot']:
+            [AnnotationArgumentScore, missing_arguments_list] =\
+                documentation_logging.grade_annotation_contains_arguments(df_annotation=df_annotation,
+                                                                          main_location=main_location)
+            missing_arguments_list = str(missing_arguments_list).replace("'", "")
+        else:
+            missing_arguments_list = "[Not evaluated]"
+            AnnotationArgumentScore = "[Not evaluated]"
+
+        # level 3: Comments
+        #commentScore = documentation_logging.grade_comments(df_annotation=df_annotation)
+
+        # level 2: documentation_logging score
+        lt_docScore = [wfAnnotationScore, logMessageScore, screenshotScore, json_name_score,
+                       json_description_score, AnnotationArgumentScore]
+        docScore = 0
+        count = 0
+        for i in lt_docScore:
+            if i != "[Not evaluated]":
+                docScore += i
+                count += 1
+        docScore = int(docScore / count)
+
+    else:
+        noSsExp = "[Not evaluated]"
+        notAnnotWf = "[Not evaluated]"
+        noLMExp = "[Not evaluated]"
+        missing_arguments_list = "[Not evaluated]"
+        project_detail = "[Not evaluated]"
+        docScore = "[Not evaluated]"
+
+    dict_score['documentation'] = docScore
 
 
     # establish score list and name list
-    lst_score = [namingScore, usageScore, docScore]
-    lst_tolerance = [90, 90, 100]
-    lst_checkName = ['Naming', 'Usage', 'Documentation']
+    dict_tolerance = {'naming':90, 'usage':90, 'documentation':100}
+    lst_score = []
+    lst_tolerance = []
+    lst_checkName = []
+    for checks in ['naming','usage','documentation']:
+        if session[checks]:
+            lst_score.append(dict_score[checks])
+            lst_tolerance.append(dict_tolerance[checks])
+            lst_checkName.append(checks.capitalize())
+
+
+
+
+
 
     # level 1: soft checks
     # level 2: activity stats
@@ -179,21 +375,19 @@ def __main__():
     else:
         folderStructure = project_folder_structure.list_files("/home/site/wwwroot" + app.config['UPLOAD_PATH'])
     # level 2: project structure
-    project_structure.get_project_structure(df_annotation)
-
+    main_location = documentation_logging.grade_project_json_name_desc()[3]
+    print(main_location)
+    project_structure.get_project_structure(df_annotation=df_annotation, main_location=main_location)
     # radar plot
     radar_plot.radarPlot(lst_score=lst_score, lst_tolerance=lst_tolerance, lst_checkName=lst_checkName)
 
-    improperNamedVar = str(improperNamedVariable).replace("'", "")
-    unusedVar = str(unusedVariable).replace("'", "")
-    improperNamedArg = str(improperNamedArguments).replace("'", "")
-    improperNamedAct = str(improperNamedActivities).replace("'", "")
-    noSsExp = str(noSsException).replace("'", "")
-    notAnnotWf = str(notAnnotatedWf).replace("'", "")
-    noLMExp = str(noLMException).replace("'", "")
+
 
     with app.app_context():
         return render_template('index.html',
+                               namingScore=namingScore,
+                               usageScore=usageScore,
+                               docScore=docScore,
                                improperNamedVar=improperNamedVar,
                                unusedVar=unusedVar,
                                improperNamedArg=improperNamedArg,
@@ -202,6 +396,8 @@ def __main__():
                                noSsExp=noSsExp,
                                notAnnotWf=notAnnotWf,
                                noLMExp=noLMExp,
+                               project_detail=project_detail,
+                               missing_arguments_list=missing_arguments_list,
                                folderStructure=folderStructure,
                                unusedArgument=unusedArgument)
 
@@ -209,9 +405,4 @@ def __main__():
 # only run when executing locally (if this doesnt run then remove the if statement)
 if __name__ == "__main__":
     app.run(debug=True)
-
-    #upload()
-
-__main__()
-#upload()
-
+    upload()
