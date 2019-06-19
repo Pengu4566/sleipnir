@@ -356,9 +356,10 @@ def handle_upload():
             # level 2: project structure
             main_location = documentation_logging.grade_project_json_name_desc(folderPath)[3]
             print(main_location)
-            project_structure.get_project_structure(df_annotation=df_annotation, main_location=main_location)
+            picStore = project_structure.get_project_structure(df_annotation=df_annotation, main_location=main_location)
             # radar plot
-            radar_plot.radarPlot(lst_score=lst_score, lst_tolerance=lst_tolerance, lst_checkName=lst_checkName)
+            radarStore = radar_plot.radarPlot(lst_score=lst_score, lst_tolerance=lst_tolerance, lst_checkName=lst_checkName,
+                                              main_location=main_location)
 
             # pass along the variables
             session['namingScore'] = namingScore
@@ -377,6 +378,8 @@ def handle_upload():
             session['folderStructure'] = folderStructure
             session['unusedArgument'] = unusedArgument
             session['fileFolder'] = folderPath
+            session['structurePic'] = picStore
+            session['radarStore'] = radarStore
 
             ##########################################################################################################
 
@@ -392,7 +395,8 @@ def __main__():
         # clear out content in file folder
 
         shutil.rmtree(session['fileFolder'])
-
+        radarChartPath = "/".join(session['radarStore'].split("/")[-3:])
+        structurePath = "/".join(session['structurePic'].split("/")[-3:])
 
         return render_template('index.html',
                                namingScore=session['namingScore'],
@@ -409,7 +413,16 @@ def __main__():
                                project_detail=session['project_detail'],
                                missing_arguments_list=session['missing_arguments_list'],
                                folderStructure=session['folderStructure'],
-                               unusedArgument=session['unusedArgument'])
+                               unusedArgument=session['unusedArgument'],
+                               structurePath=structurePath,
+                               radarChartPath=radarChartPath)
+
+@app.route("/retry")
+def delete_pics():
+    with app.app_context():
+        os.remove(session['structurePic'])
+        os.remove(session['radarStore'])
+        return redirect(url_for('upload'))
 
 
 # only run when executing locally (if this doesnt run then remove the if statement)
