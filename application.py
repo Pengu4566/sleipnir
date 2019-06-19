@@ -27,14 +27,6 @@ app.config['SECRET_KEY'] = 'super secret key'
 @app.route('/')
 def upload():
     with app.app_context():
-
-        # clear out content in file folder
-        for r, d, f in os.walk((os.getcwd() + app.config['UPLOAD_PATH']).replace("\\", "/")[:-1]):
-            for dir in d:
-                shutil.rmtree(r+"/"+dir)
-            for file in f:
-                os.remove(r+"/"+file)
-
         return render_template('fileUpload.html')
 
 
@@ -123,15 +115,13 @@ def handle_upload():
             filename = secure_filename(file.filename)
             filename = filename.replace("\\", "/")
 
-            # top will run locally (saving to michael's computer), bottom will run on Azure (linux)
-            if __name__ == "__main__":
-                file.save((os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\", "/"))
-                zipFile = zipfile.ZipFile((os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\","/"))
-                zipFile.extractall((os.getcwd() + app.config['UPLOAD_PATH']).replace("\\", "/"))
-            else:
-                file.save(os.getcwd() + app.config['UPLOAD_PATH'] + filename)
-                zipFile = zipfile.ZipFile(os.getcwd() + app.config['UPLOAD_PATH'] + filename)
-                zipFile.extractall(os.getcwd() + app.config['UPLOAD_PATH'])
+            # save, unzip, and remove zip
+
+            file.save((os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\", "/"))
+            zipFile = zipfile.ZipFile((os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\", "/"))
+            zipFile.extractall((os.getcwd() + app.config['UPLOAD_PATH']).replace("\\", "/"))
+            zipFile.close()
+            os.remove((os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\", "/"))
 
             ##########################################################################################################
             # file processing
@@ -378,12 +368,9 @@ def handle_upload():
             session['missing_arguments_list'] = missing_arguments_list
             session['folderStructure'] = folderStructure
             session['unusedArgument'] = unusedArgument
+            session['fileFolder'] = (os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\", "/")[:-4]
 
             ##########################################################################################################
-
-
-
-
 
             return redirect(url_for('.__main__'))
 
@@ -395,11 +382,9 @@ def __main__():
     with app.app_context():
 
         # clear out content in file folder
-        for r, d, f in os.walk((os.getcwd() + app.config['UPLOAD_PATH']).replace("\\", "/")[:-1]):
-            for dir in d:
-                shutil.rmtree(r + "/" + dir)
-            for file in f:
-                os.remove(r + "/" + file)
+
+        shutil.rmtree(session['fileFolder'])
+
 
         return render_template('index.html',
                                namingScore=session['namingScore'],
