@@ -27,6 +27,14 @@ app.config['SECRET_KEY'] = 'super secret key'
 @app.route('/')
 def upload():
     with app.app_context():
+
+        # clear out content in file folder
+        for r, d, f in os.walk((os.getcwd() + app.config['UPLOAD_PATH']).replace("\\", "/")[:-1]):
+            for dir in d:
+                shutil.rmtree(r+"/"+dir)
+            for file in f:
+                os.remove(r+"/"+file)
+
         return render_template('fileUpload.html')
 
 
@@ -94,17 +102,6 @@ def handle_upload():
         if request.form.get('ArgExpAnnot') == "ArgExpAnnot":
             session['arginAnnot'] = True
 
-
-        # clear out content in file folder
-        for r, d, f in os.walk((os.getcwd()+app.config['UPLOAD_PATH']).replace("\\","/").strip("/")):
-            for file in f:
-                os.remove((os.getcwd() + "/" + r + "/" + file).replace("\\", "/"))
-        folders = []
-        for r, d, f in os.walk((os.getcwd()+app.config['UPLOAD_PATH']).replace("\\","/").strip("/")):
-            folders = [(os.getcwd() + "/" + r).replace("\\", "/")] + folders
-        folders = folders[:-1]
-        for folder in folders:
-            os.rmdir(folder)
 
         
         # check if the post request has the file part
@@ -295,8 +292,8 @@ def handle_upload():
 
                 # level 3: workflow annotation
                 [wfAnnotationScore, notAnnotatedWf] = documentation_logging.grade_annotation_in_workflow(
-                    df_annotation=df_annotation,
-                    main_location=main_location)
+                                                                            df_annotation=df_annotation,
+                                                                            main_location=main_location)
                 if session['wfAnnot']:
                     notAnnotWf = str(notAnnotatedWf).replace("'", "")
                 else:
@@ -387,6 +384,7 @@ def handle_upload():
 
 
 
+
             return redirect(url_for('.__main__'))
 
 
@@ -395,6 +393,14 @@ def handle_upload():
 def __main__():
 
     with app.app_context():
+
+        # clear out content in file folder
+        for r, d, f in os.walk((os.getcwd() + app.config['UPLOAD_PATH']).replace("\\", "/")[:-1]):
+            for dir in d:
+                shutil.rmtree(r + "/" + dir)
+            for file in f:
+                os.remove(r + "/" + file)
+
         return render_template('index.html',
                                namingScore=session['namingScore'],
                                usageScore=session['usageScore'],
