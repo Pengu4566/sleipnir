@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import zipfile
+from random import randint
 from werkzeug.utils import secure_filename
 import shutil
 
@@ -118,18 +119,28 @@ def handle_upload():
             # save, unzip, and remove zip
 
             file.save((os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\", "/"))
+            folderPath = (os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\", "/")[:-4]
             zipFile = zipfile.ZipFile((os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\", "/"))
-            zipFile.extractall((os.getcwd() + app.config['UPLOAD_PATH']).replace("\\", "/"))
+            if os.path.isdir(folderPath):
+                folderExist = True
+                count = 1
+                while folderExist:
+                    folderPath = (os.getcwd() + app.config['UPLOAD_PATH'] + filename[:-4] + str(count))\
+                                     .replace("\\", "/")
+                    folderExist = os.path.isdir(folderPath)
+                    count += 1
+
+            zipFile.extractall(folderPath)
+
             zipFile.close()
             os.remove((os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\", "/"))
 
             ##########################################################################################################
             # file processing
-
-            filePath = "file"
             files = []
+            print(folderPath)
 
-            for r, d, f in os.walk(filePath):
+            for r, d, f in os.walk(folderPath):
                 for file in f:
                     if '.xaml' in file:
                         files.append(os.path.join(r, file).replace("\\", "/"))
@@ -273,7 +284,7 @@ def handle_upload():
                 # level 3: Project.json (name and description)
                 if session['jsonLog']:
                     [json_name_score, json_description_score, project_detail, main_location] = \
-                        documentation_logging.grade_project_json_name_desc()
+                        documentation_logging.grade_project_json_name_desc(folderPath)
                     project_detail = str(project_detail).replace("'", "")
                 else:
                     json_name_score = "[Not evaluated]"
@@ -341,12 +352,9 @@ def handle_upload():
             # level 2: activity stats
             activityStats = activity_stats.get_activity_stats(df_activity=df_activity)
             # level 2: folder structure
-            if __name__ == "__main__":
-                folderStructure = project_folder_structure.list_files(os.getcwd() + app.config['UPLOAD_PATH'])
-            else:
-                folderStructure = project_folder_structure.list_files("/home/site/wwwroot" + app.config['UPLOAD_PATH'])
+            folderStructure = project_folder_structure.list_files(main_location=main_location)
             # level 2: project structure
-            main_location = documentation_logging.grade_project_json_name_desc()[3]
+            main_location = documentation_logging.grade_project_json_name_desc(folderPath)[3]
             print(main_location)
             project_structure.get_project_structure(df_annotation=df_annotation, main_location=main_location)
             # radar plot
@@ -368,7 +376,7 @@ def handle_upload():
             session['missing_arguments_list'] = missing_arguments_list
             session['folderStructure'] = folderStructure
             session['unusedArgument'] = unusedArgument
-            session['fileFolder'] = (os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\", "/")[:-4]
+            session['fileFolder'] = folderPath
 
             ##########################################################################################################
 

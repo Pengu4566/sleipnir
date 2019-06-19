@@ -59,13 +59,13 @@ def grade_screenshot_in_catches(df_catches):
 # end 3. Screenshot in catches
 
 # 4. Project.json (name and description)
-def grade_project_json_name_desc():
+def grade_project_json_name_desc(folderPath):
     fileName = "project.json"
     project_name = "NO PROJECT FOUND"
     project_description = "NO DESCRIPTION FOUND"
     json_name_score = 0
     json_description_score = 0
-    for root, dirs, file in os.walk("file/"):
+    for root, dirs, file in os.walk(folderPath):
         if fileName in file:
             project_folder_name = root.replace("\\","/")
             # open file and collect data
@@ -97,8 +97,6 @@ def grade_project_json_name_desc():
 
 # 5. Annotations in invoked workflow
 def grade_annotation_in_workflow(df_annotation, main_location):
-    df_annotation['workflowName'] = main_location + "/" + df_annotation['workflowName']
-    df_annotation['invokedBy'] = main_location + "/" + df_annotation['invokedBy']
     completeProject = True
     for workflowPath in list(df_annotation['workflowName']):
         try:
