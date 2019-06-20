@@ -394,7 +394,7 @@ def __main__():
 
         # clear out content in file folder
 
-        shutil.rmtree(session['fileFolder'])
+        #shutil.rmtree(session['fileFolder'])
         radarChartPath = "/".join(session['radarStore'].split("/")[-3:])
         structurePath = "/".join(session['structurePic'].split("/")[-3:])
 
@@ -420,8 +420,8 @@ def __main__():
 @app.route("/retry")
 def delete_pics():
     with app.app_context():
-        os.remove(session['structurePic'])
-        os.remove(session['radarStore'])
+        #os.remove(session['structurePic'])
+        #os.remove(session['radarStore'])
         return redirect(url_for('upload'))
 
 
