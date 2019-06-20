@@ -3,9 +3,10 @@ import pandas as pd
 import zipfile
 from werkzeug.utils import secure_filename
 import shutil
-import System
-
-
+import tempfile
+import sys
+##
+##
 # dataframes
 from dataframes import variable_dataframe, argument_dataframe, activity_dataframe, catch_dataframe, annotation_dataframe
 
@@ -28,7 +29,8 @@ app.config['SECRET_KEY'] = 'super secret key'
 @app.route('/')
 def upload():
     with app.app_context():
-        temp_filepath = System.IO.Path.GetTempPath()
+        #print(os.listdir("D:/"))
+        print(tempfile.gettempdir(), file=sys.stderr)
         return render_template('fileUpload.html')
 
 
