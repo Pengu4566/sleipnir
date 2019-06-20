@@ -102,7 +102,9 @@ def handle_upload():
         
         # check if the post request has the file part
         if 'file' not in request.files:
-            return "You must pick a file! Use your browser's back button and try again."
+            #print(tempfile.gettempdir(), file=sys.stderr)
+            return tempfile.gettempdir()
+                #"You must pick a file! Use your browser's back button and try again."
         file = request.files['file']
         # if user does not select file, browser also
         # submit an empty part without filename
@@ -173,10 +175,7 @@ def __main__():
 
         # checks for empty files list, program should end if this gets triggered
         if (files == []):
-            # print(os.listdir("D:/"))
-            #print(tempfile.gettempdir(), file=sys.stderr)
-            return tempfile.gettempdir()
-                #"Could not find project files! Did you put them in the right place?"
+            return "Could not find project files! Did you put them in the right place?"
 
         # scans all project files and populates dataframes with relevant info
         for filePath in files:
