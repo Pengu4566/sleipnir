@@ -3,6 +3,7 @@ import pandas as pd
 import zipfile
 from werkzeug.utils import secure_filename
 import shutil
+import System
 
 
 # dataframes
@@ -27,6 +28,7 @@ app.config['SECRET_KEY'] = 'super secret key'
 @app.route('/')
 def upload():
     with app.app_context():
+        temp_filepath = System.IO.Path.GetTempPath()
         return render_template('fileUpload.html')
 
 
