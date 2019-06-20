@@ -29,8 +29,7 @@ app.config['SECRET_KEY'] = 'super secret key'
 @app.route('/')
 def upload():
     with app.app_context():
-        #print(os.listdir("D:/"))
-        print(tempfile.gettempdir(), file=sys.stderr)
+
         return render_template('fileUpload.html')
 
 
@@ -174,7 +173,10 @@ def __main__():
 
         # checks for empty files list, program should end if this gets triggered
         if (files == []):
-            return "Could not find project files! Did you put them in the right place?"
+            # print(os.listdir("D:/"))
+            #print(tempfile.gettempdir(), file=sys.stderr)
+            return tempfile.gettempdir()
+                #"Could not find project files! Did you put them in the right place?"
 
         # scans all project files and populates dataframes with relevant info
         for filePath in files:
