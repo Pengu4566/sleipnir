@@ -1,10 +1,13 @@
 const webpack = require("webpack");
 
 const config = {
-  entry: __dirname + "/js/index.jsx",
+  entry: {
+    index: __dirname + "/js/index.jsx",
+    fileUpload: __dirname + "/js/fileUpload.jsx"
+  },
   output: {
     path: __dirname + "/dist",
-    filename: "index.js"
+    filename: "[name].js"
   },
   resolve: {
     extensions: [".js", ".jsx", ".css"]
@@ -15,6 +18,10 @@ const config = {
         test: /\.jsx?/,
         exclude: /node_modules/,
         use: "babel-loader"
+      },
+      {
+        test: /\.css$/,
+        loader: ["style-loader", "css-loader"]
       }
     ]
   }

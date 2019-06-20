@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import styles from "../css/index.css";
 import ImproperNamedVarBlock from "./checkBlocks/ImproperNamedVarBlock";
 import UnusedVarBlock from "./checkBlocks/UnusedVarBlock";
 import ImproperNamedArgBlock from "./checkBlocks/ImproperNamedArgBlock";
@@ -8,6 +9,8 @@ import ImproperNamedActBlock from "./checkBlocks/ImproperNamedActBlock";
 import NoSsExpBlock from "./checkBlocks/NoSsExpBlock";
 import NotAnnotWfBlock from "./checkBlocks/NotAnnotWfBlock";
 import NoLMExpBlock from "./checkBlocks/NoLMExpBlock";
+import ArginAnnotBlock from "./checkBlocks/ArginAnnotBlock";
+import JsonLogBlock from "./checkBlocks/JsonLogBlock";
 
 ReactDOM.render(
   <ImproperNamedVarBlock name={window.improperNamedVar} />,
@@ -47,4 +50,14 @@ ReactDOM.render(
 ReactDOM.render(
   <NoLMExpBlock name={window.noLMExp} />,
   document.getElementById("ExpLM")
+);
+
+ReactDOM.render(
+  <JsonLogBlock name={window.projectDetail} />,
+  document.getElementById("JsonLog")
+);
+
+ReactDOM.render(
+  <ArginAnnotBlock name={window.missingArg} />,
+  document.getElementById("ArginAnnot")
 );
