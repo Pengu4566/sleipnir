@@ -36,9 +36,10 @@ def upload():
             for file in f:
                 createTime = time.ctime(
                     os.path.getctime((os.getcwd() + "/" + "static/dist/chart/" + file).replace("\\", "/")))
-                createDate = "/".join(createTime.split(" ")[1:3]) + "/" + createTime.split(" ")[4]
-                dateDiff = (datetime.now() - datetime.strptime(createDate, "%b/%d/%Y")).days
-                if dateDiff >= 1:
+                createDate = "/".join(createTime.split(" ")[1:3]) + "/" + createTime.split(" ")[4] + " " + \
+                             createTime.split(" ")[3]
+                timeDiff = (datetime.now() - datetime.strptime(createDate, "%b/%d/%Y %H:%M:%S")).seconds / 60
+                if timeDiff >= 20:
                     os.remove((os.getcwd() + "/" + "static/dist/chart/" + file).replace("\\", "/"))
 
         return render_template('fileUpload.html')
