@@ -2,6 +2,8 @@ import pandas as pd
 from math import pi
 import matplotlib.pyplot as plt
 from os import path
+from random import randint
+import time
 
 # radar chart
 def radarPlot(lst_score, lst_tolerance, lst_checkName, main_location):
@@ -36,14 +38,14 @@ def radarPlot(lst_score, lst_tolerance, lst_checkName, main_location):
     ax.plot(angles, values, linewidth=1, linestyle='--', label="group B")
 
     # finish up
-    radarStore = "/".join(main_location.split("/")[:-3]) + "/static/dist/chart/radar.png"
-    count = 1
+    radarStore = "/".join(main_location.split("/")[:-3]) + "/static/dist/chart/radar"\
+                 + str(time.time()).replace(".", "") + str(randint(1, 999999999999)) + ".png"
     picExists = path.isfile(radarStore)
     while picExists:
-        radarStore = "/".join(main_location.split("/")[:-3]) + "/static/dist/chart/radar" + str(
-            count) + ".png"
+        radarStore = "/".join(main_location.split("/")[:-3]) + "/static/dist/chart/radar" \
+                     + str(time.time()).replace(".", "") + str(randint(1, 999999999999)) + ".png"
         picExists = path.isfile(radarStore)
-        count += 1
+
     plt.savefig(radarStore)
     plt.close()
 

@@ -3,6 +3,8 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from os import path
+import time
+from random import randint
 
 
 def get_project_structure(df_annotation, main_location):
@@ -15,13 +17,14 @@ def get_project_structure(df_annotation, main_location):
     G = nx.from_pandas_edgelist(df_invokeWf, 'invokedBy', 'workflowName', create_using=nx.DiGraph())
     plt.figure(figsize=(15, 15))
     nx.draw(G, with_labels=True, node_size=1500, alpha=0.3, arrows=True)
-    picStore = "/".join(main_location.split("/")[:-3]) + "/static/dist/chart/project_structure.png"
-    count = 1
+
+    picStore = "/".join(main_location.split("/")[:-3]) + "/static/dist/chart/project_structure"\
+               + str(time.time()).replace(".", "") + str(randint(1, 99999999999)) + ".png"
     picExists = path.isfile(picStore)
     while picExists:
-        picStore = "/".join(main_location.split("/")[:-3]) + "/static/dist/chart/project_structure"+str(count)+".png"
+        picStore = "/".join(main_location.split("/")[:-3]) + "/static/dist/chart/project_structure" \
+                   + str(time.time()).replace(".", "") + str(randint(1, 99999999999)) + ".png"
         picExists = path.isfile(picStore)
-        count += 1
 
     plt.savefig(picStore)
     plt.close()

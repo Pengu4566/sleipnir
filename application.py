@@ -3,6 +3,8 @@ import pandas as pd
 import zipfile
 from werkzeug.utils import secure_filename
 import shutil
+import time
+from random import randint
 
 
 # dataframes
@@ -117,23 +119,34 @@ def handle_upload():
             filename = filename.replace("\\", "/")
 
             # save, unzip, and remove zip
+            generatedFileNaming = filename[:-4] + str(time.time()).replace(".", "") +\
+                                  str(randint(1, 999999999999)) + ".zip"
+            if os.path.isfile(os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming):
+                nameDup = True
+                while nameDup:
+                    generatedFileNaming = filename[:-4] + str(time.time()).replace(".", "") +\
+                                          str(randint(1, 999999999999)) + ".zip"
+                    nameDup = os.path.isfile(os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming)
+            file.save((os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming).replace("\\", "/"))
+            generatedFolderName = filename[:-4] + str(time.time()).replace(".", "") + str(randint(1, 999999999999))
 
-            file.save((os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\", "/"))
-            folderPath = (os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\", "/")[:-4]
-            zipFile = zipfile.ZipFile((os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\", "/"))
-            if os.path.isdir(folderPath):
+            if os.path.isdir((os.getcwd() + app.config['UPLOAD_PATH'] + generatedFolderName).replace("\\", "/")):
                 folderExist = True
-                count = 1
                 while folderExist:
-                    folderPath = (os.getcwd() + app.config['UPLOAD_PATH'] + filename[:-4] + str(count))\
-                                     .replace("\\", "/")
-                    folderExist = os.path.isdir(folderPath)
-                    count += 1
+                    generatedFolderName = filename[:-4] + str(time.time()).replace(".", "") +\
+                                          str(randint(1, 999999999999))
+                    folderExist = os.path.isdir((os.getcwd() + app.config['UPLOAD_PATH'] +
+                                                 generatedFolderName).replace("\\", "/"))
+
+            folderPath = (os.getcwd() + app.config['UPLOAD_PATH'] + generatedFolderName).replace("\\", "/")
+            zipFile = zipfile.ZipFile((os.getcwd() + app.config['UPLOAD_PATH'] +
+                                       generatedFileNaming).replace("\\", "/"))
+
 
             zipFile.extractall(folderPath)
 
             zipFile.close()
-            os.remove((os.getcwd() + app.config['UPLOAD_PATH'] + filename).replace("\\", "/"))
+            os.remove((os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming).replace("\\", "/"))
             session['folderPath'] = folderPath
 
 
@@ -389,15 +402,14 @@ def __main__():
         # session['missing_arguments_list'] = missing_arguments_list
         # session['folderStructure'] = folderStructure
         # session['unusedArgument'] = unusedArgument
-        # session['fileFolder'] = folderPath
         session['structurePic'] = picStore
         session['radarStore'] = radarStore
 
         ##########################################################################################################
 
         # clear out content in file folder
-
-        #shutil.rmtree(session['fileFolder'])
+        print(folderPath)
+        shutil.rmtree(folderPath)
         radarChartPath = "/".join(session['radarStore'].split("/")[-3:])
         structurePath = "/".join(session['structurePic'].split("/")[-3:])
 
@@ -419,6 +431,7 @@ def __main__():
                                unusedArgument=unusedArgument,
                                structurePath=structurePath,
                                radarChartPath=radarChartPath)
+
 
 @app.route("/retry")
 def delete_pics():
