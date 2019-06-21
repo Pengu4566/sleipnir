@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 import shutil
 import tempfile
 import sys
+
 ##
 ##
 # dataframes
@@ -15,7 +16,8 @@ from charts import radar_plot
 from grading_checks import naming, usage, documentation_logging, error_handling
 from soft_checks import activity_stats, project_folder_structure, project_structure
 
-from flask import Flask, request, render_template, redirect, url_for, session
+from flask import Flask, request, render_template, redirect, url_for, session, jsonify
+
 app = Flask(__name__, static_folder='./static/dist', template_folder="./static")
 
 # dont save cache in web browser (updating results image correctly)
@@ -25,6 +27,7 @@ app.config['UPLOAD_PATH'] = '/file/'
 app.config['ALLOWED_EXTENSIONS'] = set(['zip'])
 app.config['SECRET_KEY'] = 'super secret key'
 
+dict_score = {}
 
 @app.route('/')
 def upload():
@@ -195,7 +198,7 @@ def __main__():
             df_annotation = annotation_dataframe.populate_annotation_dataframe(df_annotation=df_annotation,
                                                                                filePath=filePath)
 
-        dict_score = {}
+
         # level 1: grading checks
 
         # level 2: name
@@ -431,6 +434,15 @@ def delete_pics():
         os.remove(session['structurePic'])
         os.remove(session['radarStore'])
         return redirect(url_for('upload'))
+
+
+@app.route("/radar", methods=['GET'])
+def radar_plot_data():
+    #print("THIS IS A LOG MESSAGE" + str(dict_score['naming']), file=sys.stderr)
+    message = {'usage': dict_score['usage'],
+               'documentation': dict_score['documentation'],
+               'naming': dict_score['naming']}
+    return jsonify(message)  # serialize and use JSON headers
 
 
 # only run when executing locally (if this doesnt run then remove the if statement)
