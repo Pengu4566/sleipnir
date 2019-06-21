@@ -5,6 +5,7 @@ from werkzeug.utils import secure_filename
 import shutil
 import time
 from random import randint
+from datetime import datetime
 import tempfile
 import sys
 ##
@@ -31,6 +32,14 @@ app.config['SECRET_KEY'] = 'super secret key'
 @app.route('/')
 def upload():
     with app.app_context():
+        for r, d, f in os.walk((os.getcwd() + "/" + "static/dist/chart").replace("\\", "/")):
+            for file in f:
+                createTime = time.ctime(
+                    os.path.getctime((os.getcwd() + "/" + "static/dist/chart/" + file).replace("\\", "/")))
+                createDate = "/".join(createTime.split(" ")[1:3]) + "/" + createTime.split(" ")[4]
+                dateDiff = (datetime.now() - datetime.strptime(createDate, "%b/%d/%Y")).days
+                if dateDiff >= 1:
+                    os.remove((os.getcwd() + "/" + "static/dist/chart/" + file).replace("\\", "/"))
 
         return render_template('fileUpload.html')
 
@@ -440,8 +449,6 @@ def __main__():
 @app.route("/retry")
 def delete_pics():
     with app.app_context():
-        os.remove(session['structurePic'])
-        os.remove(session['radarStore'])
         return redirect(url_for('upload'))
 
 
