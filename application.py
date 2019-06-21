@@ -5,8 +5,10 @@ from werkzeug.utils import secure_filename
 import shutil
 import time
 from random import randint
-
-
+import tempfile
+import sys
+##
+##
 # dataframes
 from dataframes import variable_dataframe, argument_dataframe, activity_dataframe, catch_dataframe, annotation_dataframe
 
@@ -29,6 +31,7 @@ app.config['SECRET_KEY'] = 'super secret key'
 @app.route('/')
 def upload():
     with app.app_context():
+
         return render_template('fileUpload.html')
 
 
@@ -101,6 +104,7 @@ def handle_upload():
         
         # check if the post request has the file part
         if 'file' not in request.files:
+            #print(tempfile.gettempdir())
             return "You must pick a file! Use your browser's back button and try again."
         file = request.files['file']
         # if user does not select file, browser also
