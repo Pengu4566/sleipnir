@@ -1,6 +1,7 @@
 import untangle
 import pandas as pd
 import re
+import xml
 
 def populate_variables_dataframe(df_variable, filePath):
     temp_df_variable = pd.DataFrame(columns=['variableType', 'variableName', 'count', 'filePath'])
@@ -8,10 +9,15 @@ def populate_variables_dataframe(df_variable, filePath):
     with open(filePath, encoding='utf-8', mode='r') as f:
         for line in f:
             if line.strip(" ").startswith('<Variable x:'):
-                variableName = untangle.parse(line.strip(" ")).children[0]['Name']
-                dataType = untangle.parse(line.strip(" ")).children[0]['x:TypeArguments'].split(":")[1].split("(")[0]
+                try:
+                    variableName = untangle.parse(line.strip(" ")).children[0]['Name']
+                    dataType = untangle.parse(line.strip(" ")).children[0]['x:TypeArguments'].split(":")[1]\
+                        .split("(")[0].lower()
+                except xml.sax._exceptions.SAXParseException:
+                    variableName = re.search("Name=\"[^\"]*\"", line).group(0).replace("Name='", "").replace("'", "")
+                    dataType = re.search("x:TypeArguments=\"[^\"]*\"", line).group(0).split(":")[1].split("(")[0].lower()
                 if '[]' in dataType:
-                    dataType = 'Array'
+                    dataType = 'array'
                 if filePath not in list(df_variable[df_variable.variableName == variableName].filePath):
                     temp_df_variable = temp_df_variable.append({'variableType': dataType, 'variableName': variableName,
                                                                 'count': 1, 'filePath': filePath}, ignore_index=True)

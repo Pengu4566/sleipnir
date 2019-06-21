@@ -1,9 +1,10 @@
 import pandas as pd
 from math import pi
 import matplotlib.pyplot as plt
+from os import path
 
 # radar chart
-def radarPlot(lst_score, lst_tolerance, lst_checkName):
+def radarPlot(lst_score, lst_tolerance, lst_checkName, main_location):
     # Set data
     dict = {'group': ['Score', 'tolerance']}
     for i in range(len(lst_score)):
@@ -35,6 +36,16 @@ def radarPlot(lst_score, lst_tolerance, lst_checkName):
     ax.plot(angles, values, linewidth=1, linestyle='--', label="group B")
 
     # finish up
-    plt.savefig('static/dist/Score.png')
+    radarStore = "/".join(main_location.split("/")[:-3]) + "/static/dist/chart/radar.png"
+    count = 1
+    picExists = path.isfile(radarStore)
+    while picExists:
+        radarStore = "/".join(main_location.split("/")[:-3]) + "/static/dist/chart/radar" + str(
+            count) + ".png"
+        picExists = path.isfile(radarStore)
+        count += 1
+    plt.savefig(radarStore)
     plt.close()
+
+    return radarStore
 # end radar chart

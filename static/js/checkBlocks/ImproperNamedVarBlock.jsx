@@ -4,38 +4,43 @@ export default class ImproperNamedVarBlock extends React.Component {
   render() {
     if (this.props.name == "[]") {
       return (
-        <div>
-          <p>There is no improperly named variable.</p>
-          <p>
-            {" "}
-            --------------------------------------------------------------------------------------------------------------{" "}
-          </p>
+        <div className="single_check">
+          <h3>Variable Naming</h3>
+          <div className="check_explain">
+            <p>
+              Variable naming is evaluated according to camel case rule and the
+              variable's data type.
+            </p>
+            <p>
+              According to our best practice, there is no improperly named
+              variable.
+            </p>
+          </div>
         </div>
       );
     } else if (this.props.name == "[There is no variable in your project.]") {
       return (
-        <div>
-          <p>There is no variable in your project.</p>
-          <p>
-            {" "}
-            --------------------------------------------------------------------------------------------------------------{" "}
-          </p>
+        <div className="single_check">
+          <h3>Variable Naming</h3>
+          <div className="check_explain">
+            <p>There is no variable in your project.</p>
+          </div>
         </div>
       );
+    } else if (this.props.name == "[Not evaluated]") {
+      return <div />;
     } else {
       return (
-        <div>
-          <p>
-            {" "}
-            A proper variable name should start with an abbreviation of data
-            type, following by a hyphen to data name. Variables that are not
-            properly named include:{" "}
-          </p>
-          <p>{this.props.name}</p>
-          <p>
-            {" "}
-            --------------------------------------------------------------------------------------------------------------{" "}
-          </p>
+        <div className="single_check">
+          <h3>Variable Naming</h3>
+          <div className="check_explain">
+            <p>
+              Variable naming is evaluated according to camel case rule and the
+              variable's data type. Variables that are not properly named
+              include:
+            </p>
+            <p>{this.props.name}</p>
+          </div>
         </div>
       );
     }

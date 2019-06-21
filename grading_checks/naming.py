@@ -15,9 +15,14 @@ def grade_variable_name(df_variable):
         if "_" in df_variable_row['variableName']:
             # check camelcase
             # For right of "_" apply:
-            afterUnderscoreString = df_variable_row['variableName'].split('_')[1]
+            try:
+                afterUnderscoreString = df_variable_row['variableName'].split('_')[1]
+            except IndexError:
+                return False
             # first char must not be upper
-            if afterUnderscoreString[0].isupper():
+            if len(afterUnderscoreString) == 0:
+                return False
+            elif afterUnderscoreString[0].isupper():
                 return False
             else:
                 # Any upper case may be not be next to another upper case
@@ -32,31 +37,29 @@ def grade_variable_name(df_variable):
                         return False
             # if passed camelcase checking, check for abbreviation
             # variable type is in dict above and format matches ['abbreviation''_''anything'] i.e.(int_counter, str_thing)
-            dic_type_abbreviation = {'String': 'str',
-                                     'Int32': 'int',
-                                     'DataColumn': 'dclm',
-                                     'Double': 'dbl',
-                                     'DateTime': 'date',
-                                     'Array': 'arr',
-                                     'List': 'lst',
-                                     'Dictionary': 'dic',
-                                     'Exception': 'ept',
-                                     'QueueItem': 'qi'}
-            if (df_variable_row['variableType'] in dic_type_abbreviation.keys()) and \
-                    (df_variable_row['variableName'].startswith(
-                        dic_type_abbreviation[df_variable_row['variableType']] + '_')):
-                return True
+            dic_type_abbreviation = {'string': 'str',
+                                     'int32': 'int',
+                                     'datacolumn': 'dclm',
+                                     'double': 'dbl',
+                                     'dateTime': 'date',
+                                     'array': 'arr',
+                                     'list': 'lst',
+                                     'dictionary': 'dic',
+                                     'exception': 'ept',
+                                     'queueItem': 'qi'}
+            if df_variable_row['variableType'] in dic_type_abbreviation.keys():
+                if df_variable_row['variableName'].startswith(dic_type_abbreviation
+                                                              [df_variable_row['variableType']] + '_'):
+                    return True
+                return False
             # variable type is not in above dict but format still matches ['abbreviation''_''anything']
-            elif (not df_variable_row['variableType'] in dic_type_abbreviation.keys()) and \
-                    ('_' in df_variable_row['variableName']):
+            else:
                 variableType = df_variable_row['variableType']
                 for j in df_variable_row['variableName'].split('_')[0]:
                     if j not in variableType:
                         return False
                     variableType = variableType[(variableType.find(j)+1):]
                 return True
-            else:
-                return False
         # if there is no "_" in the name
         else:
             return False
@@ -101,16 +104,16 @@ def grade_argument_name(df_argument):
             pass_io = True
         if pass_io:
             # check for abbreviation
-            dic_type_abbreviation = {'String': 'str',
-                                     'Int32': 'int',
-                                     'DataColumn': 'dclm',
-                                     'Double': 'dbl',
-                                     'DateTime': 'date',
-                                     'Array': 'arr',
-                                     'List': 'lst',
-                                     'Dictionary': 'dic',
-                                     'Exception': 'ept',
-                                     'QueueItem': 'qi'}
+            dic_type_abbreviation = {'string': 'str',
+                                     'int32': 'int',
+                                     'datacolumn': 'dclm',
+                                     'double': 'dbl',
+                                     'dateTime': 'date',
+                                     'array': 'arr',
+                                     'list': 'lst',
+                                     'dictionary': 'dic',
+                                     'exception': 'ept',
+                                     'queueitem': 'qi'}
             if (len(df_argument_row['argumentName']) -
                 len(df_argument_row['argumentName'].replace("_", ""))) >= 2:
                 substring = df_argument_row['argumentName'].split("_")[1]
