@@ -202,6 +202,7 @@ def __main__():
         # scans all project files and populates dataframes with relevant info
         for filePath in files:
             print("Worker "+str(os.getpid())+": Progress %d/%d: Scanning %s" % (fileCount, numFiles, filePath))
+            time.sleep(0.05)
             fileCount += 1
 
             # variables dataframe
