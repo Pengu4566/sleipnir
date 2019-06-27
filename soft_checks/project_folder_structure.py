@@ -5,7 +5,6 @@ import os
 def list_files(main_location):
     dirName = ''
     folder = "/".join(main_location.split("/")[:-1])
-    print(folder)
     for root, dirs, files in os.walk(folder):
         if (len(dirs) == 1) and (len(files) == 0):
             break
