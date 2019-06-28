@@ -77,6 +77,8 @@ def connect():
 @app.route("/uploader", methods=['GET', 'POST'])
 def handle_upload():
     if request.method == 'POST':
+        socketio.emit('message', {'alive': "Session Checks 1"})
+        socketio.sleep(0.01)
         # get value of checkboxes
         session['naming'] = False
         session['varNaming'] = False
@@ -94,7 +96,7 @@ def handle_upload():
         session['jsonLog'] = False
         session['arginAnnot'] = False
 
-        socketio.emit('message', {'alive': "Session Checks"})
+        socketio.emit('message', {'alive': "Session Checks 2"})
         socketio.sleep(0.01)
 
         # naming
