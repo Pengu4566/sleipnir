@@ -6,7 +6,7 @@ import shutil
 import time
 from random import randint
 from datetime import datetime, timedelta
-import threading
+import eventlet
 import tempfile
 import sys
 ##
@@ -64,7 +64,8 @@ def background_thread():
     while True:
         print("1")
         socketio.emit('message', {'alive': "Alive"})
-        socketio.sleep(60)
+        socketio.sleep(10)
+        eventlet.sleep(10)
 
 
 @socketio.on('connect')
@@ -79,6 +80,7 @@ def handle_upload():
     if request.method == 'POST':
         socketio.emit('message', {'alive': "Session Checks 1"})
         socketio.sleep(0.01)
+        eventlet.sleep(0.01)
         # get value of checkboxes
         session['naming'] = False
         session['varNaming'] = False
@@ -98,6 +100,7 @@ def handle_upload():
 
         socketio.emit('message', {'alive': "Session Checks 2"})
         socketio.sleep(0.01)
+        eventlet.sleep(0.01)
 
         # naming
         if request.form.get('Naming') == "Naming":
@@ -208,6 +211,7 @@ def handle_upload():
 
             socketio.emit('message', {'alive': "Starting DF"})
             socketio.sleep(0.01)
+            eventlet.sleep(0.01)
 
             # dataframe initiation
             df_variable = pd.DataFrame(columns=['variableType', 'variableName', 'count', 'filePath'])
