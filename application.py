@@ -47,7 +47,7 @@ thread = None
 @app.route('/')
 def upload():
     with app.app_context():
-        socketio.emit('message', {'alive': "test"})
+        socketio.emit('message', {'alive': "test"}, namespace="/")
         socketio.sleep(1)
         for r, d, f in os.walk((os.getcwd() + "/" + "static/dist/chart").replace("\\", "/")):
             for file in f:
@@ -78,11 +78,12 @@ def connect():
 
 @app.route("/uploader", methods=['GET', 'POST'])
 def handle_upload():
-    socketio.emit('message', {'alive': "In Uploader"})
-    # socketio.sleep(0.01)
-    eventlet.sleep(0.01)
+    socketio.emit('message', {'alive': "In Uploader"}, namespace="/uploader")
+    socketio.sleep(0.01)
+    # eventlet.sleep(0.01)
+
     if request.method == 'POST':
-        socketio.emit('message', {'alive': "Session Checks 1"})
+        socketio.emit('message', {'alive': "Session Checks 1"}, namespace="/uploader")
         #socketio.sleep(0.01)
         socketio.sleep(0.01)
         # get value of checkboxes
@@ -102,7 +103,7 @@ def handle_upload():
         session['jsonLog'] = False
         session['arginAnnot'] = False
 
-        socketio.emit('message', {'alive': "Session Checks 2"})
+        socketio.emit('message', {'alive': "Session Checks 2"}, namespace="/uploader")
         socketio.sleep(0.01)
 
         # naming
@@ -212,9 +213,9 @@ def handle_upload():
                     if '.xaml' in file:
                         files.append(os.path.join(r, file).replace("\\", "/"))
 
-            socketio.emit('message', {'alive': "Starting DF"})
+            socketio.emit('message', {'alive': "Starting DF"}, namespace="/uploader")
             socketio.sleep(0.01)
-            eventlet.sleep(0.01)
+            # eventlet.sleep(0.01)
 
             # dataframe initiation
             df_variable = pd.DataFrame(columns=['variableType', 'variableName', 'count', 'filePath'])
