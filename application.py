@@ -60,26 +60,29 @@ def upload():
         return render_template('fileUpload.html')
 
 
-# def background_thread():
-#     while True:
-#         print("1")
-#         socketio.emit('message', {'alive': "Alive"})
-#         socketio.sleep(10)
-#         eventlet.sleep(10)
-#
-#
-# @socketio.on('connect')
-# def connect():
-#     global thread
-#     if thread is None:
-#         thread = socketio.start_background_task(target=background_thread)
+def background_thread():
+    while True:
+        print("1")
+        socketio.emit('message', {'alive': "Alive"})
+        socketio.sleep(10)
+        eventlet.sleep(10)
+
+
+@socketio.on('connect')
+def connect():
+    global thread
+    if thread is None:
+        thread = socketio.start_background_task(target=background_thread)
 
 
 @app.route("/uploader", methods=['GET', 'POST'])
 def handle_upload():
+    socketio.emit('message', {'alive': "In Uploader"})
+    # socketio.sleep(0.01)
+    eventlet.sleep(0.01)
     if request.method == 'POST':
         socketio.emit('message', {'alive': "Session Checks 1"})
-        socketio.sleep(0.01)
+        #socketio.sleep(0.01)
         eventlet.sleep(0.01)
         # get value of checkboxes
         session['naming'] = False
