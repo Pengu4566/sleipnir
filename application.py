@@ -60,19 +60,19 @@ def upload():
         return render_template('fileUpload.html')
 
 
-def background_thread():
-    while True:
-        print("1")
-        socketio.emit('message', {'alive': "Alive"})
-        socketio.sleep(10)
-        eventlet.sleep(10)
-
-
-@socketio.on('connect')
-def connect():
-    global thread
-    if thread is None:
-        thread = socketio.start_background_task(target=background_thread)
+# def background_thread():
+#     while True:
+#         print("1")
+#         socketio.emit('message', {'alive': "Alive"})
+#         socketio.sleep(10)
+#         eventlet.sleep(10)
+#
+#
+# @socketio.on('connect')
+# def connect():
+#     global thread
+#     if thread is None:
+#         thread = socketio.start_background_task(target=background_thread)
 
 
 @app.route("/uploader", methods=['GET', 'POST'])
@@ -210,8 +210,8 @@ def handle_upload():
                         files.append(os.path.join(r, file).replace("\\", "/"))
 
             socketio.emit('message', {'alive': "Starting DF"})
-            socketio.sleep(0.01)
-            eventlet.sleep(0.01)
+            # socketio.sleep(60)
+            eventlet.sleep(60)
 
             # dataframe initiation
             df_variable = pd.DataFrame(columns=['variableType', 'variableName', 'count', 'filePath'])
