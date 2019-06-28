@@ -94,6 +94,9 @@ def handle_upload():
         session['jsonLog'] = False
         session['arginAnnot'] = False
 
+        socketio.emit('message', {'alive': "Session Checks"})
+        socketio.sleep(0.01)
+
         # naming
         if request.form.get('Naming') == "Naming":
             session['naming'] = True
@@ -201,6 +204,9 @@ def handle_upload():
                     if '.xaml' in file:
                         files.append(os.path.join(r, file).replace("\\", "/"))
 
+            socketio.emit('message', {'alive': "Starting DF"})
+            socketio.sleep(0.01)
+
             # dataframe initiation
             df_variable = pd.DataFrame(columns=['variableType', 'variableName', 'count', 'filePath'])
             df_argument = pd.DataFrame(columns=['argumentName', 'argumentType', 'filePath', 'dataType', 'count'])
@@ -221,7 +227,7 @@ def handle_upload():
                 progress = "Progress " + str(fileCount) + "/" + str(numFiles) + ": Scanning " + filePath
                 print("Worker " + str(os.getpid()) + ": " + progress)
                 socketio.emit('progress', {'data': progress})
-                socketio.sleep(5)
+                socketio.sleep(0.01)
                 # variables dataframe
                 df_variable = variable_dataframe.populate_variables_dataframe(df_variable=df_variable,
                                                                               filePath=filePath)
