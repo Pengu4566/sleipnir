@@ -211,7 +211,7 @@ def handle_upload():
 
             socketio.emit('message', {'alive': "Starting DF"})
             # socketio.sleep(60)
-            eventlet.sleep(60)
+            eventlet.sleep(0.01)
 
             # dataframe initiation
             df_variable = pd.DataFrame(columns=['variableType', 'variableName', 'count', 'filePath'])
