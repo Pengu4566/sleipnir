@@ -82,7 +82,7 @@ def handle_upload():
     if request.method == 'POST':
         socketio.emit('message', {'alive': "Session Checks 1"})
         #socketio.sleep(0.01)
-        eventlet.sleep(0.01)
+        socketio.sleep(0.01)
         # get value of checkboxes
         session['naming'] = False
         session['varNaming'] = False
@@ -102,7 +102,6 @@ def handle_upload():
 
         socketio.emit('message', {'alive': "Session Checks 2"})
         socketio.sleep(0.01)
-        eventlet.sleep(0.01)
 
         # naming
         if request.form.get('Naming') == "Naming":
@@ -212,8 +211,7 @@ def handle_upload():
                         files.append(os.path.join(r, file).replace("\\", "/"))
 
             socketio.emit('message', {'alive': "Starting DF"})
-            # socketio.sleep(60)
-            eventlet.sleep(0.01)
+            socketio.sleep(0.01)
 
             # dataframe initiation
             df_variable = pd.DataFrame(columns=['variableType', 'variableName', 'count', 'filePath'])
@@ -236,6 +234,7 @@ def handle_upload():
                 print("Worker " + str(os.getpid()) + ": " + progress)
                 socketio.emit('progress', {'data': progress})
                 socketio.sleep(0.01)
+                eventlet.sleep(0.01)
                 # variables dataframe
                 df_variable = variable_dataframe.populate_variables_dataframe(df_variable=df_variable,
                                                                               filePath=filePath)
