@@ -40,8 +40,7 @@ def radarPlot(lst_score, lst_tolerance, lst_checkName, main_location):
     count = 1
     picExists = path.isfile(radarStore)
     while picExists:
-        radarStore = "/".join(main_location.split("/")[:-3]) + "/static/dist/chart/radar" + str(
-            count) + ".png"
+        radarStore = "/".join(main_location.split("/")[:-3]) + "/static/dist/chart/radar" + str(count) + ".png"
         picExists = path.isfile(radarStore)
         count += 1
     plt.savefig(radarStore)

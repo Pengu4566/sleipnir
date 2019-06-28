@@ -243,3 +243,27 @@ div.spacing {
   height: auto;
   vertical-align: center;
 }
+
+#projectStructure {
+  border-radius: 25px;
+  display: block;
+  width: 90%;
+  position: relative;
+  border: 2px solid royalblue;
+  height: auto;
+  justify-content: center;
+  padding: 1%;
+  margin-bottom: 5%;
+}
+
+#radarChart {
+  border-radius: 25px;
+  display: block;
+  width: 90%;
+  position: relative;
+  border: 2px solid royalblue;
+  height: auto;
+  justify-content: center;
+  padding: 1%;
+  margin-bottom: 5%;
+}

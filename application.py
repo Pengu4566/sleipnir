@@ -7,7 +7,6 @@ import tempfile
 import sys
 
 ##
-##
 # dataframes
 from dataframes import variable_dataframe, argument_dataframe, activity_dataframe, catch_dataframe, annotation_dataframe
 
@@ -27,12 +26,15 @@ app.config['UPLOAD_PATH'] = '/file/'
 app.config['ALLOWED_EXTENSIONS'] = set(['zip'])
 app.config['SECRET_KEY'] = 'super secret key'
 
+gexf = ''
+df_annotation = []
+main_location = ""
 dict_score = {}
+df_invokeWf = []
 
 @app.route('/')
 def upload():
     with app.app_context():
-
         return render_template('fileUpload.html')
 
 
@@ -154,6 +156,8 @@ def __main__():
 
     with app.app_context():
 
+        global gexf
+
         ##########################################################################################################
         # file processing
         files = []
@@ -171,6 +175,7 @@ def __main__():
         df_activity = pd.DataFrame(columns=['activityName', 'activityType', 'filePath'])
         df_catches = pd.DataFrame(columns=['Catch Id', 'Screenshot Included', 'filePath', 'Log Message Included'])
         df_annotation = pd.DataFrame(columns=['workflowName', 'invokedBy'])
+
         # end dataframe initiation
 
         fileCount = 1
@@ -373,13 +378,22 @@ def __main__():
         activityStats = activity_stats.get_activity_stats(df_activity=df_activity)
         # level 2: folder structure
         folderStructure = project_folder_structure.list_files(main_location=main_location)
-        # level 2: project structure
+        # level 2: project structure (old)
         main_location = documentation_logging.grade_project_json_name_desc(folderPath)[3]
         print(main_location)
         picStore = project_structure.get_project_structure(df_annotation=df_annotation, main_location=main_location)
-        # radar plot
+        gexf = project_structure.generate_gexf(df_annotation=df_annotation, main_location=main_location)
+        # radar plot (old)
         radarStore = radar_plot.radarPlot(lst_score=lst_score, lst_tolerance=lst_tolerance,
                                           lst_checkName=lst_checkName, main_location=main_location)
+
+        #generate project structure dataframe (echarts)
+        str_replace = main_location + "/"
+        df_annotation['workflowName'] = df_annotation['workflowName'].str.replace(str_replace, "")
+        df_annotation['invokedBy'] = df_annotation['invokedBy'].str.replace(str_replace, "")
+        # Create tree object
+        df_invokeWf = df_annotation.loc[:, ['workflowName', 'invokedBy']].drop_duplicates()
+
 
         # pass along the variables
         # session['namingScore'] = namingScore
@@ -436,14 +450,22 @@ def delete_pics():
         return redirect(url_for('upload'))
 
 
+# echarts graphs go here
 @app.route("/radar", methods=['GET'])
 def radar_plot_data():
     #print("THIS IS A LOG MESSAGE" + str(dict_score['naming']), file=sys.stderr)
     message = {'usage': dict_score['usage'],
                'documentation': dict_score['documentation'],
                'naming': dict_score['naming']}
-    return jsonify(message)  # serialize and use JSON headers
+    return jsonify(message)
 
+@app.route("/structure", methods=['GET'])
+def project_structure_data():
+    #gexf = project_structure.generate_gexf(df_annotation=df_annotation, main_location=main_location)
+
+    #print("DF_ANNOTATION" + str(df_annotation), file=sys.stderr)
+    message = {'gexf': gexf}
+    return jsonify(message)
 
 # only run when executing locally (if this doesnt run then remove the if statement)
 if __name__ == "__main__":
