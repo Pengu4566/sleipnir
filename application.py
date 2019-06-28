@@ -212,14 +212,16 @@ def __main__():
         # file processing
         files = []
 
+        folderPath = session['folderPath']
+
         for r, d, f in os.walk(folderPath):
             for file in f:
                 if '.xaml' in file:
                     files.append(os.path.join(r, file).replace("\\", "/"))
 
-        socketio.emit('message', {'alive': "Starting DF"})
-        # socketio.sleep(60)
-        eventlet.sleep(0.01)
+        # socketio.emit('message', {'alive': "Starting DF"})
+        # # socketio.sleep(60)
+        # eventlet.sleep(0.01)
 
         # dataframe initiation
         df_variable = pd.DataFrame(columns=['variableType', 'variableName', 'count', 'filePath'])
