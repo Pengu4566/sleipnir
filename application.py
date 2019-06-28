@@ -24,7 +24,7 @@ from flask_session import Session
 from flask_socketio import SocketIO, emit
 
 
-async_mode = "eventlet"
+
 app = Flask(__name__, static_folder='./static/dist', template_folder="./static")
 
 # dont save cache in web browser (updating results image correctly)
@@ -38,7 +38,7 @@ app.config['SECRET_KEY'] = randint(0,99999999999999999999)
 
 # Check Configuration section for more details
 Session(app)
-socketio = SocketIO(app, async_mode=async_mode)
+socketio = SocketIO(app, async_mode="eventlet")
 thread = None
 
 
@@ -47,6 +47,8 @@ thread = None
 @app.route('/')
 def upload():
     with app.app_context():
+        socketio.emit('message', {'alive': "test"})
+        socketio.sleep(1)
         for r, d, f in os.walk((os.getcwd() + "/" + "static/dist/chart").replace("\\", "/")):
             for file in f:
                 createTime = time.ctime(
@@ -212,6 +214,7 @@ def handle_upload():
 
             socketio.emit('message', {'alive': "Starting DF"})
             socketio.sleep(0.01)
+            eventlet.sleep(0.01)
 
             # dataframe initiation
             df_variable = pd.DataFrame(columns=['variableType', 'variableName', 'count', 'filePath'])
