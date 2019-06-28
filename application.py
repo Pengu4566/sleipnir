@@ -221,7 +221,7 @@ def handle_upload():
                 progress = "Progress " + str(fileCount) + "/" + str(numFiles) + ": Scanning " + filePath
                 print("Worker " + str(os.getpid()) + ": " + progress)
                 socketio.emit('progress', {'data': progress})
-                socketio.sleep(0.01)
+                socketio.sleep(5)
                 # variables dataframe
                 df_variable = variable_dataframe.populate_variables_dataframe(df_variable=df_variable,
                                                                               filePath=filePath)
