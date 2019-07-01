@@ -53,8 +53,14 @@ def upload():
             for file in f:
                 createTime = time.ctime(
                     os.path.getctime((os.getcwd() + "/" + "static/dist/chart/" + file).replace("\\", "/")))
-                createDate = "/".join(createTime.split(" ")[1:3]) + "/" + createTime.split(" ")[4] + " " + \
-                             createTime.split(" ")[3]
+                print(createTime)
+                if createTime.split(" ")[2] != "":
+                    createDate = "/".join(createTime.split(" ")[1:3]) + "/" + createTime.split(" ")[4] + " " + \
+                                 createTime.split(" ")[3]
+                else:
+                    createDate = createTime.split(" ")[1] + "/" + createTime.split(" ")[3] + "/" +\
+                                 createTime.split(" ")[5] + " " + createTime.split(" ")[4]
+                print(createDate)
                 timeDiff = (datetime.now() - datetime.strptime(createDate, "%b/%d/%Y %H:%M:%S")).seconds / 60
                 if timeDiff >= 20:
                     os.remove((os.getcwd() + "/" + "static/dist/chart/" + file).replace("\\", "/"))
@@ -66,7 +72,7 @@ def background_thread():
     while True:
         print("1")
         socketio.emit('message', {'alive': "Alive"})
-        socketio.sleep(1)
+        socketio.sleep(60)
 
 
 @socketio.on('connect')
