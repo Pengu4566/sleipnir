@@ -1,17 +1,17 @@
 var parsedData
 
-//ajax request that gets information from python code
+//ajax request for radar chart values
 fetch('/radar')
     .then(function (response) {
         return response.text();
     }).then(function (text) {
-        console.log('GET response text:');
-        console.log(text); // Print the greeting as text
+        //console.log('GET response text:');
+        //console.log(text); // Print the greeting as text
         parsedData = JSON.parse(text)
-        console.log(parsedData['usage'])
+        //console.log(parsedData['usage'])
 
     // based on prepared DOM, initialize echarts instance
-    var myChart = echarts.init(document.getElementById('radarChart'));
+    var radarChart = echarts.init(document.getElementById('radarChart'));
 
     option = {
         title: {
@@ -41,6 +41,11 @@ fetch('/radar')
             name: 'Budget vs spending',
             type: 'radar',
             // areaStyle: {normal: {}},
+            itemStyle: {
+                normal: {
+                    color: 'blue'
+                }
+            },
             data : [
                 {
                     value : [parsedData['usage'], parsedData['naming'], parsedData['documentation']],
@@ -51,5 +56,5 @@ fetch('/radar')
     };
 
     // use configuration item and data specified to show chart
-    myChart.setOption(option);
+    radarChart.setOption(option);
 });
