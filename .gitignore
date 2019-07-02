@@ -1,0 +1,13 @@
+flask_session/
+.idea/
+env/
+__pycache__/
+.vscode/
+__pycache__
+.venv/
+static/node_modules/
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

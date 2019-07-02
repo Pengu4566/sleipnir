@@ -1,0 +1,255 @@
+div.spacing {
+  height: 2.5%;
+  display: block;
+}
+
+.spacing2 {
+  height: 1%;
+}
+
+#categories_and_checklist {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+}
+
+#score_pic {
+  position: relative;
+  display: inline-block;
+  width: 50%;
+  padding: 6px;
+}
+
+#all_categories {
+  position: absolute;
+  margin-top: 20%;
+  display: inline-block;
+  margin-left: 65%;
+  width: 35%;
+}
+
+.categories_div {
+  position: relative;
+  display: block;
+}
+
+.categories_btn {
+  border: 2px royalblue solid;
+  border-radius: 25px;
+  position: relative;
+  display: inline-block;
+  height: 40px;
+  width: 30%;
+  background-color: transparent;
+  margin-bottom: 6px;
+  margin-left: 6px;
+}
+
+.checklist {
+  position: absolute;
+  display: inline-block;
+  width: 300px;
+  background-color: transparent;
+  border: 2px dashed royalblue;
+  border-radius: 25px;
+  margin-bottom: 6px;
+  margin-left: 6px;
+  padding-left: 6px;
+  opacity: 0;
+}
+
+.checklist button {
+  font: bold;
+}
+
+.categories_btn:hover,
+.categories_btn:focus {
+  border-color: lightskyblue;
+}
+
+.categories_btn:focus + .checklist {
+  opacity: 1;
+}
+
+.grade_checks {
+  display: block;
+  width: 100%;
+}
+
+.check_sec {
+  display: inline-block;
+  position: relative;
+  background-color: transparent;
+  border-radius: 25px;
+  border: 2px solid royalblue;
+  padding: 1%;
+  width: 40%;
+  height: auto;
+  margin-right: 5%;
+  margin-bottom: 5%;
+  vertical-align: top;
+}
+
+.check_title {
+  font-weight: bold;
+  text-align: center;
+}
+
+.single_check {
+  justify-content: center;
+  display: block;
+  position: relative;
+  background-color: transparent;
+  border-radius: 25px;
+  border: 2px dashed cornflowerblue;
+  padding: 2%;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  height: auto;
+  margin-bottom: 2.5%;
+}
+
+.check_explain {
+  display: none;
+}
+
+.single_check:hover .check_explain {
+  display: block;
+}
+
+#ActivityStats {
+  border-radius: 25px;
+  display: inline-block;
+  width: 40%;
+  position: relative;
+  border: 2px solid royalblue;
+  height: auto;
+  justify-content: center;
+  padding: 1%;
+  margin-bottom: 5%;
+}
+
+#act_stat_header {
+  text-align: center;
+}
+
+#stat_notes {
+  text-align: center;
+  margin-bottom: 3%;
+  font-style: italic;
+}
+
+.act_stat {
+  margin-left: 10%;
+  margin-right: 10%;
+  justify-content: center;
+  display: block;
+  position: relative;
+  height: auto;
+  text-align: center;
+}
+
+#stats_buttons {
+  display: none;
+}
+
+#ActivityStats:hover > #stats_buttons {
+  opacity: 1;
+  height: auto;
+  margin: 0 auto;
+  justify-content: center;
+  display: block;
+}
+
+#stats_buttons button {
+  background-color: transparent;
+  border: 0px;
+  word-wrap: break-word;
+  justify-content: center;
+  display: block;
+  margin: 0 auto;
+}
+
+.stats_table {
+  position: relative;
+  display: inline-block;
+  opacity: 0;
+  height: 0px;
+  margin-bottom: 0%;
+}
+
+.act_stat button:hover,
+.act_stat button:focus {
+  background-color: lightskyblue;
+}
+
+.act_stat button:focus + .stats_table {
+  opacity: 1;
+  height: auto;
+  margin-top: 2%;
+  margin-bottom: 2%;
+}
+
+#FolderStructure {
+  border-radius: 25px;
+  display: inline-block;
+  width: 40%;
+  position: relative;
+  border: 2px solid royalblue;
+  height: auto;
+  justify-content: center;
+  padding: 1%;
+  margin-bottom: 5%;
+  margin-left: 5%;
+  vertical-align: top;
+}
+
+#FolderStructure h3 {
+  text-align: center;
+}
+
+#folder_struct {
+  display: none;
+}
+
+#FolderStructure:hover > #folder_struct {
+  display: block;
+  height: auto;
+  padding: 1%;
+}
+
+#WfInvokingNetwork {
+  border-radius: 25px;
+  display: block;
+  width: 90%;
+  position: relative;
+  border: 2px solid royalblue;
+  height: auto;
+  justify-content: center;
+  padding: 1%;
+  margin-bottom: 5%;
+}
+
+#projectStructure {
+  border-radius: 25px;
+  display: block;
+  width: 90%;
+  position: relative;
+  border: 2px solid royalblue;
+  height: auto;
+  justify-content: center;
+  padding: 1%;
+  margin-bottom: 5%;
+}
+#radarChart {
+  border-radius: 25px;
+  display: block;
+  width: 50%;
+  position: relative;
+  border: 2px solid royalblue;
+  height: 50%;
+  justify-content: center;
+  padding: 1%;
+  margin-bottom: 5%;
+}
