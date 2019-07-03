@@ -52,8 +52,6 @@ df_invokeWf = []
 @app.route('/')
 def upload():
     with app.app_context():
-        socketio.emit('message', {'alive': "test"}, namespace="/")
-        socketio.sleep(0)
         return render_template('fileUpload.html')
 
 
@@ -75,8 +73,8 @@ def handle_upload():
 
     if request.method == 'POST':
 
-        socketio.emit('progress', {'data': 'Uploading ...'})
-        socketio.sleep(0)
+        socketio.emit('progress', {'data': 'Unzipping ...'})
+        socketio.sleep(0.1)
 
         # get value of checkboxes
         session['naming'] = False
@@ -177,9 +175,6 @@ def handle_upload():
                     folderExist = os.path.isdir((os.getcwd() + app.config['UPLOAD_PATH'] +
                                                  generatedFolderName).replace("\\", "/"))
 
-            socketio.emit('progress', {'data': 'Unzipping ...'})
-            socketio.sleep(0)
-
             folderPath = (os.getcwd() + app.config['UPLOAD_PATH'] + generatedFolderName).replace("\\", "/")
             zipFile = zipfile.ZipFile((os.getcwd() + app.config['UPLOAD_PATH'] +
                                        generatedFileNaming).replace("\\", "/"))
@@ -212,40 +207,40 @@ def handle_upload():
             # scans all project files and populates dataframes with relevant info
             # variables dataframe
             socketio.emit('progress', {'data': 'Processing Files ...'})
-            socketio.sleep(0)
+            socketio.sleep(0.1)
 
             # variables dataframe
             socketio.emit('progress', {'data': 'Step 1 ...'})
-            socketio.sleep(0)
+            socketio.sleep(0.1)
             lst_sub_df_variable = list(map(variable_dataframe.populate_variables_dataframe, files))
             df_variable = pd.concat(lst_sub_df_variable, ignore_index=True)
 
             # argument dataframe
             socketio.emit('progress', {'data': 'Step 2 ...'})
-            socketio.sleep(0)
+            socketio.sleep(0.1)
             lst_sub_df_argument = list(map(argument_dataframe.populate_argument_dataframe, files))
             df_argument = pd.concat(lst_sub_df_argument, ignore_index=True)
 
             # activity dataframe
             socketio.emit('progress', {'data': 'Step 3 ...'})
-            socketio.sleep(0)
+            socketio.sleep(0.1)
             lst_sub_df_activity = list(map(activity_dataframe.populate_activity_dataframe, files))
             df_activity = pd.concat(lst_sub_df_activity, ignore_index=True)
 
             # annotation dataframe
             socketio.emit('progress', {'data': 'Step 4 ...'})
-            socketio.sleep(0)
+            socketio.sleep(0.1)
             lst_sub_df_annotation = list(map(annotation_dataframe.populate_annotation_dataframe, files))
             df_annotation = pd.concat(lst_sub_df_annotation, ignore_index=True)
 
             # try catch dataframe
             socketio.emit('progress', {'data': 'Step 5 ...'})
-            socketio.sleep(0)
+            socketio.sleep(0.1)
             lst_sub_df_catch = list(map(catch_dataframe.populate_catch_dataframe, files))
             df_catches = pd.concat(lst_sub_df_catch, ignore_index=True)
 
             socketio.emit('progress', {'data': 'Processing Files Finished. Start Analyzing ...'})
-            socketio.sleep(0)
+            socketio.sleep(0.1)
 
             dict_score = {}
             # level 1: grading checks
