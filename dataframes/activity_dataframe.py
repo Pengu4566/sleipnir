@@ -1,23 +1,30 @@
 import pandas as pd
-import re
+import xml.etree.ElementTree as ET
 
 
-def populate_activity_dataframe(df_activity, filePath):
+def populate_activity_dataframe(filePath):
     temp_df_activity = pd.DataFrame(columns=['activityName', 'activityType', 'filePath'])
-    with open(filePath, encoding='utf-8', mode='r') as f:
-        for line in f:
-            if ('sap2010:WorkflowViewState.IdRef=' in line) and ('<Activity' not in line):
-                if 'DisplayName=' in line:
-                    name = re.search('DisplayName=\"[^\"]*\"', line.strip(' ')).group(0)[len("DisplayName=\""):-1]
-                    activity = line.strip(' ').split(' ')[0].strip('<')
-                    activity = activity if 'ui:' not in activity else activity[3:]
-                else:
-                    activity = line.strip(' ').split(' ')[0].strip('<')
-                    activity = activity if 'ui:' not in activity else activity[3:]
-                    name = activity
-                temp_df_activity = temp_df_activity.append({'activityName': name,
-                                                            'activityType': activity,
-                                                            'filePath': filePath},
-                                                           ignore_index=True)
+    tree = ET.parse(filePath)
+    root = tree.getroot()
+    lst_acts = root.findall('.//')
 
-    return pd.concat([df_activity, temp_df_activity], ignore_index=True, sort=False)
+    def extract_act_info(act):
+        if '{http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation}WorkflowViewState.IdRef' in act.attrib.keys():
+            try:
+                name = act.attrib['DisplayName']
+                activity = act.attrib[
+                    '{http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation}WorkflowViewState.IdRef'].split(
+                    "_")[0]
+            except Exception:
+                name = activity = act.attrib['{http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation}WorkflowViewState.IdRef'].split("_")[0]
+
+            return {'activityName': name, 'activityType': activity, 'filePath': filePath}
+        else:
+            return None
+
+    lst_df_act_rows = list(filter(lambda x: x is not None, list(map(extract_act_info, lst_acts))))
+
+    for df_row in lst_df_act_rows:
+        temp_df_activity = temp_df_activity.append(df_row, ignore_index=True)
+
+    return temp_df_activity

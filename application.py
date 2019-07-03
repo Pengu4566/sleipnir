@@ -86,12 +86,9 @@ def connect():
 
 @app.route("/uploader", methods=['GET', 'POST'])
 def handle_upload():
-    socketio.emit('message', {'alive': "In Uploader"}, namespace="/uploader")
-    socketio.sleep(0.01)
 
     if request.method == 'POST':
-        socketio.emit('message', {'alive': "Session Checks 1"}, namespace="/uploader")
-        socketio.sleep(0.01)
+
         # get value of checkboxes
         session['naming'] = False
         session['varNaming'] = False
@@ -108,9 +105,6 @@ def handle_upload():
         session['tcSs'] = False
         session['jsonLog'] = False
         session['arginAnnot'] = False
-
-        socketio.emit('message', {'alive': "Session Checks 2"}, namespace="/uploader")
-        socketio.sleep(0.01)
 
         # naming
         if request.form.get('Naming') == "Naming":
@@ -156,16 +150,11 @@ def handle_upload():
         if request.form.get('ArgExpAnnot') == "ArgExpAnnot":
             session['arginAnnot'] = True
 
-
-
-
         # check if the post request has the file part
         if 'file' not in request.files:
-            #print(tempfile.gettempdir())
             return "You must pick a file! Use your browser's back button and try again."
         file = request.files['file']
-        # if user does not select file, browser also
-        # submit an empty part without filename
+        # if user does not select file, browser also submit an empty part without filename
         if file.filename == '':
             return'No selected file'
 
@@ -220,46 +209,50 @@ def handle_upload():
                     if '.xaml' in file:
                         files.append(os.path.join(r, file).replace("\\", "/"))
 
-            socketio.emit('message', {'alive': "Starting DF"}, namespace="/uploader")
-            socketio.sleep(0.01)
-            # eventlet.sleep(0.01)
-
-            # dataframe initiation
-            df_variable = pd.DataFrame(columns=['variableType', 'variableName', 'count', 'filePath'])
-            df_argument = pd.DataFrame(columns=['argumentName', 'argumentType', 'filePath', 'dataType', 'count'])
-            df_activity = pd.DataFrame(columns=['activityName', 'activityType', 'filePath'])
-            df_catches = pd.DataFrame(columns=['Catch Id', 'Screenshot Included', 'filePath', 'Log Message Included'])
-            df_annotation = pd.DataFrame(columns=['workflowName', 'invokedBy'])
-            # end dataframe initiation
-
-            fileCount = 1
-            numFiles = len(files)
 
             # checks for empty files list, program should end if this gets triggered
             if (files == []):
                 return "Could not find project files! Did you put them in the right place?"
 
-            # scans all project files and populates dataframes with relevant info
-            for filePath in files:
-                progress = "Progress " + str(fileCount) + "/" + str(numFiles) + ": Scanning " + filePath
-                print("Worker " + str(os.getpid()) + ": " + progress)
-                socketio.emit('progress', {'data': progress})
-                socketio.sleep(0.01)
-                eventlet.sleep(0.01)
-                # variables dataframe
-                df_variable = variable_dataframe.populate_variables_dataframe(df_variable=df_variable,
-                                                                              filePath=filePath)
-                # argument dataframe
-                df_argument = argument_dataframe.populate_argument_dataframe(df_argument=df_argument, filePath=filePath)
-                # activity dataframe
-                df_activity = activity_dataframe.populate_activity_dataframe(df_activity=df_activity, filePath=filePath)
-                # try catch dataframe
-                df_catches = catch_dataframe.populate_catch_dataframe(df_catches=df_catches, filePath=filePath)
-                # annotation dataframe
-                df_annotation = annotation_dataframe.populate_annotation_dataframe(df_annotation=df_annotation,
-                                                                                   filePath=filePath)
-                fileCount += 1
 
+
+            # scans all project files and populates dataframes with relevant info
+            # variables dataframe
+            socketio.emit('progress', {'data': 'Processing Files ...'})
+            socketio.sleep(0.01)
+
+            # variables dataframe
+            socketio.emit('progress', {'data': 'Step 1 ...'})
+            socketio.sleep(0.01)
+            lst_sub_df_variable = list(map(variable_dataframe.populate_variables_dataframe, files))
+            df_variable = pd.concat(lst_sub_df_variable, ignore_index=True)
+
+            # argument dataframe
+            socketio.emit('progress', {'data': 'Step 2 ...'})
+            socketio.sleep(0.01)
+            lst_sub_df_argument = list(map(argument_dataframe.populate_argument_dataframe, files))
+            df_argument = pd.concat(lst_sub_df_argument, ignore_index=True)
+
+            # activity dataframe
+            socketio.emit('progress', {'data': 'Step 3 ...'})
+            socketio.sleep(0.01)
+            lst_sub_df_activity = list(map(activity_dataframe.populate_activity_dataframe, files))
+            df_activity = pd.concat(lst_sub_df_activity, ignore_index=True)
+
+            # annotation dataframe
+            socketio.emit('progress', {'data': 'Step 4 ...'})
+            socketio.sleep(0.01)
+            lst_sub_df_annotation = list(map(annotation_dataframe.populate_annotation_dataframe, files))
+            df_annotation = pd.concat(lst_sub_df_annotation, ignore_index=True)
+
+            # try catch dataframe
+            socketio.emit('progress', {'data': 'Step 5 ...'})
+            socketio.sleep(0.01)
+            lst_sub_df_catch = list(map(catch_dataframe.populate_catch_dataframe, files))
+            df_catches = pd.concat(lst_sub_df_catch, ignore_index=True)
+
+            socketio.emit('progress', {'data': 'Processing Files Finished. Start Analyzing ...'})
+            socketio.sleep(0.01)
 
             dict_score = {}
             # level 1: grading checks

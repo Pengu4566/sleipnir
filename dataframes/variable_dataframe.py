@@ -1,32 +1,39 @@
-import untangle
 import pandas as pd
 import re
-import xml
+import xml.etree.ElementTree as ET
 
-def populate_variables_dataframe(df_variable, filePath):
+def populate_variables_dataframe(filePath):
     temp_df_variable = pd.DataFrame(columns=['variableType', 'variableName', 'count', 'filePath'])
-    # capture variables bound by tags
-    with open(filePath, encoding='utf-8', mode='r') as f:
-        for line in f:
-            if line.strip(" ").startswith('<Variable x:'):
-                try:
-                    variableName = untangle.parse(line.strip(" ")).children[0]['Name']
-                    dataType = untangle.parse(line.strip(" ")).children[0]['x:TypeArguments'].split(":")[1]\
-                        .split("(")[0].lower()
-                except xml.sax._exceptions.SAXParseException:
-                    variableName = re.search("Name=\"[^\"]*\"", line).group(0).replace("Name='", "").replace("'", "")
-                    dataType = re.search("x:TypeArguments=\"[^\"]*\"", line).group(0).split(":")[1].split("(")[0].lower()
-                if '[]' in dataType:
-                    dataType = 'array'
-                if filePath not in list(df_variable[df_variable.variableName == variableName].filePath):
-                    temp_df_variable = temp_df_variable.append({'variableType': dataType, 'variableName': variableName,
-                                                                'count': 1, 'filePath': filePath}, ignore_index=True)
+    tree = ET.parse(filePath)
+    root = tree.getroot()
+    lst_vars = root.findall('.//{http://schemas.microsoft.com/netfx/2009/xaml/activities}Variable')
+
+    def extract_var_info(var):
+        variableName = var.attrib['Name']
+        dataType = var.attrib['{http://schemas.microsoft.com/winfx/2006/xaml}TypeArguments'].split(":")[1].lower()
+        if '[]' in dataType:
+            dataType = 'array'
+        return {'variableType': dataType, 'variableName': variableName, 'count': 1, 'filePath': filePath}
+
+    lst_processed = list(map(extract_var_info, lst_vars.copy()))
+
+    for i in lst_processed:
+        temp_df_variable = temp_df_variable.append(i, ignore_index=True)
+    temp_df_variable.drop_duplicates(inplace=True)
+
     if len(temp_df_variable.variableName) > 0:
         with open(filePath, encoding='utf-8', mode='r') as f:
-            for line in f:
-                for index, row in temp_df_variable.iterrows():
-                    if (re.search(('\[.*' + row['variableName'] + '.*\]'), line) is not None) and (filePath == row['filePath']):
-                        row['count'] += 1
-        return pd.concat([df_variable,temp_df_variable], ignore_index=True, sort=False)
-    else:
-        return df_variable
+            lst_lines = f.readlines()
+            f.close()
+
+        def var_count_file(df_row):
+            def var_count_line(variableName, line):
+                if re.search(('\[.*' + variableName + '.*\]'), line) is not None:
+                    return 1
+                else:
+                    return 0
+            lst_count = list(map(var_count_line, [df_row['variableName']]*len(lst_lines), lst_lines))
+            return sum(lst_count) + 1
+        temp_df_variable['count'] = temp_df_variable.apply(var_count_file, axis=1)
+
+    return temp_df_variable

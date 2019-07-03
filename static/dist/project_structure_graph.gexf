@@ -3,21 +3,27 @@
   <graph defaultedgetype="directed" mode="static" name="">
     <meta>
       <creator>NetworkX 2.3</creator>
-      <lastmodified>01/07/2019</lastmodified>
+      <lastmodified>03/07/2019</lastmodified>
     </meta>
     <nodes>
       <node id="Main" label="Main" />
+      <node id="Process" label="Process" />
+      <node id="_Test" label="_Test" />
       <node id="Framework/CloseAllApplications" label="Framework/CloseAllApplications" />
       <node id="Framework/InitAllApplications" label="Framework/InitAllApplications" />
       <node id="Framework/SetTransactionStatus" label="Framework/SetTransactionStatus" />
-      <node id="System1/System1_Login(Autosaved)" label="System1/System1_Login(Autosaved)" />
       <node id="System1/System1_Login" label="System1/System1_Login" />
       <node id="Framework/InitAllSettings" label="Framework/InitAllSettings" />
       <node id="Framework/KillAllProcesses" label="Framework/KillAllProcesses" />
       <node id="Framework/GetTransactionData" label="Framework/GetTransactionData" />
-      <node id="Process" label="Process" />
-      <node id="System1/System1_Close" label="System1/System1_Close" />
       <node id="System1/System1_NavigateTo_WorkItems" label="System1/System1_NavigateTo_WorkItems" />
+      <node id="System1/System1_NavigateTo_WIDetails" label="System1/System1_NavigateTo_WIDetails" />
+      <node id="System1/System1_NavigateTo_MonthlyReport" label="System1/System1_NavigateTo_MonthlyReport" />
+      <node id="System1/System1_CreateYearlyReport" label="System1/System1_CreateYearlyReport" />
+      <node id="System1/System1_NavigateTo_UploadYearlyReport" label="System1/System1_NavigateTo_UploadYearlyReport" />
+      <node id="System1/System1_UploadYearlyReport" label="System1/System1_UploadYearlyReport" />
+      <node id="System1/System1_UpdateWorkItem" label="System1/System1_UpdateWorkItem" />
+      <node id="System1/System1_Close" label="System1/System1_Close" />
       <node id="Framework/TakeScreenshot" label="Framework/TakeScreenshot" />
       <node id="Framework/GetAppCredentials" label="Framework/GetAppCredentials" />
       <node id="Misc/SendExceptionEmail" label="Misc/SendExceptionEmail" />
@@ -30,16 +36,23 @@
       <edge id="4" source="Main" target="Process" />
       <edge id="5" source="Main" target="Framework/SetTransactionStatus" />
       <edge id="6" source="Main" target="Framework/CloseAllApplications" />
-      <edge id="7" source="Framework/CloseAllApplications" target="System1/System1_Close" />
-      <edge id="8" source="Framework/InitAllApplications" target="System1/System1_Login" />
-      <edge id="9" source="Framework/InitAllApplications" target="System1/System1_NavigateTo_WorkItems" />
-      <edge id="10" source="Framework/SetTransactionStatus" target="Framework/TakeScreenshot" />
-      <edge id="11" source="Framework/SetTransactionStatus" target="Framework/CloseAllApplications" />
-      <edge id="12" source="Framework/SetTransactionStatus" target="Framework/KillAllProcesses" />
-      <edge id="13" source="System1/System1_Login(Autosaved)" target="Framework/GetAppCredentials" />
-      <edge id="14" source="System1/System1_Login(Autosaved)" target="Misc/SendExceptionEmail" />
-      <edge id="15" source="System1/System1_Login" target="Framework/GetAppCredentials" />
-      <edge id="16" source="System1/System1_Login" target="Misc/SendExceptionEmail" />
+      <edge id="7" source="Process" target="System1/System1_NavigateTo_WorkItems" />
+      <edge id="8" source="Process" target="System1/System1_NavigateTo_WIDetails" />
+      <edge id="9" source="Process" target="System1/System1_NavigateTo_MonthlyReport" />
+      <edge id="10" source="Process" target="System1/System1_CreateYearlyReport" />
+      <edge id="11" source="Process" target="System1/System1_NavigateTo_UploadYearlyReport" />
+      <edge id="12" source="Process" target="System1/System1_UploadYearlyReport" />
+      <edge id="13" source="Process" target="System1/System1_UpdateWorkItem" />
+      <edge id="14" source="_Test" target="Framework/InitAllSettings" />
+      <edge id="15" source="_Test" target="Framework/KillAllProcesses" />
+      <edge id="16" source="_Test" target="System1/System1_Login" />
+      <edge id="17" source="Framework/CloseAllApplications" target="System1/System1_Close" />
+      <edge id="18" source="Framework/InitAllApplications" target="System1/System1_Login" />
+      <edge id="19" source="Framework/SetTransactionStatus" target="Framework/TakeScreenshot" />
+      <edge id="20" source="Framework/SetTransactionStatus" target="Framework/CloseAllApplications" />
+      <edge id="21" source="Framework/SetTransactionStatus" target="Framework/KillAllProcesses" />
+      <edge id="22" source="System1/System1_Login" target="Framework/GetAppCredentials" />
+      <edge id="23" source="System1/System1_Login" target="Misc/SendExceptionEmail" />
     </edges>
   </graph>
 </gexf>
