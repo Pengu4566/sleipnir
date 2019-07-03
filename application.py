@@ -53,21 +53,7 @@ df_invokeWf = []
 def upload():
     with app.app_context():
         socketio.emit('message', {'alive': "test"}, namespace="/")
-        socketio.sleep(1)
-        # for r, d, f in os.walk((os.getcwd() + "/" + "static/dist/chart").replace("\\", "/")):
-        #     for file in f:
-        #         createTime = time.ctime(
-        #             os.path.getctime((os.getcwd() + "/" + "static/dist/chart/" + file).replace("\\", "/")))
-        #         if createTime.split(" ")[2] != "":
-        #             createDate = "/".join(createTime.split(" ")[1:3]) + "/" + createTime.split(" ")[4] + " " + \
-        #                          createTime.split(" ")[3]
-        #         else:
-        #             createDate = createTime.split(" ")[1] + "/" + createTime.split(" ")[3] + "/" +\
-        #                          createTime.split(" ")[5] + " " + createTime.split(" ")[4]
-        #         timeDiff = (datetime.now() - datetime.strptime(createDate, "%b/%d/%Y %H:%M:%S")).seconds / 60
-        #         if timeDiff >= 20:
-        #             os.remove((os.getcwd() + "/" + "static/dist/chart/" + file).replace("\\", "/"))
-
+        socketio.sleep(0)
         return render_template('fileUpload.html')
 
 
@@ -88,6 +74,9 @@ def connect():
 def handle_upload():
 
     if request.method == 'POST':
+
+        socketio.emit('progress', {'data': 'Uploading ...'})
+        socketio.sleep(0)
 
         # get value of checkboxes
         session['naming'] = False
@@ -188,6 +177,9 @@ def handle_upload():
                     folderExist = os.path.isdir((os.getcwd() + app.config['UPLOAD_PATH'] +
                                                  generatedFolderName).replace("\\", "/"))
 
+            socketio.emit('progress', {'data': 'Unzipping ...'})
+            socketio.sleep(0)
+
             folderPath = (os.getcwd() + app.config['UPLOAD_PATH'] + generatedFolderName).replace("\\", "/")
             zipFile = zipfile.ZipFile((os.getcwd() + app.config['UPLOAD_PATH'] +
                                        generatedFileNaming).replace("\\", "/"))
@@ -198,6 +190,7 @@ def handle_upload():
             zipFile.close()
             os.remove((os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming).replace("\\", "/"))
             session['folderPath'] = folderPath
+            fileLocationStr = folderPath + "/" + filename[:-4] + "/"
 
             ##########################################################################################################
             global gexf
@@ -219,40 +212,40 @@ def handle_upload():
             # scans all project files and populates dataframes with relevant info
             # variables dataframe
             socketio.emit('progress', {'data': 'Processing Files ...'})
-            socketio.sleep(0.01)
+            socketio.sleep(0)
 
             # variables dataframe
             socketio.emit('progress', {'data': 'Step 1 ...'})
-            socketio.sleep(0.01)
+            socketio.sleep(0)
             lst_sub_df_variable = list(map(variable_dataframe.populate_variables_dataframe, files))
             df_variable = pd.concat(lst_sub_df_variable, ignore_index=True)
 
             # argument dataframe
             socketio.emit('progress', {'data': 'Step 2 ...'})
-            socketio.sleep(0.01)
+            socketio.sleep(0)
             lst_sub_df_argument = list(map(argument_dataframe.populate_argument_dataframe, files))
             df_argument = pd.concat(lst_sub_df_argument, ignore_index=True)
 
             # activity dataframe
             socketio.emit('progress', {'data': 'Step 3 ...'})
-            socketio.sleep(0.01)
+            socketio.sleep(0)
             lst_sub_df_activity = list(map(activity_dataframe.populate_activity_dataframe, files))
             df_activity = pd.concat(lst_sub_df_activity, ignore_index=True)
 
             # annotation dataframe
             socketio.emit('progress', {'data': 'Step 4 ...'})
-            socketio.sleep(0.01)
+            socketio.sleep(0)
             lst_sub_df_annotation = list(map(annotation_dataframe.populate_annotation_dataframe, files))
             df_annotation = pd.concat(lst_sub_df_annotation, ignore_index=True)
 
             # try catch dataframe
             socketio.emit('progress', {'data': 'Step 5 ...'})
-            socketio.sleep(0.01)
+            socketio.sleep(0)
             lst_sub_df_catch = list(map(catch_dataframe.populate_catch_dataframe, files))
             df_catches = pd.concat(lst_sub_df_catch, ignore_index=True)
 
             socketio.emit('progress', {'data': 'Processing Files Finished. Start Analyzing ...'})
-            socketio.sleep(0.01)
+            socketio.sleep(0)
 
             dict_score = {}
             # level 1: grading checks
@@ -430,7 +423,7 @@ def handle_upload():
             folderStructure = project_folder_structure.list_files(main_location=main_location)
             # level 2: project structure
             main_location = documentation_logging.grade_project_json_name_desc(folderPath)[3]
-            gexf = project_structure.generate_gexf(df_annotation=df_annotation, main_location=main_location)
+            gexf = project_structure.generate_gexf(df_annotation=df_annotation, fileLocationStr=fileLocationStr)
             # generate project structure dataframe (echarts)
             # str_replace = main_location + "/"
             # df_annotation['workflowName'] = df_annotation['workflowName'].str.replace(str_replace, "")

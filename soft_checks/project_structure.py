@@ -6,10 +6,9 @@ import sys
 import pandas as pd
 
 
-def generate_gexf(df_annotation, main_location):
-    str_replace = main_location + "/"
-    df_annotation['workflowName'] = df_annotation['workflowName'].str.replace(str_replace, "")
-    df_annotation['invokedBy'] = df_annotation['invokedBy'].str.replace(str_replace, "")
+def generate_gexf(df_annotation, fileLocationStr):
+    df_annotation['workflowName'] = df_annotation['workflowName'].str.replace(fileLocationStr, "")
+    df_annotation['invokedBy'] = df_annotation['invokedBy'].str.replace(fileLocationStr, "")
     df_invokeWf = df_annotation.loc[:, ['workflowName', 'invokedBy']].drop_duplicates()
     #combine source and target with no dupes
     df_node_list = list(pd.concat([df_invokeWf.loc[:, 'invokedBy'], df_invokeWf.loc[:, 'workflowName']], ignore_index= True).drop_duplicates())

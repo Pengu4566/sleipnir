@@ -9,9 +9,14 @@ def populate_catch_dataframe(filePath):
     lst_catches = root.findall('.//{http://schemas.microsoft.com/netfx/2009/xaml/activities}Catch')
 
     def extract_catch_content(catch):
-        catchId = catch.attrib['{http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation}WorkflowViewState.IdRef']
-        screenshotIncluded = True if len(catch.findall('.//{http://schemas.uipath.com/workflow/activities}TakeScreenshot'))>0 else False
-        logMessageIncluded = True if len(catch.findall('.//{http://schemas.uipath.com/workflow/activities}LogMessage'))>0 else False
+        try:
+            catchId = catch.attrib['{http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation}WorkflowViewState.IdRef']
+        except Exception:
+            catchId = catch.find('./{http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation}WorkflowViewState.IdRef').text
+        screenshotIncluded = True if len(
+                catch.findall('.//{http://schemas.uipath.com/workflow/activities}TakeScreenshot')) > 0 else False
+        logMessageIncluded = True if len(
+                catch.findall('.//{http://schemas.uipath.com/workflow/activities}LogMessage')) > 0 else False
 
         return {'Catch Id': catchId, 'Screenshot Included': screenshotIncluded, 'filePath': filePath, 'Log Message Included': logMessageIncluded}
 
