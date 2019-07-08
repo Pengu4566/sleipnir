@@ -73,7 +73,7 @@ def handle_upload():
 
     if request.method == 'POST':
 
-        socketio.emit('progress', {'data': 'Unzipping ...'})
+        socketio.emit('progress', {'data': 'Get Info from Web ...'})
         socketio.sleep(0.1)
 
         # get value of checkboxes
@@ -156,6 +156,8 @@ def handle_upload():
             filename = filename.replace("\\", "/")
 
             # save, unzip, and remove zip
+            socketio.emit('progress', {'data': 'Saving File ...'})
+            socketio.sleep(0.1)
             generatedFileNaming = filename[:-4] + str(time.time()).replace(".", "") +\
                                   str(randint(1, 999999999999)) + ".zip"
             if os.path.isfile(os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming):
@@ -176,6 +178,8 @@ def handle_upload():
                                                  generatedFolderName).replace("\\", "/"))
 
             folderPath = (os.getcwd() + app.config['UPLOAD_PATH'] + generatedFolderName).replace("\\", "/")
+            socketio.emit('progress', {'data': 'Unzipping ...'})
+            socketio.sleep(0.1)
             zipFile = zipfile.ZipFile((os.getcwd() + app.config['UPLOAD_PATH'] +
                                        generatedFileNaming).replace("\\", "/"))
 
