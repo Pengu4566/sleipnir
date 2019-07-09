@@ -12,8 +12,7 @@ import sys
 ##
 ##
 # dataframes
-from dataframes import variable_dataframe, argument_dataframe, activity_dataframe, catch_dataframe, annotation_dataframe
-
+from dataframes import dataframe
 # functions
 from grading_checks import naming, usage, documentation_logging, error_handling
 from soft_checks import activity_stats, project_folder_structure, project_structure
@@ -72,72 +71,39 @@ def connect():
 def handle_upload():
 
     if request.method == 'POST':
+        print(request.remote_addr)
 
-        socketio.emit('progress', {'data': 'Get Info from Web ...'})
+        socketio.emit('progress', {'data': 'Getting Check Info ...'})
         socketio.sleep(0.1)
 
-        # get value of checkboxes
-        session['naming'] = False
-        session['varNaming'] = False
-        session['argNaming'] = False
-        session['actNaming'] = False
-
-        session['usage'] = False
-        session['varUsage'] = False
-        session['argUsage'] = False
-
-        session['documentation'] = False
-        session['wfAnnot'] = False
-        session['tcLog'] = False
-        session['tcSs'] = False
-        session['jsonLog'] = False
-        session['arginAnnot'] = False
-
         # naming
-        if request.form.get('Naming') == "Naming":
-            session['naming'] = True
-
-        if request.form.get('VariableNaming') == "VariableNaming":
-            session['varNaming'] = True
-
-        if request.form.get('ArgumentNaming') == "ArgumentNaming":
-            session['argNaming'] = True
-
-        if request.form.get('ActivityNaming') == "ActivityNaming":
-            session['actNaming'] = True
-
+        socketio.emit('progress', {'data': 'Getting Check Info 1...'})
+        socketio.sleep(0.1)
+        session['naming'] = True if request.form.get('Naming') == "Naming" else False
+        session['varNaming'] = True if request.form.get('VariableNaming') == "VariableNaming" else False
+        session['argNaming'] = True if request.form.get('ArgumentNaming') == "ArgumentNaming" else False
+        session['actNaming'] = True if request.form.get('ActivityNaming') == "ActivityNaming" else False
 
         # usage
-        if request.form.get('Usage') == "Usage":
-            session['usage'] = True
-
-        if request.form.get('VariableUsage') == "VariableUsage":
-            session['varUsage'] = True
-
-        if request.form.get('ArgumentUsage') == "ArgumentUsage":
-            session['argUsage'] = True
-
+        socketio.emit('progress', {'data': 'Getting Check Info 2...'})
+        socketio.sleep(0.1)
+        session['usage'] = True if request.form.get('Usage') == "Usage" else False
+        session['varUsage'] = True if request.form.get('VariableUsage') == "VariableUsage" else False
+        session['argUsage'] = True if request.form.get('ArgumentUsage') == "ArgumentUsage" else False
 
         # documentation
-        if request.form.get('Documentation') == "Documentation":
-            session['documentation'] = True
-
-        if request.form.get('WorkflowAnnotation') == "WorkflowAnnotation":
-            session['wfAnnot'] = True
-
-        if request.form.get('TryCatchLogging') == "TryCatchLogging":
-            session['tcLog'] = True
-
-        if request.form.get('TryCatchScreenshot') == "TryCatchScreenshot":
-            session['tcSs'] = True
-
-        if request.form.get('JsonLogging') == "JsonLogging":
-            session['jsonLog'] = True
-
-        if request.form.get('ArgExpAnnot') == "ArgExpAnnot":
-            session['arginAnnot'] = True
+        socketio.emit('progress', {'data': 'Getting Check Info 3...'})
+        socketio.sleep(0.1)
+        session['documentation'] = True if request.form.get('Documentation') == "Documentation" else False
+        session['wfAnnot'] = True if request.form.get('WorkflowAnnotation') == "WorkflowAnnotation" else False
+        session['tcLog'] = True if request.form.get('TryCatchLogging') == "TryCatchLogging" else False
+        session['tcSs'] = True if request.form.get('TryCatchScreenshot') == "TryCatchScreenshot" else False
+        session['jsonLog'] = True if request.form.get('JsonLogging') == "JsonLogging" else False
+        session['arginAnnot'] = True if request.form.get('ArgExpAnnot') == "ArgExpAnnot" else False
 
         # check if the post request has the file part
+        socketio.emit('progress', {'data': 'Getting File Info ...'})
+        socketio.sleep(0.1)
         if 'file' not in request.files:
             return "You must pick a file! Use your browser's back button and try again."
         file = request.files['file']
@@ -183,7 +149,6 @@ def handle_upload():
             zipFile = zipfile.ZipFile((os.getcwd() + app.config['UPLOAD_PATH'] +
                                        generatedFileNaming).replace("\\", "/"))
 
-
             zipFile.extractall(folderPath)
 
             zipFile.close()
@@ -209,42 +174,16 @@ def handle_upload():
 
 
             # scans all project files and populates dataframes with relevant info
-            # variables dataframe
             socketio.emit('progress', {'data': 'Processing Files ...'})
             socketio.sleep(0.1)
 
-            # variables dataframe
-            socketio.emit('progress', {'data': 'Step 1 ...'})
-            socketio.sleep(0.1)
-            lst_sub_df_variable = list(map(variable_dataframe.populate_variables_dataframe, files))
-            df_variable = pd.concat(lst_sub_df_variable, ignore_index=True)
+            lst_sub_df = list(map(dataframe.populate_dataframe, files))
+            df_variable = pd.concat([x[0] for x in lst_sub_df], ignore_index=True)
+            df_argument = pd.concat([x[1] for x in lst_sub_df], ignore_index=True)
+            df_catches = pd.concat([x[2] for x in lst_sub_df], ignore_index=True)
+            df_activity = pd.concat([x[3] for x in lst_sub_df], ignore_index=True)
+            df_annotation = pd.concat([x[4] for x in lst_sub_df], ignore_index=True)
 
-            # argument dataframe
-            socketio.emit('progress', {'data': 'Step 2 ...'})
-            socketio.sleep(0.1)
-            lst_sub_df_argument = list(map(argument_dataframe.populate_argument_dataframe, files))
-            df_argument = pd.concat(lst_sub_df_argument, ignore_index=True)
-
-            # activity dataframe
-            socketio.emit('progress', {'data': 'Step 3 ...'})
-            socketio.sleep(0.1)
-            lst_sub_df_activity = list(map(activity_dataframe.populate_activity_dataframe, files))
-            df_activity = pd.concat(lst_sub_df_activity, ignore_index=True)
-
-            # annotation dataframe
-            socketio.emit('progress', {'data': 'Step 4 ...'})
-            socketio.sleep(0.1)
-            lst_sub_df_annotation = list(map(annotation_dataframe.populate_annotation_dataframe, files))
-            df_annotation = pd.concat(lst_sub_df_annotation, ignore_index=True)
-
-            # try catch dataframe
-            socketio.emit('progress', {'data': 'Step 5 ...'})
-            socketio.sleep(0.1)
-            lst_sub_df_catch = list(map(catch_dataframe.populate_catch_dataframe, files))
-            df_catches = pd.concat(lst_sub_df_catch, ignore_index=True)
-
-            socketio.emit('progress', {'data': 'Processing Files Finished. Start Analyzing ...'})
-            socketio.sleep(0.1)
 
             dict_score = {}
             # level 1: grading checks
