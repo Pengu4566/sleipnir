@@ -1,5 +1,4 @@
 import pandas as pd
-import re
 import xml.etree.ElementTree as ET
 
 def populate_dataframe(filePath):
@@ -18,8 +17,7 @@ def populate_dataframe(filePath):
     def extract_var_info(var):
         variableName = var.attrib['Name']
         dataType = var.attrib['{http://schemas.microsoft.com/winfx/2006/xaml}TypeArguments'].split(":")[1].lower()
-        if '[]' in dataType:
-            dataType = 'array'
+        dataType = 'array' if '[]' in dataType else dataType
         return pd.DataFrame.from_dict({'variableType': [dataType],
                                        'variableName': [variableName],
                                        'count': [1],
@@ -28,25 +26,28 @@ def populate_dataframe(filePath):
     lst_var_processed = list(map(extract_var_info, lst_vars.copy()))
 
     if len(lst_var_processed) > 0:
-        temp_df_variable = pd.concat(lst_var_processed, ignore_index=True)
-        temp_df_variable.drop_duplicates(inplace=True)
-    else:
-        temp_df_variable = pd.DataFrame(columns=['variableType', 'variableName', 'count', 'filePath'])
-
-    if len(temp_df_variable.variableName) > 0:
-        with open(filePath, encoding='utf-8', mode='r') as f:
-            lst_lines = f.readlines()
-            f.close()
+        temp_df_variable = pd.concat(lst_var_processed, ignore_index=True).drop_duplicates(inplace=False)
+        lst_text = list(filter(lambda x: x.startswith("["),
+                               list(filter(lambda x: x is not None, [ele.text for ele in lst_acts]))))
+        lst_attrib = list(filter(lambda x: len(x.keys()) > 0, [ele.attrib for ele in lst_acts]))
+        lst_search = sum([list(x.values()) for x in lst_attrib], []) + lst_text
 
         def var_count_file(df_row):
-            def var_count_line(variableName, line):
-                if re.search(('\[.*' + variableName + '.*\]'), line) is not None:
+            varName = df_row.variableName
+
+            def var_match(varName, ele_search):
+                if varName in ele_search:
                     return 1
                 else:
                     return 0
-            lst_count = list(map(var_count_line, [df_row['variableName']]*len(lst_lines), lst_lines))
-            return sum(lst_count) + 1
+
+            lst_count = list(map(var_match, [varName] * len(lst_search), lst_search))
+            return sum(lst_count)
+
         temp_df_variable['count'] = temp_df_variable.apply(var_count_file, axis=1)
+
+    else:
+        temp_df_variable = pd.DataFrame(columns=['variableType', 'variableName', 'count', 'filePath'])
 
     # arguments
     if len(lst_args) > 0:
@@ -66,8 +67,8 @@ def populate_dataframe(filePath):
             temp_df_argument = pd.concat(lst_arg_processed, ignore_index=True)
             temp_df_argument.drop_duplicates(inplace=True)
             lst_text = list(filter(lambda x: x.startswith("["),
-                                   list(filter(lambda x: x is not None, [ele.text for ele in root.findall('.//')]))))
-            lst_attrib = list(filter(lambda x: len(x.keys()) > 0, [ele.attrib for ele in root.findall('.//')]))
+                                   list(filter(lambda x: x is not None, [ele.text for ele in lst_acts]))))
+            lst_attrib = list(filter(lambda x: len(x.keys()) > 0, [ele.attrib for ele in lst_acts]))
             lst_search = sum([list(x.values()) for x in lst_attrib], []) + lst_text
 
             def arg_count_file(df_row):
@@ -129,8 +130,6 @@ def populate_dataframe(filePath):
 
     lst_df_act_rows = list(filter(lambda x: x is not None, list(map(extract_act_info, lst_acts))))
 
-    # for df_row in lst_df_act_rows:
-    #     temp_df_activity = temp_df_activity.append(df_row, ignore_index=True)
     if len(lst_df_act_rows) > 0:
         temp_df_activity = pd.concat(lst_df_act_rows, ignore_index=True)
     else:

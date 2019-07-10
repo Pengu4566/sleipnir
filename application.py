@@ -71,7 +71,8 @@ def connect():
 def handle_upload():
 
     if request.method == 'POST':
-        print(request.remote_addr)
+        socketio.emit('progress', {'data': str(request.remote_addr)})
+        socketio.sleep(0.1)
 
         socketio.emit('progress', {'data': 'Getting Check Info ...'})
         socketio.sleep(0.1)
@@ -104,6 +105,7 @@ def handle_upload():
         # check if the post request has the file part
         socketio.emit('progress', {'data': 'Getting File Info ...'})
         socketio.sleep(0.1)
+
         if 'file' not in request.files:
             return "You must pick a file! Use your browser's back button and try again."
         file = request.files['file']
