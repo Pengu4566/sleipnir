@@ -156,7 +156,6 @@ def handle_upload():
             zipFile.close()
             os.remove((os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming).replace("\\", "/"))
             session['folderPath'] = folderPath
-            fileLocationStr = folderPath + "/" + filename[:-4] + "/"
 
             ##########################################################################################################
             global gexf
@@ -167,6 +166,11 @@ def handle_upload():
                 for file in f:
                     if '.xaml' in file:
                         files.append(os.path.join(r, file).replace("\\", "/"))
+
+            for r, d, f in os.walk(folderPath):
+                if len(d) == 1 and len(f) == 0:
+                    fileLocationStr = r.replace("\\","/") + "/" + d[0] + "/"
+                    break
 
 
             # checks for empty files list, program should end if this gets triggered
@@ -362,7 +366,7 @@ def handle_upload():
             # level 2: folder structure
             folderStructure = project_folder_structure.list_files(main_location=main_location)
             # level 2: project structure
-            main_location = documentation_logging.grade_project_json_name_desc(folderPath)[3]
+            # main_location = documentation_logging.grade_project_json_name_desc(folderPath)[3]
             gexf = project_structure.generate_gexf(df_annotation=df_annotation, fileLocationStr=fileLocationStr)
             # generate project structure dataframe (echarts)
             # str_replace = main_location + "/"
