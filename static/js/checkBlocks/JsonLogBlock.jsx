@@ -13,7 +13,7 @@ export default class JsonLogBlock extends React.Component {
               The project.json file should contain your own project name and
               description. Default values are not recommended.
             </p>
-            <p>Project Name, Project Description: {this.props.name}</p>
+            <p>{this.props.name}</p>
           </div>
         </div>
       );

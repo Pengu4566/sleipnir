@@ -77,41 +77,24 @@ def handle_upload():
         socketio.emit('progress', {'data': 'Getting Check Info ...'})
         socketio.sleep(0.1)
 
-        # naming
-        socketio.emit('progress', {'data': 'Getting Check Info 1...'})
-        socketio.sleep(0.1)
-        session['naming'] = True if request.form.get('Naming') == "Naming" else False
-        session['varNaming'] = True if request.form.get('VariableNaming') == "VariableNaming" else False
-        session['argNaming'] = True if request.form.get('ArgumentNaming') == "ArgumentNaming" else False
-        session['actNaming'] = True if request.form.get('ActivityNaming') == "ActivityNaming" else False
-
-        # usage
-        socketio.emit('progress', {'data': 'Getting Check Info 2...'})
-        socketio.sleep(0.1)
-        session['usage'] = True if request.form.get('Usage') == "Usage" else False
-        session['varUsage'] = True if request.form.get('VariableUsage') == "VariableUsage" else False
-        session['argUsage'] = True if request.form.get('ArgumentUsage') == "ArgumentUsage" else False
-
-        # documentation
-        socketio.emit('progress', {'data': 'Getting Check Info 3...'})
-        socketio.sleep(0.1)
-        session['documentation'] = True if request.form.get('Documentation') == "Documentation" else False
-        session['wfAnnot'] = True if request.form.get('WorkflowAnnotation') == "WorkflowAnnotation" else False
-        session['tcLog'] = True if request.form.get('TryCatchLogging') == "TryCatchLogging" else False
-        session['tcSs'] = True if request.form.get('TryCatchScreenshot') == "TryCatchScreenshot" else False
-        session['jsonLog'] = True if request.form.get('JsonLogging') == "JsonLogging" else False
-        session['arginAnnot'] = True if request.form.get('ArgExpAnnot') == "ArgExpAnnot" else False
-
+        # get checks info
+        def get_checks_info(ele_lst_info):
+            return True if request.form.get(ele_lst_info) == ele_lst_info else False
+        lst_info = ['Naming', 'VariableNaming', 'ArgumentNaming', 'ActivityNaming',
+                    'Usage', 'VariableUsage', 'ArgumentUsage',
+                    'Documentation', 'WorkflowAnnotation', 'TryCatchLogging', 'TryCatchScreenshot', 'JsonLogging', 'ArgExpAnnot']
+        start = time.time()
+        [session['naming'], session['varNaming'], session['argNaming'], session['actNaming'],
+         session['usage'], session['varUsage'], session['argUsage'],
+         session['documentation'], session['wfAnnot'], session['tcLog'], session['tcSs'], session['jsonLog'], session['arginAnnot']] = map(get_checks_info,lst_info)
+        print('Get checks info takes %s seconds' % (time.time() - start))
         # check if the post request has the file part
         socketio.emit('progress', {'data': 'Getting File Info ...'})
         socketio.sleep(0.1)
 
-        if 'file' not in request.files:
+        if ('file' not in request.files) or (request.files['file'].filename == ''):
             return "You must pick a file! Use your browser's back button and try again."
         file = request.files['file']
-        # if user does not select file, browser also submit an empty part without filename
-        if file.filename == '':
-            return'No selected file'
 
         def allowed_file(file_name):
             return '.' in file_name and file_name.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
@@ -120,8 +103,7 @@ def handle_upload():
             with app.app_context():
                 return render_template("wrongFile.html")
         elif file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            filename = filename.replace("\\", "/")
+            filename = secure_filename(file.filename).replace("\\", "/")
 
             # save, unzip, and remove zip
             socketio.emit('progress', {'data': 'Saving File ...'})
@@ -148,12 +130,14 @@ def handle_upload():
             folderPath = (os.getcwd() + app.config['UPLOAD_PATH'] + generatedFolderName).replace("\\", "/")
             socketio.emit('progress', {'data': 'Unzipping ...'})
             socketio.sleep(0.1)
+            start = time.time()
             zipFile = zipfile.ZipFile((os.getcwd() + app.config['UPLOAD_PATH'] +
                                        generatedFileNaming).replace("\\", "/"))
 
             zipFile.extractall(folderPath)
 
             zipFile.close()
+            print('Unzipping takes %s seconds' % (time.time() - start))
             os.remove((os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming).replace("\\", "/"))
             session['folderPath'] = folderPath
 
@@ -161,35 +145,49 @@ def handle_upload():
             global gexf
             # file processing
             files = []
-
+            start = time.time()
             for r, d, f in os.walk(folderPath):
                 for file in f:
                     if '.xaml' in file:
                         files.append(os.path.join(r, file).replace("\\", "/"))
-
+            print('Get list of all xaml files takes %s seconds' % (time.time() - start))
+            fileLocationStr = (os.getcwd() + app.config['UPLOAD_PATH'] + generatedFolderName).replace("\\", "/") + "/"
             for r, d, f in os.walk(folderPath):
-                if len(d) == 1 and len(f) == 0:
+                if len(d) == 1:
                     fileLocationStr = r.replace("\\","/") + "/" + d[0] + "/"
+                else:
                     break
-
 
             # checks for empty files list, program should end if this gets triggered
             if (files == []):
                 return "Could not find project files! Did you put them in the right place?"
 
+            # Get related info from Project.json (name and description)
+            df_json = documentation_logging.grade_project_json_name_desc(folderPath)
+            if session['jsonLog']:
+                project_detail = str(df_json.projectDetail.sum())
+                json_name_score = df_json.namingScore.sum() / len(df_json.namingScore)
+                json_description_score = df_json.descriptionScore.sum() / len(df_json.descriptionScore)
+            else:
+                json_name_score = "[Not evaluated]"
+                json_description_score = "[Not evaluated]"
+                project_detail = "[Not evaluated]"
 
 
             # scans all project files and populates dataframes with relevant info
             socketio.emit('progress', {'data': 'Processing Files ...'})
             socketio.sleep(0.1)
 
-            lst_sub_df = list(map(dataframe.populate_dataframe, files))
-            df_variable = pd.concat([x[0] for x in lst_sub_df], ignore_index=True)
-            df_argument = pd.concat([x[1] for x in lst_sub_df], ignore_index=True)
-            df_catches = pd.concat([x[2] for x in lst_sub_df], ignore_index=True)
-            df_activity = pd.concat([x[3] for x in lst_sub_df], ignore_index=True)
-            df_annotation = pd.concat([x[4] for x in lst_sub_df], ignore_index=True)
-
+            start = time.time()
+            lst_sub_df = list(map(dataframe.populate_dataframe, files, [df_json]*len(files)))
+            print('Generate all takes %s seconds'% (time.time() - start))
+            start = time.time()
+            df_variable = pd.concat([x[0] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False)
+            df_argument = pd.concat([x[1] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False)
+            df_catches = pd.concat([x[2] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False)
+            df_activity = pd.concat([x[3] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False)
+            df_annotation = pd.concat([x[4] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False)
+            print('Concat takes %s seconds' % (time.time() - start))
 
             dict_score = {}
             # level 1: grading checks
@@ -294,20 +292,8 @@ def handle_upload():
                     screenshotScore = "[Not evaluated]"
                     noSsExp = "[Not evaluated]"
 
-                # level 3: Project.json (name and description)
-                if session['jsonLog']:
-                    [json_name_score, json_description_score, project_detail, main_location] = \
-                        documentation_logging.grade_project_json_name_desc(folderPath)
-                    project_detail = str(project_detail).replace("'", "")
-                else:
-                    json_name_score = "[Not evaluated]"
-                    json_description_score = "[Not evaluated]"
-                    project_detail = "[Not evaluated]"
-
                 # level 3: workflow annotation
-                [wfAnnotationScore, notAnnotatedWf] = documentation_logging.grade_annotation_in_workflow(
-                    df_annotation=df_annotation,
-                    main_location=main_location)
+                [wfAnnotationScore, notAnnotatedWf, AnnotationArgumentScore, missing_arguments_list] = documentation_logging.grade_annotation_in_workflow(df_annotation=df_annotation, fileLocationStr=fileLocationStr, df_argument=df_argument)
                 if session['wfAnnot']:
                     notAnnotWf = str(notAnnotatedWf).replace("'", "")
                 else:
@@ -317,9 +303,6 @@ def handle_upload():
                 # level 3: Arguments should be at least mentioned in annotation
                 # outputs a percentage score of the number of correct arguments and a list of missing arguments
                 if session['arginAnnot']:
-                    [AnnotationArgumentScore, missing_arguments_list] = \
-                        documentation_logging.grade_annotation_contains_arguments(df_annotation=df_annotation,
-                                                                                  main_location=main_location)
                     missing_arguments_list = str(missing_arguments_list).replace("'", "")
                 else:
                     missing_arguments_list = "[Not evaluated]"
@@ -362,19 +345,11 @@ def handle_upload():
 
             # level 1: soft checks
             # level 2: activity stats
-            activityStats = activity_stats.get_activity_stats(df_activity=df_activity)
+            activityStats = activity_stats.get_activity_stats(df_activity=df_activity, fileLocationStr=fileLocationStr)
             # level 2: folder structure
-            folderStructure = project_folder_structure.list_files(main_location=main_location)
+            folderStructure = project_folder_structure.list_files(fileLocationStr=fileLocationStr)
             # level 2: project structure
-            # main_location = documentation_logging.grade_project_json_name_desc(folderPath)[3]
             gexf = project_structure.generate_gexf(df_annotation=df_annotation, fileLocationStr=fileLocationStr)
-            # generate project structure dataframe (echarts)
-            # str_replace = main_location + "/"
-            # df_annotation['workflowName'] = df_annotation['workflowName'].str.replace(str_replace, "")
-            # df_annotation['invokedBy'] = df_annotation['invokedBy'].str.replace(str_replace, "")
-            # # Create tree object
-            # df_invokeWf = df_annotation.loc[:, ['workflowName', 'invokedBy']].drop_duplicates()
-
 
             # pass along the variables
             session['namingScore'] = namingScore
@@ -424,24 +399,6 @@ def __main__():
                                folderStructure=session.get("folderStructure"),
                                unusedArgument=session.get("unusedArgument"))
 
-                               # namingScore=namingScore,
-                               # usageScore=usageScore,
-                               # docScore=docScore,
-                               # improperNamedVar=improperNamedVar,
-                               # unusedVar=unusedVar,
-                               # improperNamedArg=improperNamedArg,
-                               # improperNamedAct=improperNamedAct,
-                               # activityStats=activityStats,
-                               # noSsExp=noSsExp,
-                               # notAnnotWf=notAnnotWf,
-                               # noLMExp=noLMExp,
-                               # project_detail=project_detail,
-                               # missing_arguments_list=missing_arguments_list,
-                               # folderStructure=folderStructure,
-                               # unusedArgument=unusedArgument,
-                               # structurePath=structurePath,
-                               # radarChartPath=radarChartPath)
-
 
 
 
@@ -454,7 +411,6 @@ def delete_pics():
 # echarts graphs go here
 @app.route("/radar", methods=['GET'])
 def radar_plot_data():
-    #print("THIS IS A LOG MESSAGE" + str(dict_score['naming']), file=sys.stderr)
     message = {'usage': session.get("usageScore"),
                'documentation': session.get("docScore"),
                'naming': session.get("namingScore")}
@@ -463,14 +419,12 @@ def radar_plot_data():
 
 @app.route("/structure", methods=['GET'])
 def project_structure_data():
-    #gexf = project_structure.generate_gexf(df_annotation=df_annotation, main_location=main_location)
-    #print("DF_ANNOTATION" + str(df_annotation), file=sys.stderr)
     message = {'gexf': session.get("gexf")}
     return jsonify(message)
 
 
 
-# only run when executing locally (if this doesnt run then remove the if statement)
+# only run when executing locally
 if __name__ == "__main__":
     socketio.run(app, debug=True)
     upload()

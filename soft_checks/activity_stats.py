@@ -1,5 +1,5 @@
 # activity stats
-def get_activity_stats(df_activity):
+def get_activity_stats(df_activity, fileLocationStr):
     if len(df_activity['activityName']) > 0:
         html_string = "<h3 id='act_stat_header'>Activity Statistics</h3>"
         html_string += "<div id='stats_buttons'> <p id='stat_notes'>(Click on the file name to see details)</p>"
@@ -11,7 +11,7 @@ def get_activity_stats(df_activity):
             df_activity_gbPathType = df_activity_gbPathType.loc[:].sort_values(by=['Count'], ascending= False)
             df_activity_gbPathType.reset_index(drop=True, inplace=True)
             df_activity_gbPathType = df_activity_gbPathType.to_html(justify="center")
-            html_string += "<div class='act_stat'> <button>" + "/".join(f.split("/")[f.split("/").index("file")+3:]) + "</button>" + "<div class='stats_table'>" + df_activity_gbPathType + "</div></div>"
+            html_string += "<div class='act_stat'> <button>" + f.replace(fileLocationStr,'').replace(".xaml",'') + "</button>" + "<div class='stats_table'>" + df_activity_gbPathType + "</div></div>"
         html_string += "</div>"
         return html_string
     else:
