@@ -1,7 +1,23 @@
 import React from "react";
+import ReactTable from "react-table";
+import "react-table/react-table.css";
 
 export default class JsonLogBlock extends React.Component {
   render() {
+    const columns = [
+      {
+        Header: "Project ID",
+        accessor: "index"
+      },
+      {
+        Header: "Project Name",
+        accessor: "projectDetail.projectName"
+      },
+      {
+        Header: "Project Description",
+        accessor: "projectDetail.projectDescription"
+      }
+    ];
     if (this.props.name == "[Not evaluated]") {
       return <div />;
     } else {
@@ -13,7 +29,7 @@ export default class JsonLogBlock extends React.Component {
               The project.json file should contain your own project name and
               description. Default values are not recommended.
             </p>
-            <p>{this.props.name}</p>
+            <ReactTable columns={columns} data={this.props.name.data} />
           </div>
         </div>
       );

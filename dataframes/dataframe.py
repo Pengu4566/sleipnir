@@ -71,21 +71,12 @@ def populate_dataframe(filePath, df_json):
             lst_search = sum([list(x.values()) for x in lst_attrib], []) + lst_text
 
             def arg_count_file(df_row):
-                argName = df_row.argumentName
-
-                def arg_match(argName, ele_search):
-                    if argName in ele_search:
-                        return 1
-                    else:
-                        return 0
-
-                lst_count = list(map(arg_match, [argName] * len(lst_search), lst_search))
+                lst_count = [1 if df_row.argumentName in ele else 0 for ele in lst_search]
                 return sum(lst_count)
 
             temp_df_argument['count'] = temp_df_argument.apply(arg_count_file, axis=1)
     else:
         temp_df_argument = pd.DataFrame(columns=['argumentName', 'argumentType', 'filePath', 'dataType', 'count'])
-
 
     # catches
     def extract_catch_content(catch):

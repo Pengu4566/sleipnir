@@ -1,8 +1,10 @@
 import React from "react";
+import ReactTable from "react-table";
+import "react-table/react-table.css";
 
 export default class ArginAnnotBlock extends React.Component {
   render() {
-    if (this.props.name == "There is no argument in this project.") {
+    if (this.props.name.data == ["There is no argument in this project."]) {
       return (
         <div className="single_check">
           <h3>Argument Explanation in Annotation</h3>
@@ -15,7 +17,7 @@ export default class ArginAnnotBlock extends React.Component {
           </div>
         </div>
       );
-    } else if (this.props.name == "[The file you uploaded is not completed.]") {
+    } else if (this.props.name.data == []) {
       return (
         <div className="single_check">
           <h3>Argument Explanation in Annotation</h3>
@@ -25,15 +27,28 @@ export default class ArginAnnotBlock extends React.Component {
               workflow.
             </p>
             <p>
-              The file you uploaded is not complete, therefore we could not
-              perform this check on it.
+              There is no arguments that are not mentioned in the annotation.
             </p>
           </div>
         </div>
       );
-    } else if (this.props.name == "[Not evaluated]") {
+    } else if (this.props.name.data == ["Not evaluated"]) {
       return <div />;
     } else {
+      const columns = [
+        {
+          Header: "Argument ID",
+          accessor: "index"
+        },
+        {
+          Header: "Argument Name",
+          accessor: "argumentName"
+        },
+        {
+          Header: "From File",
+          accessor: "filePath"
+        }
+      ];
       return (
         <div className="single_check">
           <h3>Argument Explanation in Annotation</h3>
@@ -43,7 +58,7 @@ export default class ArginAnnotBlock extends React.Component {
               workflow. Arguments that are not even mentioned in the annotation
               include:
             </p>
-            <p>{this.props.name}</p>
+            <ReactTable columns={columns} data={this.props.name.data} />
           </div>
         </div>
       );

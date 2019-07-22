@@ -5,8 +5,9 @@
 
 # 1. variable naming: camelcase, abbreviation ahead of name
 
-def grade_variable_name(df_variable):
-    numVariables = len(df_variable.variableName)
+def grade_variable_name(df_variable, fileLocationStr):
+    df_variable_dup = df_variable.copy()
+    numVariables = len(df_variable_dup.variableName)
 
     # check if variable name is proper in df_variable ['variableType', 'variableName', 'count', 'filePath']
     def proper_variable_naming(df_variable_row):
@@ -64,19 +65,20 @@ def grade_variable_name(df_variable):
         else:
             return False
 
+    df_variable_dup.filePath = df_variable_dup.filePath.str.replace(fileLocationStr, '')
 
     if numVariables > 0:
-        df_variable['properNamed'] = df_variable.apply(proper_variable_naming, axis=1)
+        df_variable_dup['properNamed'] = df_variable_dup.apply(proper_variable_naming, axis=1)
         # return lists
-        if (False in df_variable.properNamed) and (True in df_variable.properNamed):
-            improperNamedVariable = list(df_variable.loc[df_variable.properNamed == False].variableName)
-            variableNamingScore = len(
-                df_variable.loc[df_variable.properNamed == True].variableName) / numVariables * 100
-        elif True in df_variable.properNamed :
+        if (False in df_variable_dup.properNamed) and (True in df_variable_dup.properNamed):
+            improperNamedVariable = list(df_variable_dup.loc[df_variable_dup.properNamed == False].reset_index()
+                                         .loc[:, ['index', 'variableName', 'filePath']].T.to_dict().values())
+            variableNamingScore = df_variable_dup.properNamed.sum() / numVariables * 100
+        elif True in df_variable_dup.properNamed:
             improperNamedVariable = ['There is no improperly named variable.']
             variableNamingScore = 100
         else:
-            improperNamedVariable = list(df_variable.variableName)
+            improperNamedVariable = list(df_variable_dup.reset_index().loc[:, ['index', 'variableName', 'filePath']].T.to_dict().values())
             variableNamingScore = 0
     else:
         improperNamedVariable = ['There is no variable in your project.']
@@ -89,7 +91,7 @@ def grade_variable_name(df_variable):
 
 # 2. argument naming: in/out/io, abbreviation, camel case
 
-def grade_argument_name(df_argument):
+def grade_argument_name(df_argument, fileLocationStr):
     numArgument = len(df_argument) / 100
 
     # check if argument name is proper in df_argument
@@ -159,10 +161,11 @@ def grade_argument_name(df_argument):
     if numArgument > 0:
         df_argument['properNamed'] = df_argument.apply(proper, axis=1)
         # return lists
-        argumentNamingScore = len(df_argument[df_argument['properNamed'] == True]) / numArgument
-        # improperNamedArguments = list(df_argument[df_argument['properNamed']!= True].argumentName)
-        temp_improperNamedArguments = list(df_argument[df_argument['properNamed'] != True].argumentName)
-        improperNamedArguments = [x for x in temp_improperNamedArguments if x is not None]
+        argumentNamingScore = df_argument.properNamed.sum() / numArgument
+        df_argument_dup = df_argument.copy()
+        df_argument_dup.filePath = df_argument_dup.filePath.str.replace(fileLocationStr, '')
+        improperNamedArguments = list(df_argument_dup[df_argument_dup['properNamed'] == False].dropna().reset_index()
+                                      .loc[:, ['index', 'argumentName', 'filePath']].T.to_dict().values())
     else:
         [argumentNamingScore, improperNamedArguments] = [0, ["There is no argument in your project."]]
 
@@ -173,13 +176,16 @@ def grade_argument_name(df_argument):
 
 # 3. activity naming
 
-def grade_activity_name(df_activity):
+def grade_activity_name(df_activity,fileLocationStr):
     if len(df_activity['activityName']) > 0:
         # return lists
         df_activity['customizedName'] = (df_activity['activityName'] != df_activity['activityType'])
-        activityNamingScore = len(df_activity[df_activity['customizedName'] == True].customizedName) / len(
-            df_activity.customizedName) * 100
-        improperNamedActivities = list(df_activity[df_activity['customizedName'] != True].activityName)
+        df_activity_dup = df_activity.copy()
+        df_activity_dup.filePath = df_activity_dup.filePath.str.replace(fileLocationStr,'')
+        activityNamingScore = df_activity_dup['customizedName'].sum() / len(df_activity_dup.customizedName) * 100
+        improperNamedActivities = list(df_activity_dup[df_activity_dup['customizedName'] != True].dropna()
+                                       .reset_index(drop=True).reset_index(drop=False)
+                                       .loc[:, ['index', 'activityName', 'filePath']].T.to_dict().values())
     else:
         [activityNamingScore, improperNamedActivities] = [0, ["There is no activity in your project."]]
 

@@ -1,8 +1,10 @@
 import React from "react";
+import ReactTable from "react-table";
+import "react-table/react-table.css";
 
 export default class NotAnnotWfBlock extends React.Component {
   render() {
-    if (this.props.name == "[]") {
+    if (this.props.name == []) {
       return (
         <div className="single_check">
           <h3>Workflow Annotation</h3>
@@ -15,9 +17,9 @@ export default class NotAnnotWfBlock extends React.Component {
           </div>
         </div>
       );
-    } else if (this.props.name == "[Not evaluated]") {
+    } else if (this.props.name == ["Not evaluated"]) {
       return <div />;
-    } else if (this.props.name == "[The file you uploaded is not completed.]") {
+    } else if (this.props.name == ["The file you uploaded is not completed."]) {
       return (
         <div className="single_check">
           <h3>Workflow Annotation</h3>
@@ -32,7 +34,7 @@ export default class NotAnnotWfBlock extends React.Component {
         </div>
       );
     } else if (
-      this.props.name == "[There is no invoked workflow in your project.]"
+      this.props.name == ["There is no invoked workflow in your project."]
     ) {
       return (
         <div className="single_check">
@@ -47,6 +49,16 @@ export default class NotAnnotWfBlock extends React.Component {
         </div>
       );
     } else {
+      const columns = [
+        {
+          Header: "Workflow ID",
+          accessor: "index"
+        },
+        {
+          Header: "Workflow Path",
+          accessor: "workflowName"
+        }
+      ];
       return (
         <div className="single_check">
           <h3>Workflow Annotation</h3>
@@ -56,7 +68,7 @@ export default class NotAnnotWfBlock extends React.Component {
               workflow is annotated. An invoked workflow should always be
               annotated. Such workflows that are not annotated include:
             </p>
-            <p>{this.props.name}</p>
+            <ReactTable columns={columns} data={this.props.name.data} />
           </div>
         </div>
       );

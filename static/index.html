@@ -82,16 +82,16 @@
     <div class="check_sec" id="naming_sec">
       <h2 class="check_title">Naming Checks</h2>
       <div id="VarName"></div>
-      <script>
-        window.improperNamedVar = "{{improperNamedVar}}"
+      <script >
+        window.improperNamedVar = JSON.parse('{{improperNamedVar|tojson|safe}}');
       </script>
       <div id="ArgName"></div>
       <script>
-        window.improperNamedArg = "{{improperNamedArg}}"
+        window.improperNamedArg = JSON.parse('{{improperNamedArg|tojson|safe}}');
       </script>
       <div id="ActName"></div>
       <script>
-        window.improperNamedAct = "{{improperNamedAct}}"
+        window.improperNamedAct = JSON.parse('{{improperNamedAct|tojson|safe}}');
       </script>
     </div>
 
@@ -99,11 +99,11 @@
       <h2 class="check_title">Usage Checks</h2>
       <div id="VarUsage"></div>
       <script>
-        window.unusedVar = "{{unusedVar}}"
+        window.unusedVar = JSON.parse('{{unusedVar|tojson|safe}}');
       </script>
       <div id="ArgUsage"></div>
       <script>
-        window.unusedArg = "{{unusedArgument}}"
+        window.unusedArg = JSON.parse('{{unusedArgument|tojson|safe}}');
       </script>
     </div>
 
@@ -111,23 +111,23 @@
       <h2 class="check_title">Documentation Checks</h2>
       <div id="ExpSs"></div>
       <script>
-        window.noSsExp = "{{noSsExp}}"
+        window.noSsExp = JSON.parse('{{noSsExp|tojson|safe}}');
       </script>
       <div id="WfAnnot"></div>
       <script>
-        window.notAnnotWf = "{{notAnnotWf}}"
+        window.notAnnotWf = JSON.parse('{{notAnnotWf|tojson|safe}}');
       </script>
       <div id="ExpLM"></div>
       <script>
-        window.noLMExp = "{{noLMExp}}"
+        window.noLMExp = JSON.parse('{{noLMExp|tojson|safe}}');
       </script>
       <div id="JsonLog"></div>
       <script>
-        window.projectDetail = "{{project_detail}}"
+        window.projectDetail = JSON.parse('{{project_detail|tojson|safe}}');
       </script>
       <div id="ArginAnnot"></div>
       <script>
-        window.missingArg = "{{missing_arguments_list}}"
+        window.missingArg = JSON.parse('{{missing_arguments_list|tojson|safe}}');
       </script>
       </div>
   </div>

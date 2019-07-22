@@ -63,5 +63,19 @@
     });
     </script>
     <script src="dist/fileUpload.js" type="text/javascript"></script>
+    <div id=”dropzone”></div>
+    <script type="text/javascript">
+    var dropzone = document.getElementById('dropzone');
+    dropzone.ondrop = function(e) {
+      var length = e.dataTransfer.items.length;
+      for (var i = 0; i < length; i++) {
+        var entry = e.dataTransfer.items[i].webkitGetAsEntry();
+        if (entry.isFile) {
+          
+        } else if (entry.isDirectory) {
+    }
+  }
+};
+    </script>
   </body>
 </html>

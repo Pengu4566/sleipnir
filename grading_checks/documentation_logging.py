@@ -14,15 +14,17 @@ import xml.etree.ElementTree as ET
 
 
 # 2. Log messages in catches
-def grade_log_message_in_catches(df_catches):
+def grade_log_message_in_catches(df_catches, fileLocationStr):
+    # columns=['Catch Id', 'Screenshot Included', 'filePath', 'Log Message Included']
     df_catches_dup = df_catches.loc[:, :]
+    df_catches_dup.filePath = df_catches_dup.filePath.str.replace(fileLocationStr,'')
     numCatch = len(df_catches_dup['Log Message Included'])
     if numCatch > 0:
         # checks if try/catch activities have log messages within them
         logMessageScore = df_catches_dup['Log Message Included'].sum() / numCatch * 100
         if df_catches_dup['Log Message Included'].sum() < numCatch:
-            noLMException = list(
-                df_catches_dup[df_catches_dup['Log Message Included'] == False]['Catch Id'])
+            noLMException = list(df_catches_dup[df_catches_dup['Log Message Included'] == False].dropna().reset_index()
+                                 .loc[:, ['index', 'Catch Id', 'filePath']].T.to_dict().values())
         else:
             noLMException = []
 
@@ -33,15 +35,16 @@ def grade_log_message_in_catches(df_catches):
 # end 2. Log messages in catches
 
 # 3. Screenshot in catches
-def grade_screenshot_in_catches(df_catches):
+def grade_screenshot_in_catches(df_catches, fileLocationStr):
     df_catches_dup = df_catches.loc[:, :]
+    df_catches_dup.filePath = df_catches_dup.filePath.str.replace(fileLocationStr,'')
     numCatch = len(df_catches_dup['Screenshot Included'])
     if numCatch > 0:
         # checks if try/catch activities have screenshots within them
         screenshotScore = df_catches_dup['Screenshot Included'].sum() / numCatch * 100
         if df_catches_dup['Screenshot Included'].sum() < numCatch:
-            noSsException = list(
-                df_catches[df_catches['Screenshot Included'] == False]['Catch Id'])
+            noSsException = list(df_catches[df_catches['Screenshot Included'] == False].dropna().reset_index()
+                                 .loc[:, ['index', 'Catch Id', 'filePath']].T.to_dict().values())
         else:
             noSsException = []
 
@@ -63,7 +66,7 @@ def grade_project_json_name_desc(folderPath):
             for r, d, f in os.walk(project_folder_name):
                 for xamlFile in f:
                     if '.xaml' in xamlFile:
-                        lst_wf_associated.append(r.replace("\\","/") + '/' + xamlFile)
+                        lst_wf_associated.append(r.replace("\\", "/") + '/' + xamlFile)
             lst_json.append({fileLocation: lst_wf_associated})
 
     def collect_json_data(json_dic):
@@ -84,7 +87,7 @@ def grade_project_json_name_desc(folderPath):
             json_name_score = 100
         else:
             json_name_score = 0
-        project_detail = 'Project Name: ' + project_name + '. Project Description: ' + project_description +'.'
+        project_detail = {'projectName':project_name, 'projectDescription': project_description}
         row = pd.DataFrame.from_dict({'fileLocation': [fileLocation],
                                       'projectDetail': [project_detail],
                                       'mainFolder': [fileLocation[:-(len(fileName) + 1)]],
@@ -124,11 +127,9 @@ def grade_annotation_in_workflow(df_annotation, fileLocationStr, df_argument):
 
     numWf = len(df_annotation_dup.workflowName)
     if numWf > 0:
-        notAnnotatedWf = list(df_annotation_dup[df_annotation_dup.annotated == 0].workflowName)
-        if len(notAnnotatedWf) > 0:
-            def replace_fileLoc(ele_notAnnotatedWf):
-                return ele_notAnnotatedWf.replace(fileLocationStr, '')
-            notAnnotatedWf = list(map(replace_fileLoc, notAnnotatedWf))
+        df_annotation_dup.workflowName = df_annotation_dup.workflowName.str.replace(fileLocationStr,'')
+        notAnnotatedWf = list(df_annotation_dup[df_annotation_dup.annotated == 0].dropna().reset_index()
+                              .loc[:, ['index', 'workflowName']].T.to_dict().values())
         wfAnnotationScore = 100 - (len(notAnnotatedWf) / numWf * 100)
     else:
         [wfAnnotationScore, notAnnotatedWf] = [0, ["There is no invoked workflow in your project."]]
@@ -142,7 +143,12 @@ def grade_annotation_in_workflow(df_annotation, fileLocationStr, df_argument):
         else:
             return str(df_join_row['argumentName']) in str(df_join_row['annotation'])
     df_join_arg_annot['arginAnnot'] = df_join_arg_annot.apply(arginAnnot, axis=1)
-    missing_arguments_list = list(df_join_arg_annot[df_join_arg_annot['arginAnnot'] == False].argumentName) if len(df_join_arg_annot) > 0 else "There is no argument in this project."
+    if len(df_join_arg_annot) > 0:
+        df_join_arg_annot.filePath = df_join_arg_annot.filePath.str.replace(fileLocationStr, '')
+        missing_arguments_list = list(df_join_arg_annot[df_join_arg_annot['arginAnnot'] == False].reset_index()
+                                      .loc[:, ['index', 'argumentName', 'filePath']].T.to_dict().values())
+    else:
+        missing_arguments_list = ["There is no argument in this project."]
     AnnotationArgumentScore = len(missing_arguments_list)/len(df_join_arg_annot) if len(df_join_arg_annot) > 0 else 0
 
     return [wfAnnotationScore, notAnnotatedWf, AnnotationArgumentScore, missing_arguments_list]

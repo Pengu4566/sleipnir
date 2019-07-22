@@ -16,11 +16,14 @@ from werkzeug.utils import secure_filename
 # 3. activity usage
 
 # 1. variable usage
-def grade_variable_usage(df_variable):
+def grade_variable_usage(df_variable, fileLocationStr):
     numVariables = len(df_variable.variableName)
     if numVariables > 0:
-        unusedVariable = list(df_variable.loc[df_variable['count'] == 1].variableName)
-        variableUsageScore = len(df_variable.loc[df_variable['count'] > 1]['count']) / numVariables * 100
+        df_variable_dup = df_variable.copy()
+        df_variable_dup.filePath = df_variable_dup.filePath.str.replace(fileLocationStr, '')
+        unusedVariable = list(df_variable_dup.loc[df_variable_dup['count'] == 1].dropna().reset_index()
+                              .loc[:, ['index', 'variableName', 'filePath']].T.to_dict().values())
+        variableUsageScore = len(df_variable_dup.loc[df_variable_dup['count'] > 1]['count']) / numVariables * 100
     else:
         [variableUsageScore, unusedVariable] = [0, ["There is no variable in your project."]]
 
@@ -29,11 +32,14 @@ def grade_variable_usage(df_variable):
 
 
 # 2. argument usage
-def grade_argument_usage(df_argument):
+def grade_argument_usage(df_argument, fileLocationStr):
     numArguments = len(df_argument['count'])
     if numArguments > 0:
-        unusedArgument = list(df_argument.loc[df_argument['count'] == 1].argumentName)
-        argumentUsageScore = len(df_argument.loc[df_argument['count'] > 1]['count']) / numArguments * 100
+        df_argument_dup = df_argument.copy()
+        df_argument_dup.filePath = df_argument_dup.filePath.str.replace(fileLocationStr, '')
+        unusedArgument = list(df_argument_dup.loc[df_argument_dup['count'] == 1].dropna().reset_index()
+                              .loc[:, ['index', 'argumentName', 'filePath']].T.to_dict().values())
+        argumentUsageScore = len(df_argument_dup.loc[df_argument_dup['count'] > 1]['count']) / numArguments * 100
     else:
         [argumentUsageScore, unusedArgument] = [0, ["There is no argument in your project."]]
     return [argumentUsageScore, unusedArgument]

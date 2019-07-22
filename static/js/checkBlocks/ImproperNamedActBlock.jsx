@@ -1,8 +1,10 @@
 import React from "react";
+import ReactTable from "react-table";
+import "react-table/react-table.css";
 
 export default class ImproperNamedActBlock extends React.Component {
   render() {
-    if (this.props.name == "[]") {
+    if (this.props.name.data == []) {
       return (
         <div className="single_check">
           <h3>Activity Naming</h3>
@@ -15,7 +17,9 @@ export default class ImproperNamedActBlock extends React.Component {
           </div>
         </div>
       );
-    } else if (this.props.name == "[There is no activity in your project.]") {
+    } else if (
+      this.props.name.data == "[There is no activity in your project.]"
+    ) {
       return (
         <div className="single_check">
           <h3>Activity Naming</h3>
@@ -24,9 +28,23 @@ export default class ImproperNamedActBlock extends React.Component {
           </div>
         </div>
       );
-    } else if (this.props.name == "[Not evaluated]") {
+    } else if (this.props.name.data == "[Not evaluated]") {
       return <div />;
     } else {
+      const columns = [
+        {
+          Header: "Activity ID",
+          accessor: "index"
+        },
+        {
+          Header: "Activity Name",
+          accessor: "activityName"
+        },
+        {
+          Header: "From File",
+          accessor: "filePath"
+        }
+      ];
       return (
         <div className="single_check">
           <h3>Activity Naming</h3>
@@ -36,7 +54,7 @@ export default class ImproperNamedActBlock extends React.Component {
               activity should be named with its default name. Activities that
               are not properly named include:
             </p>
-            <p>{this.props.name}</p>
+            <ReactTable columns={columns} data={this.props.name.data} />
           </div>
         </div>
       );

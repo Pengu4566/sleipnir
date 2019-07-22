@@ -27,6 +27,7 @@
     "jquery": "^3.2.1",
     "react": "^15.6.2",
     "react-dom": "^15.6.2",
+    "react-table": "6.10.0",
     "style-loader": "^0.18.2",
     "webpack": "^3.0.0"
   },

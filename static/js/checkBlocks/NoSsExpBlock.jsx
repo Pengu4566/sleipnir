@@ -1,8 +1,10 @@
 import React from "react";
+import ReactTable from "react-table";
+import "react-table/react-table.css";
 
 export default class NoSsExpBlock extends React.Component {
   render() {
-    if (this.props.name == "[]") {
+    if (this.props.name.data == []) {
       return (
         <div className="single_check">
           <h3>Try Catch Screenshot</h3>
@@ -15,7 +17,7 @@ export default class NoSsExpBlock extends React.Component {
           </div>
         </div>
       );
-    } else if (this.props.name == "[There is no catch in your project.]") {
+    } else if (this.props.name.data == ["There is no catch in your project."]) {
       return (
         <div className="single_check">
           <h3>Try Catch Screenshot</h3>
@@ -24,9 +26,23 @@ export default class NoSsExpBlock extends React.Component {
           </div>
         </div>
       );
-    } else if (this.props.name == "[Not evaluated]") {
+    } else if (this.props.name == ["Not evaluated"]) {
       return <div />;
     } else {
+      const columns = [
+        {
+          Header: "TryCatch ID",
+          accessor: "index"
+        },
+        {
+          Header: "Catch",
+          accessor: "Catch Id"
+        },
+        {
+          Header: "From File",
+          accessor: "filePath"
+        }
+      ];
       return (
         <div className="single_check">
           <h3>Try Catch Screenshot</h3>
@@ -37,7 +53,7 @@ export default class NoSsExpBlock extends React.Component {
               by a screenshot activity. Exceptions that are not handled by
               screenshot include:
             </p>
-            <p>{this.props.name}</p>
+            <ReactTable columns={columns} data={this.props.name.data} />
           </div>
         </div>
       );
