@@ -64,7 +64,7 @@ div.spacing {
 
 .categories_btn:hover,
 .categories_btn:focus {
-  border-color: lightskyblue;
+  border-color: rgb(237, 96, 116);
 }
 
 .categories_btn:focus + .checklist {
@@ -90,6 +90,10 @@ div.spacing {
   vertical-align: top;
 }
 
+.check_sec:hover {
+  border: 2px solid rgb(237, 96, 116);
+}
+
 .check_title {
   font-weight: bold;
   text-align: center;
@@ -106,16 +110,12 @@ div.spacing {
   width: 90%;
   margin-left: auto;
   margin-right: auto;
-  height: auto;
   margin-bottom: 2.5%;
+  height: auto;
 }
 
-.check_explain {
-  display: none;
-}
-
-.single_check:hover .check_explain {
-  display: block;
+.single_check h3:hover {
+  color: rgb(237, 96, 116);
 }
 
 #ActivityStats {
@@ -150,15 +150,19 @@ div.spacing {
   text-align: center;
 }
 
-#stats_buttons {
-  display: none;
+#ActivityStats:hover {
+  border: 2px solid rgb(237, 96, 116);
 }
 
-#ActivityStats:hover > #stats_buttons {
+#stats_buttons {
   opacity: 1;
   height: auto;
   margin: 0 auto;
   justify-content: center;
+  display: none;
+}
+
+#ActivityStats:hover > #stats_buttons {
   display: block;
 }
 
@@ -213,6 +217,10 @@ div.spacing {
   display: none;
 }
 
+#FolderStructure:hover {
+  border: 2px solid rgb(237, 96, 116);
+}
+
 #FolderStructure:hover > #folder_struct {
   display: block;
   height: auto;
@@ -252,4 +260,8 @@ div.spacing {
   justify-content: center;
   padding: 1%;
   margin-bottom: 5%;
+}
+
+#radarChart:hover {
+  border: 2px solid rgb(237, 96, 116);
 }

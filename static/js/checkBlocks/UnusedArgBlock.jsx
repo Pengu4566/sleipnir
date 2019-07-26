@@ -3,12 +3,22 @@ import ReactTable from "react-table";
 import "react-table/react-table.css";
 
 export default class UnusedArgBlock extends React.Component {
+  constructor() {
+    super();
+    this.state = { collapse: false };
+  }
+  toggle() {
+    this.setState(state => ({ collapse: !state.collapse }));
+  }
   render() {
     if (this.props.name == []) {
       return (
         <div className="single_check">
-          <h3>Argument Usage</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Argument Usage</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>
               Argument usage is evaluate based on how many arguments are
               declared but not used.
@@ -22,8 +32,11 @@ export default class UnusedArgBlock extends React.Component {
     } else if (this.props.name == ["There is no argument in your project."]) {
       return (
         <div className="single_check">
-          <h3>Argument Usage</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Argument Usage</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>There is no argument in your project.</p>
           </div>
         </div>
@@ -45,8 +58,11 @@ export default class UnusedArgBlock extends React.Component {
       ];
       return (
         <div className="single_check">
-          <h3>Argument Usage</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Argument Usage</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>
               Argument usage is evaluate based on how many arguments are
               declared but not used. An unused argument should be deleted. Such

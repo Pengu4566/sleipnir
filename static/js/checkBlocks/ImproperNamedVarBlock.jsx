@@ -3,12 +3,22 @@ import ReactTable from "react-table";
 import "react-table/react-table.css";
 
 export default class ImproperNamedVarBlock extends React.Component {
+  constructor() {
+    super();
+    this.state = { collapse: false };
+  }
+  toggle() {
+    this.setState(state => ({ collapse: !state.collapse }));
+  }
   render() {
     if (this.props.name.data == []) {
       return (
         <div className="single_check">
-          <h3>Variable Naming</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Variable Naming</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>
               Variable naming is evaluated according to camel case rule and the
               variable's data type.
@@ -25,8 +35,11 @@ export default class ImproperNamedVarBlock extends React.Component {
     ) {
       return (
         <div className="single_check">
-          <h3>Variable Naming</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Variable Naming</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>There is no variable in your project.</p>
           </div>
         </div>
@@ -50,8 +63,11 @@ export default class ImproperNamedVarBlock extends React.Component {
       ];
       return (
         <div className="single_check">
-          <h3>Variable Naming</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Variable Naming</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>
               Variable naming is evaluated according to camel case rule and the
               variable's data type. Variables that are not properly named

@@ -3,12 +3,22 @@ import ReactTable from "react-table";
 import "react-table/react-table.css";
 
 export default class NoLMExpBlock extends React.Component {
+  constructor() {
+    super();
+    this.state = { collapse: false };
+  }
+  toggle() {
+    this.setState(state => ({ collapse: !state.collapse }));
+  }
   render() {
     if (this.props.name.data == []) {
       return (
         <div className="single_check">
-          <h3>Try Catch Logging</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Try Catch Logging</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>
               Try catch logging is evaluated by checking if all exceptions are
               handled by log messages.
@@ -20,8 +30,11 @@ export default class NoLMExpBlock extends React.Component {
     } else if (this.props.name.data == ["There is no catch in your project."]) {
       return (
         <div className="single_check">
-          <h3>Try Catch Logging</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Try Catch Logging</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>There is no catch in your project.</p>
           </div>
         </div>
@@ -45,8 +58,11 @@ export default class NoLMExpBlock extends React.Component {
       ];
       return (
         <div className="single_check">
-          <h3>Try Catch Logging</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Try Catch Logging</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>
               Try catch logging is evaluated by checking if all exceptions are
               handled by log messages. An exception should always be logged.

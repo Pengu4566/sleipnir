@@ -3,12 +3,22 @@ import ReactTable from "react-table";
 import "react-table/react-table.css";
 
 export default class NotAnnotWfBlock extends React.Component {
+  constructor() {
+    super();
+    this.state = { collapse: false };
+  }
+  toggle() {
+    this.setState(state => ({ collapse: !state.collapse }));
+  }
   render() {
     if (this.props.name == []) {
       return (
         <div className="single_check">
-          <h3>Workflow Annotation</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Workflow Annotation</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>
               Workflow annotation is evaluated by checking if all invoked
               workflow is annotated.
@@ -22,8 +32,11 @@ export default class NotAnnotWfBlock extends React.Component {
     } else if (this.props.name == ["The file you uploaded is not completed."]) {
       return (
         <div className="single_check">
-          <h3>Workflow Annotation</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Workflow Annotation</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>
               Workflow annotation is evaluated by checking if all invoked
               workflow is annotated. An invoked workflow should always be
@@ -38,8 +51,11 @@ export default class NotAnnotWfBlock extends React.Component {
     ) {
       return (
         <div className="single_check">
-          <h3>Workflow Annotation</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Workflow Annotation</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>
               Workflow annotation is evaluated by checking if all invoked
               workflow is annotated.
@@ -61,8 +77,11 @@ export default class NotAnnotWfBlock extends React.Component {
       ];
       return (
         <div className="single_check">
-          <h3>Workflow Annotation</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Workflow Annotation</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>
               Workflow annotation is evaluated by checking if all invoked
               workflow is annotated. An invoked workflow should always be

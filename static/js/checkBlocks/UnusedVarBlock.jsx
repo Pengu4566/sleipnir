@@ -3,12 +3,22 @@ import ReactTable from "react-table";
 import "react-table/react-table.css";
 
 export default class UnusedVarBlock extends React.Component {
+  constructor() {
+    super();
+    this.state = { collapse: false };
+  }
+  toggle() {
+    this.setState(state => ({ collapse: !state.collapse }));
+  }
   render() {
     if (this.props.name == []) {
       return (
         <div className="single_check">
-          <h3>Variable Usage</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Variable Usage</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>
               Variable usage is evaluate based on how many variables are
               declared but not used.
@@ -22,8 +32,11 @@ export default class UnusedVarBlock extends React.Component {
     } else if (this.props.name == ["There is no variable in your project."]) {
       return (
         <div className="single_check">
-          <h3>Variable Usage</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Variable Usage</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>There is no variable in your project.</p>
           </div>
         </div>
@@ -45,8 +58,11 @@ export default class UnusedVarBlock extends React.Component {
       ];
       return (
         <div className="single_check">
-          <h3>Variable Usage</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Variable Usage</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>
               Variable usage is evaluate based on how many variables are
               declared but not used. An unused variable should be deleted. Such

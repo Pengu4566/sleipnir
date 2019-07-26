@@ -3,12 +3,22 @@ import ReactTable from "react-table";
 import "react-table/react-table.css";
 
 export default class ImproperNamedActBlock extends React.Component {
+  constructor() {
+    super();
+    this.state = { collapse: false };
+  }
+  toggle() {
+    this.setState(state => ({ collapse: !state.collapse }));
+  }
   render() {
     if (this.props.name.data == []) {
       return (
         <div className="single_check">
-          <h3>Activity Naming</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Activity Naming</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>
               Activity naming is evaluated based on the activity type. No
               activity should be named with its default name.
@@ -22,8 +32,11 @@ export default class ImproperNamedActBlock extends React.Component {
     ) {
       return (
         <div className="single_check">
-          <h3>Activity Naming</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Activity Naming</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>There is no activity in your project.</p>
           </div>
         </div>
@@ -47,8 +60,11 @@ export default class ImproperNamedActBlock extends React.Component {
       ];
       return (
         <div className="single_check">
-          <h3>Activity Naming</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Activity Naming</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>
               Activity naming is evaluated based on the activity type. No
               activity should be named with its default name. Activities that

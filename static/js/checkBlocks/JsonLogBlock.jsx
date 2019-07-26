@@ -3,6 +3,13 @@ import ReactTable from "react-table";
 import "react-table/react-table.css";
 
 export default class JsonLogBlock extends React.Component {
+  constructor() {
+    super();
+    this.state = { collapse: false };
+  }
+  toggle() {
+    this.setState(state => ({ collapse: !state.collapse }));
+  }
   render() {
     const columns = [
       {
@@ -23,8 +30,11 @@ export default class JsonLogBlock extends React.Component {
     } else {
       return (
         <div className="single_check">
-          <h3>Project.Json Logging</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Project.Json Logging</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>
               The project.json file should contain your own project name and
               description. Default values are not recommended.

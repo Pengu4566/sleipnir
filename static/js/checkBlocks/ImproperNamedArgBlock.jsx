@@ -3,12 +3,22 @@ import ReactTable from "react-table";
 import "react-table/react-table.css";
 
 export default class ImproperNamedArgBlock extends React.Component {
+  constructor() {
+    super();
+    this.state = { collapse: false };
+  }
+  toggle() {
+    this.setState(state => ({ collapse: !state.collapse }));
+  }
   render() {
     if (this.props.name.data == []) {
       return (
         <div className="single_check">
-          <h3>Argument Naming</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Argument Naming</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>
               Argument naming is evaluated according to argument type, data
               type, and camel case rule.
@@ -22,8 +32,11 @@ export default class ImproperNamedArgBlock extends React.Component {
     ) {
       return (
         <div className="single_check">
-          <h3>Argument Naming</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Argument Naming</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>There is no argument in your project.</p>
           </div>
         </div>
@@ -47,8 +60,11 @@ export default class ImproperNamedArgBlock extends React.Component {
       ];
       return (
         <div className="single_check">
-          <h3>Argument Naming</h3>
-          <div className="check_explain">
+          <h3 onClick={this.toggle.bind(this)}>Argument Naming</h3>
+          <div
+            className="check_explain"
+            style={{ display: this.state.collapse ? "block" : "none" }}
+          >
             <p>
               Argument naming is evaluated according to argument type, data
               type, and camel case rule. Arguments that are not properly named
