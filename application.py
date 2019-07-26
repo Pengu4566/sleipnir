@@ -4,12 +4,11 @@ import zipfile
 from werkzeug.utils import secure_filename
 import shutil
 import time
-import json
 from random import randint
-from datetime import datetime, timedelta
-import eventlet
+from datetime import timedelta
 import tempfile
 import sys
+from elasticsearch import Elasticsearch
 ##
 ##
 # dataframes
@@ -18,11 +17,12 @@ from dataframes import dataframe
 from grading_checks import naming, usage, documentation_logging, error_handling
 from soft_checks import activity_stats, project_folder_structure, project_structure
 
-from flask import Flask, request, render_template, redirect, url_for, session, jsonify, json
+from flask import Flask, request, render_template, redirect, url_for, session, jsonify
 from flask_session import Session
 from flask_socketio import SocketIO, emit
 
-
+es = Elasticsearch(['https://098b8510b627461cb0e77d37d10c4511.us-east-1.aws.found.io:9243'],
+                   http_auth=('elastic', '5mKdXBb77D2hLuukmTHwThkc'))
 application = app = Flask(__name__, static_folder='./static/dist', template_folder="./static")
 
 # dont save cache in web browser (updating results image correctly)
@@ -423,6 +423,33 @@ def delete_pics():
         return redirect(url_for('upload'))
 
 
+@app.route("/elastic")
+def send_data():
+    ipAddress = request.remote_addr
+    body = {
+        'namingScore': session.get("namingScore"),
+        'usageScore': session.get("usageScore"),
+        'docScore': session.get("docScore"),
+        'improperNamedVar': session.get("improperNamedVar"),
+        'unusedVar': session.get("unusedVar"),
+        'improperNamedArg': session.get("improperNamedArg"),
+        'improperNamedAct': session.get("improperNamedAct"),
+        'activityStats': session.get("activityStats"),
+        'noSsExp': session.get("noSsExp"),
+        'notAnnotWf': session.get("notAnnotWf"),
+        'noLMExp': session.get("noLMExp"),
+        'project_detail': session.get("project_detail"),
+        'missing_arguments_list': session.get("missing_arguments_list"),
+        'unusedArgument': session.get("unusedArgument")
+    }
+
+    id = str(ipAddress)+'-'+str(time.time()).split('.')[0]
+
+    result = es.index(index='sleipnirdb', doc_type='projectdata', id=id, body=body)
+
+    return jsonify(result)
+
+
 # echarts graphs go here
 @app.route("/radar", methods=['GET'])
 def radar_plot_data():
@@ -436,6 +463,7 @@ def radar_plot_data():
 def project_structure_data():
     message = {'gexf': session.get("gexf")}
     return jsonify(message)
+
 
 
 

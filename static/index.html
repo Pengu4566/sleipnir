@@ -18,6 +18,11 @@
 </head>
 
 <body>
+  <script type="text/javascript">
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', "/elastic" , true);
+    xhr.send();
+  </script>
   <button onclick="window.location='/retry'">Try Again</button>
   <div>
     <div class="spacing"></div>
