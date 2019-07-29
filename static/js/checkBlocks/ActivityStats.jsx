@@ -31,18 +31,26 @@ export default class ActivityStatsBlock extends React.Component {
       );
     } else {
       if (this.state.byProject) {
+        const byProjectData = this.props.name.data.byProject;
         const columns = [
+          {
+            Header: "Activity ID",
+            accessor: "index",
+            id: "index",
+            show: false
+          },
           {
             Header: "Activity Type",
             accessor: "activityType"
           },
           {
-            Header: "Time Appeared",
-            accessor: "count"
-          },
-          {
             Header: "From Project",
             accessor: "projectId"
+          },
+          {
+            Header: "Time Appeared",
+            accessor: "count",
+            filterable: false
           }
         ];
         return (
@@ -55,10 +63,9 @@ export default class ActivityStatsBlock extends React.Component {
               <button id="groupBy" onClick={this.switchGroupBy.bind(this)}>
                 By File
               </button>
-
               <ReactTable
                 columns={columns}
-                data={this.props.name.data.byProject}
+                data={byProjectData}
                 filterable
                 defaultSorted={[
                   {
@@ -73,21 +80,26 @@ export default class ActivityStatsBlock extends React.Component {
       } else {
         const columns = [
           {
+            Header: "Activity ID",
+            accessor: "index",
+            show: false
+          },
+          {
             Header: "Activity Type",
             accessor: "activityType"
           },
           {
-            Header: "Time Appeared",
-            accessor: "count"
+            Header: "From Project",
+            accessor: "projectId"
           },
-
           {
             Header: "From File",
             accessor: "filePath"
           },
           {
-            Header: "From Project",
-            accessor: "projectId"
+            Header: "Time Appeared",
+            accessor: "count",
+            filterable: false
           }
         ];
         return (

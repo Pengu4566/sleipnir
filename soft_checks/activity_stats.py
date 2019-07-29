@@ -13,8 +13,8 @@ def get_activity_stats(df_activity, fileLocationStr, df_json, df_annotation):
         df_activity_dup = df_activity_dup.merge(df_json_dup, on='filePath', how='left')
         df_activity_dup.filePath = df_activity_dup.filePath.str.replace(fileLocationStr, "").replace(".xaml", '')
         lst_activity_dup_byProject = list(df_activity_dup.groupby(['activityType', 'projectId'])['count'].sum()
-                                          .reset_index(drop=False).T.to_dict().values())
-        return {"byFile": list(df_activity_dup.T.to_dict().values()),
+                                          .reset_index(drop=False).reset_index().T.to_dict().values())
+        return {"byFile": list(df_activity_dup.reset_index().T.to_dict().values()),
                 "byProject": lst_activity_dup_byProject}
     else:
         return ["There is no activity in files you uploaded."]
