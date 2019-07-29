@@ -1,20 +1,22 @@
+import pandas as pd
+
 # activity stats
-def get_activity_stats(df_activity, fileLocationStr):
+def get_activity_stats(df_activity, fileLocationStr, df_json, df_annotation):
     if len(df_activity['activityName']) > 0:
-        html_string = "<h3 id='act_stat_header'>Activity Statistics</h3>"
-        html_string += "<div id='stats_buttons'> <p id='stat_notes'>(Click on the file name to see details)</p>"
-        for f in df_activity.filePath.unique():
-            df_activity_gbPathType = df_activity[df_activity['filePath'] == f].loc[:, ['activityType']]\
-                                                .groupby(['activityType']).size()
-            df_activity_gbPathType = df_activity_gbPathType.reset_index()
-            df_activity_gbPathType.columns = ['Activity Type', 'Count']
-            df_activity_gbPathType = df_activity_gbPathType.loc[:].sort_values(by=['Count'], ascending= False)
-            df_activity_gbPathType.reset_index(drop=True, inplace=True)
-            df_activity_gbPathType = df_activity_gbPathType.to_html(justify="center")
-            html_string += "<div class='act_stat'> <button>" + f.replace(fileLocationStr,'').replace(".xaml",'') + "</button>" + "<div class='stats_table'>" + df_activity_gbPathType + "</div></div>"
-        html_string += "</div>"
-        return html_string
+        df_activity_dup = df_activity.loc[:, ['activityType', 'filePath']]
+        df_activity_dup = df_activity_dup.groupby(['activityType', 'filePath']).size().reset_index(drop=False)
+        df_activity_dup.columns = ['activityType', 'filePath', 'count']
+        df_json_dup = pd.DataFrame(df_json.subfiles.tolist(), index=df_json['index']).stack().reset_index()
+        df_json_dup.columns = ['projectId', 'fileIndex', 'filePath']
+        df_json_dup.projectId = df_json_dup.projectId
+        df_json_dup.drop(columns=['fileIndex'], inplace=True)
+        df_activity_dup = df_activity_dup.merge(df_json_dup, on='filePath', how='left')
+        df_activity_dup.filePath = df_activity_dup.filePath.str.replace(fileLocationStr, "").replace(".xaml", '')
+        lst_activity_dup_byProject = list(df_activity_dup.groupby(['activityType', 'projectId'])['count'].sum()
+                                          .reset_index(drop=False).T.to_dict().values())
+        return {"byFile": list(df_activity_dup.T.to_dict().values()),
+                "byProject": lst_activity_dup_byProject}
     else:
-        html_string = "<div class='act_stat'> <h3 id='act_stat_header'>Activity Statistics</h3> <p>There is no activity in your project.</p> </div>"
-        return html_string
+        return ["There is no activity in files you uploaded."]
+
 # end activity stats

@@ -11,6 +11,7 @@ import NotAnnotWfBlock from "./checkBlocks/NotAnnotWfBlock";
 import NoLMExpBlock from "./checkBlocks/NoLMExpBlock";
 import ArginAnnotBlock from "./checkBlocks/ArginAnnotBlock";
 import JsonLogBlock from "./checkBlocks/JsonLogBlock";
+import ActivityStatsBlock from "./checkBlocks/ActivityStats";
 
 ReactDOM.render(
   <ImproperNamedVarBlock name={window.improperNamedVar} />,
@@ -60,4 +61,9 @@ ReactDOM.render(
 ReactDOM.render(
   <ArginAnnotBlock name={window.missingArg} />,
   document.getElementById("ArginAnnot")
+);
+
+ReactDOM.render(
+  <ActivityStatsBlock name={window.activityStats} />,
+  document.getElementById("ActivityStats")
 );

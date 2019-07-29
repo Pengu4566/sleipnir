@@ -71,14 +71,17 @@ def grade_variable_name(df_variable, fileLocationStr):
         df_variable_dup['properNamed'] = df_variable_dup.apply(proper_variable_naming, axis=1)
         # return lists
         if (False in df_variable_dup.properNamed) and (True in df_variable_dup.properNamed):
-            improperNamedVariable = list(df_variable_dup.loc[df_variable_dup.properNamed == False].reset_index()
+            improperNamedVariable = list(df_variable_dup.loc[df_variable_dup.properNamed == False]
+                                         .reset_index(drop=True).reset_index()
                                          .loc[:, ['index', 'variableName', 'filePath']].T.to_dict().values())
             variableNamingScore = df_variable_dup.properNamed.sum() / numVariables * 100
         elif True in df_variable_dup.properNamed:
             improperNamedVariable = ['There is no improperly named variable.']
             variableNamingScore = 100
         else:
-            improperNamedVariable = list(df_variable_dup.reset_index().loc[:, ['index', 'variableName', 'filePath']].T.to_dict().values())
+            improperNamedVariable = list(df_variable_dup.loc[:, ['index', 'variableName', 'filePath']]
+                                         .reset_index(drop=True).reset_index()
+                                         .T.to_dict().values())
             variableNamingScore = 0
     else:
         improperNamedVariable = ['There is no variable in your project.']
@@ -164,7 +167,8 @@ def grade_argument_name(df_argument, fileLocationStr):
         argumentNamingScore = df_argument.properNamed.sum() / numArgument
         df_argument_dup = df_argument.copy()
         df_argument_dup.filePath = df_argument_dup.filePath.str.replace(fileLocationStr, '')
-        improperNamedArguments = list(df_argument_dup[df_argument_dup['properNamed'] == False].dropna().reset_index()
+        improperNamedArguments = list(df_argument_dup[df_argument_dup['properNamed'] == False].dropna()
+                                      .reset_index(drop=True).reset_index()
                                       .loc[:, ['index', 'argumentName', 'filePath']].T.to_dict().values())
     else:
         [argumentNamingScore, improperNamedArguments] = [0, ["There is no argument in your project."]]

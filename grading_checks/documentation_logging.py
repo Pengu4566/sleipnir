@@ -23,7 +23,8 @@ def grade_log_message_in_catches(df_catches, fileLocationStr):
         # checks if try/catch activities have log messages within them
         logMessageScore = df_catches_dup['Log Message Included'].sum() / numCatch * 100
         if df_catches_dup['Log Message Included'].sum() < numCatch:
-            noLMException = list(df_catches_dup[df_catches_dup['Log Message Included'] == False].dropna().reset_index()
+            noLMException = list(df_catches_dup[df_catches_dup['Log Message Included'] == False].dropna()
+                                 .reset_index(drop=True).reset_index()
                                  .loc[:, ['index', 'Catch Id', 'filePath']].T.to_dict().values())
         else:
             noLMException = []
@@ -43,7 +44,8 @@ def grade_screenshot_in_catches(df_catches, fileLocationStr):
         # checks if try/catch activities have screenshots within them
         screenshotScore = df_catches_dup['Screenshot Included'].sum() / numCatch * 100
         if df_catches_dup['Screenshot Included'].sum() < numCatch:
-            noSsException = list(df_catches[df_catches['Screenshot Included'] == False].dropna().reset_index()
+            noSsException = list(df_catches[df_catches['Screenshot Included'] == False].dropna()
+                                 .reset_index(drop=True).reset_index()
                                  .loc[:, ['index', 'Catch Id', 'filePath']].T.to_dict().values())
         else:
             noSsException = []
@@ -97,6 +99,7 @@ def grade_project_json_name_desc(folderPath):
         return row
     lst_df_json_row = list(map(collect_json_data, lst_json))
     df_json = pd.concat(lst_df_json_row, ignore_index=True)
+    df_json = df_json.reset_index(drop=False)
     return df_json
 # end 4. Project.json (name and description)
 
@@ -128,7 +131,8 @@ def grade_annotation_in_workflow(df_annotation, fileLocationStr, df_argument):
     numWf = len(df_annotation_dup.workflowName)
     if numWf > 0:
         df_annotation_dup.workflowName = df_annotation_dup.workflowName.str.replace(fileLocationStr,'')
-        notAnnotatedWf = list(df_annotation_dup[df_annotation_dup.annotated == 0].dropna().reset_index()
+        notAnnotatedWf = list(df_annotation_dup[df_annotation_dup.annotated == 0].dropna()
+                              .reset_index(drop=True).reset_index()
                               .loc[:, ['index', 'workflowName']].T.to_dict().values())
         wfAnnotationScore = 100 - (len(notAnnotatedWf) / numWf * 100)
     else:
@@ -145,7 +149,8 @@ def grade_annotation_in_workflow(df_annotation, fileLocationStr, df_argument):
     df_join_arg_annot['arginAnnot'] = df_join_arg_annot.apply(arginAnnot, axis=1)
     if len(df_join_arg_annot) > 0:
         df_join_arg_annot.filePath = df_join_arg_annot.filePath.str.replace(fileLocationStr, '')
-        missing_arguments_list = list(df_join_arg_annot[df_join_arg_annot['arginAnnot'] == False].reset_index()
+        missing_arguments_list = list(df_join_arg_annot[df_join_arg_annot['arginAnnot'] == False]
+                                      .reset_index(drop=True).reset_index()
                                       .loc[:, ['index', 'argumentName', 'filePath']].T.to_dict().values())
     else:
         missing_arguments_list = ["There is no argument in this project."]

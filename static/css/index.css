@@ -154,6 +154,15 @@ div.spacing {
   border: 2px solid rgb(237, 96, 116);
 }
 
+#groupBy {
+  margin-bottom: 5%;
+  display: inline-block;
+}
+
+#ActivityStats h3:hover {
+  color: rgb(237, 96, 116);
+}
+
 #stats_buttons {
   opacity: 1;
   height: auto;

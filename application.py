@@ -363,7 +363,8 @@ def processing():
 
     # level 1: soft checks
     # level 2: activity stats
-    activityStats = activity_stats.get_activity_stats(df_activity=df_activity, fileLocationStr=fileLocationStr)
+    activityStats = activity_stats.get_activity_stats(df_activity=df_activity, fileLocationStr=fileLocationStr,
+                                                      df_json=df_json, df_annotation=df_annotation)
     # level 2: folder structure
     folderStructure = project_folder_structure.list_files(fileLocationStr=fileLocationStr)
     # level 2: project structure
@@ -407,7 +408,7 @@ def __main__():
                                unusedVar={"data": session.get("unusedVar")},
                                improperNamedArg={"data": session.get("improperNamedArg")},
                                improperNamedAct={"data": session.get("improperNamedAct")},
-                               activityStats=session.get("activityStats"),
+                               activityStats={"data": session.get("activityStats")},
                                noSsExp={"data": session.get("noSsExp")},
                                notAnnotWf={"data": session.get("notAnnotWf")},
                                noLMExp={"data": session.get("noLMExp")},
