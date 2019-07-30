@@ -465,8 +465,14 @@ def project_structure_data():
     message = {'gexf': session.get("gexf")}
     return jsonify(message)
 
+@app.route("/file_tree_map", methods=['GET'])
+def tree_map():
+    projectPath = session.get('fileLocationStr')
+    fileTreeJson = project_folder_structure.list_files_json(projectPath)
 
+    print("the json string is: " + str(fileTreeJson))
 
+    return fileTreeJson
 
 # only run when executing locally
 if __name__ == "__main__":

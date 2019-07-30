@@ -18,7 +18,7 @@ fetch('/structure')
         //console.log('GET response text:');
         //console.log(text); // Print the greeting as text
         parsedData = JSON.parse(text)
-        console.log(parsedData['gexf']);
+        //console.log(parsedData['gexf']);
         //console.log(parsedData['usage'])
 
         myChart.hideLoading();
@@ -27,7 +27,7 @@ fetch('/structure')
         //var graph = echarts.dataTool.gexf.parse(xml);
         var categories = [];
 
-        console.log(graph);
+        //console.log(graph);
 
         graph.nodes.forEach(function (node) {
             node.itemStyle = null

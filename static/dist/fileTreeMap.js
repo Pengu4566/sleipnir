@@ -1,73 +1,123 @@
-var parsedData;
+var treeMap = echarts.init(document.getElementById("fileTreeMap"));
 
-let FileTree = require('node-json-file-tree').FileTree;
-let tree = new FileTree(['/file/to/file.txt'], ['/path/to/']);
+
+treeMap.showLoading();
+
+
 
 //ajax request for radar chart values
-fetch("/radar")
-  .then(function(response) {
-    return response.text();
-  })
-  .then(function(text) {
-    //console.log('GET response text:');
-    //console.log(text); // Print the greeting as text
-    parsedData = JSON.parse(text);
-    //console.log(parsedData['usage'])
+//fetch("/file_tree_map")
+//  .then(function(response) {
+//    return response.text();
+//  })
+  //perform a task with the returned data
+//          .then(function(diskData) {
 
-    // based on prepared DOM, initialize echarts instance
-    var radarChart = echarts.init(document.getElementById("radarChart"));
+myChart.showLoading();
 
-    option = {
-      title: {
-        text: "Score",
-        subtext: "",
-        top: "top",
-        left: "center"
-      },
-      tooltip: {},
-      //legend: {
-      //    data: ['Allocated Budget', 'Actual Spending']
-      //},
-      radar: {
-        // shape: 'circle',
-        name: {
-          textStyle: {
-            color: "#fff",
-            backgroundColor: "#999",
-            borderRadius: 3,
-            padding: [3, 5]
-          }
-        },
-        indicator: [
-          { name: "Usage", max: 100 },
-          { name: "Documentation", max: 100 },
-          { name: "Naming", max: 100 }
-        ]
-      },
-      series: [
-        {
-          name: "Budget vs spending",
-          type: "radar",
-          // areaStyle: {normal: {}},
-          itemStyle: {
-            normal: {
-              color: "blue"
-            }
-          },
-          data: [
+$.get('dist/disk.tree.json', function (diskData) {
+    myChart.hideLoading();
+
+    function colorMappingChange(value) {
+        var levelOption = getLevelOption(value);
+        chart.setOption({
+            series: [{
+                levels: levelOption
+            }]
+        });
+    }
+
+    var formatUtil = echarts.format;
+
+    function getLevelOption() {
+        return [
             {
-              value: [
-                parsedData["usage"],
-                parsedData["documentation"],
-                parsedData["naming"]
-              ],
-              name: "Allocated Budget"
+                itemStyle: {
+                    normal: {
+                        borderColor: '#777',
+                        borderWidth: 0,
+                        gapWidth: 1
+                    }
+                },
+                upperLabel: {
+                    normal: {
+                        show: false
+                    }
+                }
+            },
+            {
+                itemStyle: {
+                    normal: {
+                        borderColor: '#555',
+                        borderWidth: 5,
+                        gapWidth: 1
+                    },
+                    emphasis: {
+                        borderColor: '#ddd'
+                    }
+                }
+            },
+            {
+                colorSaturation: [0.35, 0.5],
+                itemStyle: {
+                    normal: {
+                        borderWidth: 5,
+                        gapWidth: 1,
+                        borderColorSaturation: 0.6
+                    }
+                }
             }
-          ]
-        }
-      ]
-    };
+        ];
+    }
 
-    // use configuration item and data specified to show chart
-    radarChart.setOption(option);
-  });
+    myChart.setOption(option = {
+
+        title: {
+            text: 'Disk Usage',
+            left: 'center'
+        },
+
+        tooltip: {
+            formatter: function (info) {
+                var value = info.value;
+                var treePathInfo = info.treePathInfo;
+                var treePath = [];
+
+                for (var i = 1; i < treePathInfo.length; i++) {
+                    treePath.push(treePathInfo[i].name);
+                }
+
+                return [
+                    '<div class="tooltip-title">' + formatUtil.encodeHTML(treePath.join('/')) + '</div>',
+                    'Disk Usage: ' + formatUtil.addCommas(value) + ' KB',
+                ].join('');
+            }
+        },
+
+        series: [
+            {
+                name:'Disk Usage',
+                type:'treemap',
+                visibleMin: 300,
+                label: {
+                    show: true,
+                    formatter: '{b}'
+                },
+                upperLabel: {
+                    normal: {
+                        show: true,
+                        height: 30
+                    }
+                },
+                itemStyle: {
+                    normal: {
+                        borderColor: '#fff'
+                    }
+                },
+                levels: getLevelOption(),
+                data: diskData
+            }
+        ]
+    });
+});
+     //});
