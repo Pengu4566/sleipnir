@@ -13,10 +13,10 @@ treeMap.showLoading();
   //perform a task with the returned data
 //          .then(function(diskData) {
 
-myChart.showLoading();
+treeMap.showLoading();
 
 $.get('dist/disk.tree.json', function (diskData) {
-    myChart.hideLoading();
+    treeMap.hideLoading();
 
     function colorMappingChange(value) {
         var levelOption = getLevelOption(value);
@@ -70,7 +70,7 @@ $.get('dist/disk.tree.json', function (diskData) {
         ];
     }
 
-    myChart.setOption(option = {
+    treeMap.setOption(option = {
 
         title: {
             text: 'Disk Usage',
