@@ -398,7 +398,7 @@ def __main__():
 
     with app.app_context():
         # clear out content in file folder
-        shutil.rmtree(session.get("folderPath"))
+        #shutil.rmtree(session.get("folderPath"))
 
         return render_template('index.html',
                                namingScore=session.get("namingScore"),
@@ -468,11 +468,18 @@ def project_structure_data():
 @app.route("/file_tree_map", methods=['GET'])
 def tree_map():
     projectPath = session.get('fileLocationStr')
-    fileTreeJson = project_folder_structure.list_files_json(projectPath)
+    diskTree = project_folder_structure.list_files_json(projectPath)
 
-    print("the json string is: " + str(fileTreeJson))
+    print("the disk tree is: " + str(diskTree))
 
-    return fileTreeJson
+    return diskTree
+
+@app.route("/clear_uploaded_files", methods=['GET'])
+def delete_user_files():
+    # clear out content in file folder
+    with app.app_context():
+        shutil.rmtree(session.get("folderPath"))
+    return "done"
 
 # only run when executing locally
 if __name__ == "__main__":
