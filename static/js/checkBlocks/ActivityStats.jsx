@@ -4,9 +4,10 @@ import "react-table/react-table.css";
 import _ from "lodash";
 
 export default class ActivityStatsBlock extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = { collapse: false, byProject: false };
+    console.log(this.props.name);
   }
   toggle() {
     this.setState(state => ({ collapse: !state.collapse }));
@@ -14,9 +15,11 @@ export default class ActivityStatsBlock extends React.Component {
   switchGroupBy() {
     this.setState(state => ({ byProject: !state.byProject }));
   }
+
   render() {
     if (
-      this.props.name.data == ["There is no activity in files you uploaded."]
+      this.props.name ==
+      { data: ["There is no activity in files you uploaded."] }
     ) {
       return (
         <div className="act_stat">

@@ -15,7 +15,7 @@ from elasticsearch import Elasticsearch
 from dataframes import dataframe
 # functions
 from grading_checks import naming, usage, documentation_logging, error_handling
-from soft_checks import activity_stats, project_folder_structure, project_structure
+from soft_checks import activity_stats, project_folder_structure, project_structure, template_check
 
 from flask import Flask, request, render_template, redirect, url_for, session, jsonify
 from flask_session import Session
@@ -84,11 +84,10 @@ def handle_upload():
         lst_info = ['Naming', 'VariableNaming', 'ArgumentNaming', 'ActivityNaming',
                     'Usage', 'VariableUsage', 'ArgumentUsage',
                     'Documentation', 'WorkflowAnnotation', 'TryCatchLogging', 'TryCatchScreenshot', 'JsonLogging', 'ArgExpAnnot']
-        start = time.time()
+
         [session['naming'], session['varNaming'], session['argNaming'], session['actNaming'],
          session['usage'], session['varUsage'], session['argUsage'],
          session['documentation'], session['wfAnnot'], session['tcLog'], session['tcSs'], session['jsonLog'], session['arginAnnot']] = map(get_checks_info,lst_info)
-        print('Get checks info takes %s seconds' % (time.time() - start))
         # check if the post request has the file part
         socketio.emit('progress', {'data': 'Getting File Info ...'})
         socketio.sleep(0.1)
@@ -132,13 +131,10 @@ def handle_upload():
 
             socketio.emit('progress', {'data': 'Unzipping ...'})
             socketio.sleep(0.1)
-            start = time.time()
 
             zipFile = zipfile.ZipFile((os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming).replace("\\", "/"))
             zipFile.extractall(folderPath)
             zipFile.close()
-
-            print('Unzipping takes %s seconds' % (time.time() - start))
 
             os.remove((os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming).replace("\\", "/"))
             session['folderPath'] = folderPath
@@ -147,12 +143,11 @@ def handle_upload():
             global gexf
             # file processing
             files = []
-            start = time.time()
             for r, d, f in os.walk(folderPath):
                 for file in f:
                     if '.xaml' in file:
                         files.append(os.path.join(r, file).replace("\\", "/"))
-            print('Get list of all xaml files takes %s seconds' % (time.time() - start))
+            # print(files)
             fileLocationStr = (os.getcwd() + app.config['UPLOAD_PATH'] + generatedFolderName).replace("\\", "/") + "/"
             for r, d, f in os.walk(folderPath):
                 if len(d) == 1:
@@ -190,9 +185,7 @@ def processing():
     socketio.emit('progress', {'data': 'Processing Files ...'})
     socketio.sleep(0.1)
 
-    start = time.time()
     lst_sub_df = [dataframe.populate_dataframe(files[i], df_json) for i in range(len(files))]
-    print('Generate all takes %s secondss' % (time.time() - start))
     df_variable = pd.concat([x[0] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False)
     df_argument = pd.concat([x[1] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False)
     df_catches = pd.concat([x[2] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False)
@@ -370,6 +363,10 @@ def processing():
     # level 2: project structure
     gexf = project_structure.generate_gexf(df_annotation=df_annotation, fileLocationStr=fileLocationStr)
 
+    #level 2: check template
+    df_templateComment = template_check.check_template(df_json=df_json, df_annotation=df_annotation, df_activity=df_activity)
+    for project in project_detail:
+        project['templateComment'] = df_templateComment[df_templateComment['index'] == project['index']].template_comment.values[0]
     # pass along the variables
     session['namingScore'] = namingScore
     session['usageScore'] = usageScore

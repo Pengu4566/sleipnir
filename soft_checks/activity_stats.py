@@ -8,9 +8,9 @@ def get_activity_stats(df_activity, fileLocationStr, df_json, df_annotation):
         df_activity_dup.columns = ['activityType', 'filePath', 'count']
         df_json_dup = pd.DataFrame(df_json.subfiles.tolist(), index=df_json['index']).stack().reset_index()
         df_json_dup.columns = ['projectId', 'fileIndex', 'filePath']
-        df_json_dup.projectId = df_json_dup.projectId
         df_json_dup.drop(columns=['fileIndex'], inplace=True)
         df_activity_dup = df_activity_dup.merge(df_json_dup, on='filePath', how='left')
+        df_activity_dup.fillna("Unknown", inplace=True)
         df_activity_dup.filePath = df_activity_dup.filePath.str.replace(fileLocationStr, "").replace(".xaml", '')
         lst_activity_dup_byProject = list(df_activity_dup.groupby(['activityType', 'projectId'])['count'].sum()
                                           .reset_index(drop=False).reset_index().T.to_dict().values())

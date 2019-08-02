@@ -78,6 +78,7 @@ def grade_project_json_name_desc(folderPath):
             jsonFile = json.load(project_json)
             project_json.close()
         project_name = jsonFile["name"]
+        mainFileName = jsonFile["main"]
         project_description = jsonFile["description"]
         if (project_description != "Blank Process") and (project_description != "Robotic Enterprise Framework") \
                 and (project_description != "Blank Project"):
@@ -93,6 +94,7 @@ def grade_project_json_name_desc(folderPath):
         row = pd.DataFrame.from_dict({'fileLocation': [fileLocation],
                                       'projectDetail': [project_detail],
                                       'mainFolder': [fileLocation[:-(len(fileName) + 1)]],
+                                      'mainFile': [fileLocation[:-(len(fileName))]+mainFileName],
                                       'subfiles': [list(json_dic.values())[0]],
                                       'namingScore': [json_name_score],
                                       'descriptionScore': [json_description_score]})
@@ -123,6 +125,8 @@ def grade_annotation_in_workflow(df_annotation, fileLocationStr, df_argument):
                 annot_text = ''
         except FileNotFoundError:
             annot_text = ''
+        except OSError:
+            annot_text = 'Cannot find file'
         return annot_text
 
     df_annotation_dup['annotation'] = df_annotation_dup.apply(extract_annot, axis=1)

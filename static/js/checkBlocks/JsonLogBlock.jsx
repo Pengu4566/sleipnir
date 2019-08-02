@@ -23,6 +23,10 @@ export default class JsonLogBlock extends React.Component {
       {
         Header: "Project Description",
         accessor: "projectDetail.projectDescription"
+      },
+      {
+        Header: "Template",
+        accessor: "templateComment"
       }
     ];
     if (this.props.name == "[Not evaluated]") {
