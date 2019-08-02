@@ -236,6 +236,30 @@ div.spacing {
   padding: 1%;
 }
 
+#SelectorEvaluation {
+  border-radius: 25px;
+  display: inline-block;
+  width: 40%;
+  position: relative;
+  border: 2px solid royalblue;
+  height: auto;
+  justify-content: center;
+  padding: 1%;
+  margin-bottom: 5%;
+}
+
+#SelectorEvaluation:hover {
+  border: 2px solid rgb(237, 96, 116);
+}
+
+#SelectorEvaluation h3 {
+  text-align: center;
+}
+
+#SelectorEvaluation h3:hover {
+  color: rgb(237, 96, 116);
+}
+
 #WfInvokingNetwork {
   border-radius: 25px;
   display: block;

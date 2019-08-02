@@ -12,6 +12,7 @@ def populate_dataframe(filePath, df_json):
     lst_acts = root.findall('.//')
     lst_invokes = root.findall('.//{http://schemas.uipath.com/workflow/activities}InvokeWorkflowFile')
 
+
     # variables
     def extract_var_info(var):
         variableName = var.attrib['Name']
@@ -150,5 +151,19 @@ def populate_dataframe(filePath, df_json):
     else:
         temp_df_annotation = pd.DataFrame(columns=['workflowName', 'invokedBy', 'mainLocation', 'annotated', 'annotation'])
 
+    # selector
+    lst_selectors = lst_acts.copy()
+    lst_selectors = list(filter(lambda ele: "Selector" in ele.attrib.keys(), lst_selectors))
 
-    return [temp_df_variable, temp_df_argument, temp_df_catches, temp_df_activity, temp_df_annotation]
+    if len(lst_selectors) > 0:
+        def extract_selector_str(ele):
+            return ele.attrib['Selector']
+        lst_selectors_str = list(map(extract_selector_str, lst_selectors))
+
+        temp_df_selector_data = {'selectorStr': lst_selectors_str, 'filePath': [filePath]*len(lst_selectors)}
+        temp_df_selector = pd.DataFrame(data=temp_df_selector_data)
+
+    else:
+        temp_df_selector = pd.DataFrame(columns=['selectorStr', 'filePath'])
+
+    return [temp_df_variable, temp_df_argument, temp_df_catches, temp_df_activity, temp_df_annotation, temp_df_selector]

@@ -15,7 +15,7 @@ from elasticsearch import Elasticsearch
 from dataframes import dataframe
 # functions
 from grading_checks import naming, usage, documentation_logging, error_handling
-from soft_checks import activity_stats, project_folder_structure, project_structure, template_check
+from soft_checks import activity_stats, project_folder_structure, project_structure, template_check, selector_check
 
 from flask import Flask, request, render_template, redirect, url_for, session, jsonify
 from flask_session import Session
@@ -191,6 +191,7 @@ def processing():
     df_catches = pd.concat([x[2] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False)
     df_activity = pd.concat([x[3] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False)
     df_annotation = pd.concat([x[4] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False)
+    df_selector = pd.concat([x[5] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False)
 
     dict_score = {}
     # level 1: grading checks
@@ -367,6 +368,11 @@ def processing():
     df_templateComment = template_check.check_template(df_json=df_json, df_annotation=df_annotation, df_activity=df_activity)
     for project in project_detail:
         project['templateComment'] = df_templateComment[df_templateComment['index'] == project['index']].template_comment.values[0]
+
+    #level 2: check selectors
+    lst_selector_data = selector_check.selector_check(df_selector=df_selector, fileLocationStr=fileLocationStr,
+                                                     df_json=df_json)
+
     # pass along the variables
     session['namingScore'] = namingScore
     session['usageScore'] = usageScore
@@ -384,6 +390,7 @@ def processing():
     session['folderStructure'] = folderStructure
     session['unusedArgument'] = unusedArgument
     session['gexf'] = gexf
+    session['selector'] = lst_selector_data
 
     ##########################################################################################################
 
@@ -412,7 +419,8 @@ def __main__():
                                project_detail={"data": session.get("project_detail")},
                                missing_arguments_list={"data": session.get("missing_arguments_list")},
                                folderStructure=session.get("folderStructure"),
-                               unusedArgument={"data": session.get("unusedArgument")})
+                               unusedArgument={"data": session.get("unusedArgument")},
+                               selectorEval={"data": session.get('selector')})
 
 
 @app.route("/retry")
@@ -438,7 +446,8 @@ def send_data():
         'noLMExp': session.get("noLMExp"),
         'project_detail': session.get("project_detail"),
         'missing_arguments_list': session.get("missing_arguments_list"),
-        'unusedArgument': session.get("unusedArgument")
+        'unusedArgument': session.get("unusedArgument"),
+        'selectorEval': session.get('selector')
     }
 
     id = str(ipAddress)+'-'+str(time.time()).split('.')[0]

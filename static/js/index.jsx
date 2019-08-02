@@ -12,6 +12,7 @@ import NoLMExpBlock from "./checkBlocks/NoLMExpBlock";
 import ArginAnnotBlock from "./checkBlocks/ArginAnnotBlock";
 import JsonLogBlock from "./checkBlocks/JsonLogBlock";
 import ActivityStatsBlock from "./checkBlocks/ActivityStats";
+import SelectorEvalBlock from "./checkBlocks/SelectorEvalBlock";
 
 ReactDOM.render(
   <ImproperNamedVarBlock name={window.improperNamedVar} />,
@@ -66,4 +67,9 @@ ReactDOM.render(
 ReactDOM.render(
   <ActivityStatsBlock name={window.activityStats} />,
   document.getElementById("ActivityStats")
+);
+
+ReactDOM.render(
+  <SelectorEvalBlock name={window.selectorEval} />,
+  document.getElementById("SelectorEvaluation")
 );

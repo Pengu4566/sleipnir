@@ -7,7 +7,6 @@ export default class ActivityStatsBlock extends React.Component {
   constructor(props) {
     super(props);
     this.state = { collapse: false, byProject: false };
-    console.log(this.props.name);
   }
   toggle() {
     this.setState(state => ({ collapse: !state.collapse }));
