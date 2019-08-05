@@ -14,7 +14,8 @@ export default class JsonLogBlock extends React.Component {
     const columns = [
       {
         Header: "Project ID",
-        accessor: "index"
+        accessor: "index",
+        id: "index"
       },
       {
         Header: "Project Name",
@@ -43,7 +44,17 @@ export default class JsonLogBlock extends React.Component {
               The project.json file should contain your own project name and
               description. Default values are not recommended.
             </p>
-            <ReactTable columns={columns} data={this.props.name.data} />
+            <ReactTable
+              columns={columns}
+              data={this.props.name.data}
+              filterable
+              defaultFilterMethod={(filter, row) =>
+                String(row[filter.id])
+                  .toLowerCase()
+                  .includes(filter.value.toLowerCase())
+              }
+              defaultPageSize={10}
+            />
           </div>
         </div>
       );

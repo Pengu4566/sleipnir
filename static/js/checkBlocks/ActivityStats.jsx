@@ -69,12 +69,18 @@ export default class ActivityStatsBlock extends React.Component {
                 columns={columns}
                 data={byProjectData}
                 filterable
+                defaultFilterMethod={(filter, row) =>
+                  String(row[filter.id])
+                    .toLowerCase()
+                    .includes(filter.value.toLowerCase())
+                }
                 defaultSorted={[
                   {
                     id: "count",
                     desc: true
                   }
                 ]}
+                defaultPageSize={10}
               />
             </div>
           </div>
@@ -84,6 +90,7 @@ export default class ActivityStatsBlock extends React.Component {
           {
             Header: "Activity ID",
             accessor: "index",
+            id: "index",
             show: false
           },
           {
@@ -118,12 +125,19 @@ export default class ActivityStatsBlock extends React.Component {
                 columns={columns}
                 data={this.props.name.data.byFile}
                 filterable
+                defaultFilterMethod={(filter, row) =>
+                  String(row[filter.id])
+                    .toLowerCase()
+                    .includes(filter.value.toLowerCase())
+                }
                 defaultSorted={[
                   {
                     id: "count",
                     desc: true
                   }
                 ]}
+                defaultPageSize={10}
+                className="-highlight"
               />
             </div>
           </div>

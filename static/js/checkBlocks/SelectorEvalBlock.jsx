@@ -53,6 +53,12 @@ export default class SelectorEvalBlock extends React.Component {
               columns={columns}
               data={this.props.name.data}
               filterable
+              defaultFilterMethod={(filter, row) =>
+                String(row[filter.id])
+                  .toLowerCase()
+                  .includes(filter.value.toLowerCase())
+              }
+              defaultPageSize={10}
             />
           </div>
         </div>

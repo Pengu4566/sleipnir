@@ -50,7 +50,9 @@ export default class ImproperNamedVarBlock extends React.Component {
       const columns = [
         {
           Header: "Variable ID",
-          accessor: "index"
+          accessor: "index",
+          id: "index",
+          show: false
         },
         {
           Header: "Variable Name",
@@ -73,7 +75,17 @@ export default class ImproperNamedVarBlock extends React.Component {
               variable's data type. Variables that are not properly named
               include:
             </p>
-            <ReactTable columns={columns} data={this.props.name.data} />
+            <ReactTable
+              columns={columns}
+              data={this.props.name.data}
+              filterable
+              defaultFilterMethod={(filter, row) =>
+                String(row[filter.id])
+                  .toLowerCase()
+                  .includes(filter.value.toLowerCase())
+              }
+              defaultPageSize={10}
+            />
           </div>
         </div>
       );

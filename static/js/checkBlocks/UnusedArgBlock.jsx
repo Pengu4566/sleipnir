@@ -45,7 +45,9 @@ export default class UnusedArgBlock extends React.Component {
       const columns = [
         {
           Header: "Argument ID",
-          accessor: "index"
+          accessor: "index",
+          id: "index",
+          show: false
         },
         {
           Header: "Argument Name",
@@ -68,7 +70,17 @@ export default class UnusedArgBlock extends React.Component {
               declared but not used. An unused argument should be deleted. Such
               arguments include:
             </p>
-            <ReactTable columns={columns} data={this.props.name.data} />
+            <ReactTable
+              columns={columns}
+              data={this.props.name.data}
+              filterable
+              defaultFilterMethod={(filter, row) =>
+                String(row[filter.id])
+                  .toLowerCase()
+                  .includes(filter.value.toLowerCase())
+              }
+              defaultPageSize={10}
+            />
           </div>
         </div>
       );

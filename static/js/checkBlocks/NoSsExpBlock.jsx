@@ -45,7 +45,9 @@ export default class NoSsExpBlock extends React.Component {
       const columns = [
         {
           Header: "TryCatch ID",
-          accessor: "index"
+          accessor: "index",
+          id: "index",
+          show: false
         },
         {
           Header: "Catch",
@@ -69,7 +71,17 @@ export default class NoSsExpBlock extends React.Component {
               by a screenshot activity. Exceptions that are not handled by
               screenshot include:
             </p>
-            <ReactTable columns={columns} data={this.props.name.data} />
+            <ReactTable
+              columns={columns}
+              data={this.props.name.data}
+              filterable
+              defaultFilterMethod={(filter, row) =>
+                String(row[filter.id])
+                  .toLowerCase()
+                  .includes(filter.value.toLowerCase())
+              }
+              defaultPageSize={10}
+            />
           </div>
         </div>
       );

@@ -68,7 +68,9 @@ export default class NotAnnotWfBlock extends React.Component {
       const columns = [
         {
           Header: "Workflow ID",
-          accessor: "index"
+          accessor: "index",
+          id: "index",
+          show: false
         },
         {
           Header: "Workflow Path",
@@ -87,7 +89,17 @@ export default class NotAnnotWfBlock extends React.Component {
               workflow is annotated. An invoked workflow should always be
               annotated. Such workflows that are not annotated include:
             </p>
-            <ReactTable columns={columns} data={this.props.name.data} />
+            <ReactTable
+              columns={columns}
+              data={this.props.name.data}
+              filterable
+              defaultFilterMethod={(filter, row) =>
+                String(row[filter.id])
+                  .toLowerCase()
+                  .includes(filter.value.toLowerCase())
+              }
+              defaultPageSize={10}
+            />
           </div>
         </div>
       );

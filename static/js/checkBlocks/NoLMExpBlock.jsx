@@ -45,7 +45,9 @@ export default class NoLMExpBlock extends React.Component {
       const columns = [
         {
           Header: "TryCatch ID",
-          accessor: "index"
+          accessor: "index",
+          id: "index",
+          show: false
         },
         {
           Header: "Catch",
@@ -68,7 +70,17 @@ export default class NoLMExpBlock extends React.Component {
               handled by log messages. An exception should always be logged.
               Exceptions that are not logged include:
             </p>
-            <ReactTable columns={columns} data={this.props.name.data} />
+            <ReactTable
+              columns={columns}
+              data={this.props.name.data}
+              filterable
+              defaultFilterMethod={(filter, row) =>
+                String(row[filter.id])
+                  .toLowerCase()
+                  .includes(filter.value.toLowerCase())
+              }
+              defaultPageSize={10}
+            />
           </div>
         </div>
       );

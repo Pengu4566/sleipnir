@@ -55,7 +55,9 @@ export default class ArginAnnotBlock extends React.Component {
       const columns = [
         {
           Header: "Argument ID",
-          accessor: "index"
+          accessor: "index",
+          id: "index",
+          show: false
         },
         {
           Header: "Argument Name",
@@ -80,7 +82,17 @@ export default class ArginAnnotBlock extends React.Component {
               workflow. Arguments that are not even mentioned in the annotation
               include:
             </p>
-            <ReactTable columns={columns} data={this.props.name.data} />
+            <ReactTable
+              columns={columns}
+              data={this.props.name.data}
+              filterable
+              defaultFilterMethod={(filter, row) =>
+                String(row[filter.id])
+                  .toLowerCase()
+                  .includes(filter.value.toLowerCase())
+              }
+              defaultPageSize={10}
+            />
           </div>
         </div>
       );
