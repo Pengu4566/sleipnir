@@ -1,11 +1,49 @@
+#fileUploadForm {
+  display: inline-block;
+  position: relative;
+  width: 40%;
+}
+
 #checkboxes {
   display: block;
   position: relative;
   background-color: transparent;
   border-radius: 25px;
   border: 2px dashed royalblue;
+  padding: 2%;
+  width: 100%;
+  height: auto;
+  margin-bottom: 2.5%;
+}
+
+#download_buttons {
+  display: inline-block;
+  position: relative;
+  background-color: transparent;
+  border-radius: 25px;
   padding: 1%;
   width: 40%;
   height: auto;
+  margin-left: 5%;
   margin-bottom: 2.5%;
+  vertical-align: top;
+  margin-top: 5%;
+}
+
+#download_buttons button {
+  border: 2px royalblue solid;
+  border-radius: 25px;
+  position: relative;
+  display: block;
+  height: 40px;
+  width: 35%;
+  background-color: transparent;
+  margin-bottom: 6px;
+  margin-left: 6px;
+}
+
+#download_buttons button:hover,
+#download_buttons button:focus {
+  border: 2px solid rgb(237, 96, 116);
+  border-radius: 25px;
 }

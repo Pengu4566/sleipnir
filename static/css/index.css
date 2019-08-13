@@ -8,9 +8,8 @@ div.spacing {
 }
 
 #categories_and_checklist {
-  position: relative;
+  position: absolute;
   display: inline-block;
-  vertical-align: top;
 }
 
 #score_pic {
@@ -20,24 +19,19 @@ div.spacing {
   padding: 6px;
 }
 
-#all_categories {
-  position: absolute;
-  margin-top: 20%;
-  display: inline-block;
-  margin-left: 65%;
-  width: 35%;
-}
-
-.categories_div {
+#all_categories_content {
   position: relative;
-  display: block;
+  display: inline-block;
+  width: 35%;
+  vertical-align: top;
+  margin-left: 5%;
 }
 
 .categories_btn {
   border: 2px royalblue solid;
   border-radius: 25px;
   position: relative;
-  display: inline-block;
+  display: block;
   height: 40px;
   width: 30%;
   background-color: transparent;
@@ -46,29 +40,20 @@ div.spacing {
 }
 
 .checklist {
-  position: absolute;
-  display: inline-block;
-  width: 300px;
+  position: relative;
+  display: block;
+  width: 60%;
   background-color: transparent;
   border: 2px dashed royalblue;
   border-radius: 25px;
   margin-bottom: 6px;
   margin-left: 6px;
   padding-left: 6px;
-  opacity: 0;
-}
-
-.checklist button {
-  font: bold;
 }
 
 .categories_btn:hover,
 .categories_btn:focus {
   border-color: rgb(237, 96, 116);
-}
-
-.categories_btn:focus + .checklist {
-  opacity: 1;
 }
 
 .grade_checks {
@@ -112,6 +97,11 @@ div.spacing {
   margin-right: auto;
   margin-bottom: 2.5%;
   height: auto;
+}
+
+.single_check:hover {
+  border-radius: 25px;
+  border: 2px dashed rgb(237, 96, 116);
 }
 
 .single_check h3:hover {
@@ -278,11 +268,12 @@ div.spacing {
   width: 90%;
   position: relative;
   border: 2px solid royalblue;
-  height: auto;
+  height: 800px;
   justify-content: center;
   padding: 1%;
   margin-bottom: 5%;
 }
+
 #radarChart {
   border-radius: 25px;
   display: block;

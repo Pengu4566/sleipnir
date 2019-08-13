@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import styles from "../css/index.css";
+import CheckButtons from "./CheckButtons";
 import ImproperNamedVarBlock from "./checkBlocks/ImproperNamedVarBlock";
 import UnusedVarBlock from "./checkBlocks/UnusedVarBlock";
 import ImproperNamedArgBlock from "./checkBlocks/ImproperNamedArgBlock";
@@ -13,6 +14,15 @@ import ArginAnnotBlock from "./checkBlocks/ArginAnnotBlock";
 import JsonLogBlock from "./checkBlocks/JsonLogBlock";
 import ActivityStatsBlock from "./checkBlocks/ActivityStats";
 import SelectorEvalBlock from "./checkBlocks/SelectorEvalBlock";
+
+ReactDOM.render(
+  <CheckButtons
+    naming={window.NamingScore}
+    usage={window.UsageScore}
+    doc={window.DocScore}
+  />,
+  document.getElementById("all_categories_content")
+);
 
 ReactDOM.render(
   <ImproperNamedVarBlock name={window.improperNamedVar} />,

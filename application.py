@@ -21,8 +21,8 @@ from flask import Flask, request, render_template, redirect, url_for, session, j
 from flask_session import Session
 from flask_socketio import SocketIO, emit
 
-es = Elasticsearch(['https://098b8510b627461cb0e77d37d10c4511.us-east-1.aws.found.io:9243'],
-                   http_auth=('elastic', '5mKdXBb77D2hLuukmTHwThkc'))
+# es = Elasticsearch(['https://098b8510b627461cb0e77d37d10c4511.us-east-1.aws.found.io:9243'],
+#                    http_auth=('elastic', '5mKdXBb77D2hLuukmTHwThkc'))
 application = app = Flask(__name__, static_folder='./static/dist', template_folder="./static")
 
 # dont save cache in web browser (updating results image correctly)
@@ -172,6 +172,10 @@ def processing():
     files = session.get('files')
 
     df_json = documentation_logging.grade_project_json_name_desc(folderPath)
+    df_json_exp = pd.DataFrame(df_json.subfiles.tolist(), index=df_json['index']).stack().reset_index()
+    df_json_exp.columns = ['projectId', 'fileIndex', 'filePath']
+    df_json_exp.drop(columns=['fileIndex'], inplace=True)
+
     if session.get('jsonLog'):
         project_detail = list(df_json.copy().reset_index().loc[:, ['index', 'projectDetail']].T.to_dict().values())
         json_name_score = df_json.namingScore.sum() / len(df_json.namingScore)
@@ -358,20 +362,21 @@ def processing():
     # level 1: soft checks
     # level 2: activity stats
     activityStats = activity_stats.get_activity_stats(df_activity=df_activity, fileLocationStr=fileLocationStr,
-                                                      df_json=df_json, df_annotation=df_annotation)
+                                                      df_json_exp=df_json_exp)
     # level 2: folder structure
     folderStructure = project_folder_structure.list_files(fileLocationStr=fileLocationStr)
     # level 2: project structure
     gexf = project_structure.generate_gexf(df_annotation=df_annotation, fileLocationStr=fileLocationStr)
 
     #level 2: check template
-    df_templateComment = template_check.check_template(df_json=df_json, df_annotation=df_annotation, df_activity=df_activity)
+    df_templateComment = template_check.check_template(df_json_exp=df_json_exp, df_annotation=df_annotation,
+                                                       df_activity=df_activity, df_json=df_json)
     for project in project_detail:
         project['templateComment'] = df_templateComment[df_templateComment['index'] == project['index']].template_comment.values[0]
 
     #level 2: check selectors
     lst_selector_data = selector_check.selector_check(df_selector=df_selector, fileLocationStr=fileLocationStr,
-                                                     df_json=df_json)
+                                                     df_json_exp=df_json_exp)
 
     # pass along the variables
     session['namingScore'] = namingScore
@@ -429,32 +434,32 @@ def delete_pics():
         return redirect(url_for('upload'))
 
 
-@app.route("/elastic")
-def send_data():
-    ipAddress = request.remote_addr
-    body = {
-        'namingScore': session.get("namingScore"),
-        'usageScore': session.get("usageScore"),
-        'docScore': session.get("docScore"),
-        'improperNamedVar': session.get("improperNamedVar"),
-        'unusedVar': session.get("unusedVar"),
-        'improperNamedArg': session.get("improperNamedArg"),
-        'improperNamedAct': session.get("improperNamedAct"),
-        'activityStats': session.get("activityStats"),
-        'noSsExp': session.get("noSsExp"),
-        'notAnnotWf': session.get("notAnnotWf"),
-        'noLMExp': session.get("noLMExp"),
-        'project_detail': session.get("project_detail"),
-        'missing_arguments_list': session.get("missing_arguments_list"),
-        'unusedArgument': session.get("unusedArgument"),
-        'selectorEval': session.get('selector')
-    }
-
-    id = str(ipAddress)+'-'+str(time.time()).split('.')[0]
-
-    result = es.index(index='sleipnirdb', doc_type='projectdata', id=id, body=body)
-
-    return jsonify(result)
+# @app.route("/elastic")
+# def send_data():
+#     ipAddress = request.remote_addr
+#     body = {
+#         'namingScore': session.get("namingScore"),
+#         'usageScore': session.get("usageScore"),
+#         'docScore': session.get("docScore"),
+#         'improperNamedVar': session.get("improperNamedVar"),
+#         'unusedVar': session.get("unusedVar"),
+#         'improperNamedArg': session.get("improperNamedArg"),
+#         'improperNamedAct': session.get("improperNamedAct"),
+#         'activityStats': session.get("activityStats"),
+#         'noSsExp': session.get("noSsExp"),
+#         'notAnnotWf': session.get("notAnnotWf"),
+#         'noLMExp': session.get("noLMExp"),
+#         'project_detail': session.get("project_detail"),
+#         'missing_arguments_list': session.get("missing_arguments_list"),
+#         'unusedArgument': session.get("unusedArgument"),
+#         'selectorEval': session.get('selector')
+#     }
+#
+#     id = str(ipAddress)+'-'+str(time.time()).split('.')[0]
+#
+#     result = es.index(index='sleipnirdb', doc_type='projectdata', id=id, body=body)
+#
+#     return jsonify(result)
 
 
 # echarts graphs go here

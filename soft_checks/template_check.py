@@ -1,17 +1,10 @@
 import pandas as pd
 
-def check_template(df_json, df_annotation, df_activity):
+def check_template(df_json, df_annotation, df_activity, df_json_exp):
     # omit '_Test.xaml', 'Test_Framework/RunAllTests.xaml'
     df_json_dup = df_json.loc[:, ['index', 'mainFolder', 'subfiles', 'mainFile']]
     df_json_dup.subfiles = df_json_dup.apply(lambda x: [subfile.replace(x['mainFolder']+'/', '') for subfile in x['subfiles']], axis=1)
     df_annotation_dup = df_annotation.loc[:, ['mainLocation', 'workflowName', 'invokedBy']]
-    df_annotation_dup.workflowName = df_annotation_dup.apply(lambda x: x['workflowName'].replace(x['mainLocation']+'/', ''),
-                                                             axis=1)
-    df_annotation_dup.invokedBy = df_annotation_dup.apply(lambda x: x['invokedBy'].replace(x['mainLocation']+'/', ''),
-                                                             axis=1)
-
-    # print(list(df_annotation_dup.workflowName))
-    # print(list(df_annotation_dup.invokedBy))
 
     qTempInvokingData = {'workflowName': ['Framework/InitAllSettings.xaml', 'Framework/Gen_KillProcessesOfUser.xaml',
                                                  'Framework/InitAllApplications.xaml', 'Framework/GetTransactionItem.xaml',
@@ -49,42 +42,53 @@ def check_template(df_json, df_annotation, df_activity):
     df_nrTempInvoking = pd.DataFrame(data=nrTempInvokingData)
     # df_nrTempInvoking.to_csv('./nrTempInvoke.csv')
 
-    df_temp_invoking_check = pd.merge(df_annotation_dup, df_qTempInvoking, on=['workflowName', 'invokedBy'],
-                                      how='left', indicator='qTempInvoke')
+    if len(df_annotation_dup) > 0:
+        df_annotation_dup.workflowName = df_annotation_dup.apply(lambda x: x['workflowName']
+                                                                 .replace(x['mainLocation']+'/', ''), axis=1)
+        df_annotation_dup.invokedBy = df_annotation_dup.apply(lambda x: x['invokedBy']
+                                                              .replace(x['mainLocation']+'/', ''), axis=1)
+        df_temp_invoking_check = pd.merge(df_annotation_dup, df_qTempInvoking, on=['workflowName', 'invokedBy'],
+                                          how='left', indicator='qTempInvoke')
 
-    df_temp_invoking_check = pd.merge(df_temp_invoking_check, df_nqTempInvoking, on=['workflowName', 'invokedBy'],
-                                      how='left', indicator='nqTempInvoke')
+        df_temp_invoking_check = pd.merge(df_temp_invoking_check, df_nqTempInvoking, on=['workflowName', 'invokedBy'],
+                                          how='left', indicator='nqTempInvoke')
 
-    df_temp_invoking_check = pd.merge(df_temp_invoking_check, df_nrTempInvoking, on=['workflowName', 'invokedBy'],
-                                      how='left', indicator='nrTempInvoke')
+        df_temp_invoking_check = pd.merge(df_temp_invoking_check, df_nrTempInvoking, on=['workflowName', 'invokedBy'],
+                                          how='left', indicator='nrTempInvoke')
 
-    df_temp_invoking_check['qTempInvoke'] = df_temp_invoking_check.apply(
-        lambda x: True if x['qTempInvoke'] == 'both' else False,
-        axis=1)
-    df_temp_invoking_check['nqTempInvoke'] = df_temp_invoking_check.apply(
-        lambda x: True if x['nqTempInvoke'] == 'both' else False,
-        axis=1)
-    df_temp_invoking_check['nrTempInvoke'] = df_temp_invoking_check.apply(
-        lambda x: True if x['nrTempInvoke'] == 'both' else False,
-        axis=1)
+        df_temp_invoking_check['qTempInvoke'] = df_temp_invoking_check.apply(
+            lambda x: True if x['qTempInvoke'] == 'both' else False,
+            axis=1)
+        df_temp_invoking_check['nqTempInvoke'] = df_temp_invoking_check.apply(
+            lambda x: True if x['nqTempInvoke'] == 'both' else False,
+            axis=1)
+        df_temp_invoking_check['nrTempInvoke'] = df_temp_invoking_check.apply(
+            lambda x: True if x['nrTempInvoke'] == 'both' else False,
+            axis=1)
 
-    # df = df_temp_invoking_check.loc[:, ['workflowName', 'invokedBy', 'qTempInvoke', 'nqTempInvoke', 'nrTempInvoke']]
-    # df.to_csv('./test.csv')
-    df_match_invoke_byProject = df_temp_invoking_check.groupby('mainLocation')[
-        'qTempInvoke', 'nqTempInvoke', 'nrTempInvoke'].sum().reset_index(drop=False)
-    df_match_invoke_byProject.qTempInvoke = df_match_invoke_byProject.qTempInvoke == len(df_qTempInvoking)
-    df_match_invoke_byProject.nqTempInvoke = df_match_invoke_byProject.nqTempInvoke == len(df_nqTempInvoking)
-    df_match_invoke_byProject.nrTempInvoke = df_match_invoke_byProject.nrTempInvoke == len(df_nrTempInvoking)
-    df_json_dup = pd.merge(df_json_dup, df_match_invoke_byProject, left_on=['mainFolder'], right_on=['mainLocation'], how='left')
-    # df_json_dup.to_csv("./test2.csv")
+        # df = df_temp_invoking_check.loc[:, ['workflowName', 'invokedBy', 'qTempInvoke', 'nqTempInvoke', 'nrTempInvoke']]
+        # df.to_csv('./test.csv')
+        df_match_invoke_byProject = df_temp_invoking_check.groupby('mainLocation')[
+            'qTempInvoke', 'nqTempInvoke', 'nrTempInvoke'].sum().reset_index(drop=False)
+        df_match_invoke_byProject.qTempInvoke = df_match_invoke_byProject.qTempInvoke == len(df_qTempInvoking)
+        df_match_invoke_byProject.nqTempInvoke = df_match_invoke_byProject.nqTempInvoke == len(df_nqTempInvoking)
+        df_match_invoke_byProject.nrTempInvoke = df_match_invoke_byProject.nrTempInvoke == len(df_nrTempInvoking)
+        df_json_dup = pd.merge(df_json_dup, df_match_invoke_byProject, left_on=['mainFolder'],
+                               right_on=['mainLocation'], how='left')
+        # df_json_dup.to_csv("./test2.csv")
+    else:
+        df_match_invoke_byProject = df_annotation_dup.copy().loc[:,["mainLocation"]]
+        df_match_invoke_byProject["qTempInvoke"] = False
+        df_match_invoke_byProject["nqTempInvoke"] = False
+        df_match_invoke_byProject["nrTempInvoke"] = False
+        df_json_dup = pd.merge(df_json_dup, df_match_invoke_byProject, left_on=['mainFolder'],
+                               right_on=['mainLocation'], how='left')
 
     df_activity_dup = df_activity.loc[:, ['activityType', 'filePath']]
     df_json_dup['StateMachine'] = df_json_dup.apply(lambda x: 'StateMachine' in list(df_activity_dup[df_activity_dup['filePath']==x['mainFile']].activityType), axis=1)
 
-    df_json_exp = pd.DataFrame(df_json.subfiles.tolist(), index=df_json['index']).stack().reset_index()
-    df_json_exp.columns = ['projectId', 'fileIndex', 'filePath']
-    df_json_exp.drop(columns=['fileIndex'], inplace=True)
-    df_activity_dup = pd.merge(df_activity_dup, df_json_exp, on=['filePath'], how='left')
+    df_json_exp_dup = df_json_exp.copy()
+    df_activity_dup = pd.merge(df_activity_dup, df_json_exp_dup, on=['filePath'], how='left')
     df_json_dup['AddQItem'] = df_json_dup.apply(lambda x: 'AddQueueItem' in list(df_activity_dup[df_activity_dup['projectId']==x['index']]['activityType']), axis=1)
     df_json_dup['AddTItem'] = df_json_dup.apply(lambda x: 'AddTransactionItem' in list(df_activity_dup[df_activity_dup['projectId']==x['index']]['activityType']), axis=1)
     df_json_dup['BulkAddQItems'] = df_json_dup.apply(lambda x: 'BulkAddQueueItems' in list(df_activity_dup[df_activity_dup['projectId']==x['index']]['activityType']), axis=1)
@@ -108,13 +112,15 @@ def check_template(df_json, df_annotation, df_activity):
                 return "Performer not using New's template, but using State Machine."
             else:
                 return "Performer using neither New's template nor State Machine."
-        else:
+        elif all([df_row['Performer'], df_row['Dispatcher']]):
             if any([df_row['qTempInvoke'], df_row['nqTempInvoke'], df_row['nrTempInvoke']]):
                 return "Bridge performer using New's template."
             elif df_row['StateMachine']:
                 return "Bridge performer not using New's template, but using State Machine."
             else:
                 return "Bridge performer using neither New's template nor State Machine."
+        else:
+            return "Neither dispatcher nor performer."
 
     df_json_dup['template_comment'] = df_json_dup.apply(template_comment, axis=1)
 

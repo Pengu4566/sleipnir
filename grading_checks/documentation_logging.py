@@ -100,7 +100,16 @@ def grade_project_json_name_desc(folderPath):
                                       'descriptionScore': [json_description_score]})
         return row
     lst_df_json_row = list(map(collect_json_data, lst_json))
-    df_json = pd.concat(lst_df_json_row, ignore_index=True)
+    if len(lst_df_json_row) > 0:
+        df_json = pd.concat(lst_df_json_row, ignore_index=True)
+    else:
+        df_json = pd.DataFrame.from_dict({'fileLocation': ["Unknown"],
+                                      'projectDetail': ["Unknown"],
+                                      'mainFolder': ["Unknown"],
+                                      'mainFile': ["Unknown"],
+                                      'subfiles': ["Unknown"],
+                                      'namingScore': [0],
+                                      'descriptionScore': [0]})
     df_json = df_json.reset_index(drop=False)
     return df_json
 # end 4. Project.json (name and description)
@@ -109,56 +118,60 @@ def grade_project_json_name_desc(folderPath):
 def grade_annotation_in_workflow(df_annotation, fileLocationStr, df_argument):
     # columns=['workflowName', 'invokedBy', 'mainLocation', 'annotated', 'annotation']
     df_annotation_dup = df_annotation.copy()
-    df_annotation_dup['fileExists'] = df_annotation_dup.apply(lambda x: os.path.exists(x['workflowName']), axis=1)
-
-    def extract_annot(df_row):
-        wfPath = df_row['workflowName']
-        try:
-            tree = ET.parse(wfPath)
-            root = tree.getroot()
-            i = root.find('./{http://schemas.microsoft.com/netfx/2009/xaml/activities}Sequence')
+    if len(df_annotation_dup['workflowName']) > 0:
+        df_annotation_dup['fileExists'] = df_annotation_dup.apply(lambda x: os.path.exists(x['workflowName']), axis=1)
+        def extract_annot(df_row):
+            wfPath = df_row['workflowName']
             try:
-                annot_text = i.attrib['{http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation}Annotation.AnnotationText']
-            except AttributeError:
+                tree = ET.parse(wfPath)
+                root = tree.getroot()
+                i = root.find('./{http://schemas.microsoft.com/netfx/2009/xaml/activities}Sequence')
+                try:
+                    annot_text = i.attrib['{http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation}Annotation.AnnotationText']
+                except AttributeError:
+                    annot_text = ''
+                except KeyError:
+                    annot_text = ''
+            except FileNotFoundError:
                 annot_text = ''
-            except KeyError:
-                annot_text = ''
-        except FileNotFoundError:
-            annot_text = ''
-        except OSError:
-            annot_text = 'Cannot find file'
-        return annot_text
+            except OSError:
+                annot_text = 'Cannot find file'
+            return annot_text
 
-    df_annotation_dup['annotation'] = df_annotation_dup.apply(extract_annot, axis=1)
-    df_annotation_dup['annotated'] = (df_annotation_dup['annotation'] != '')
+        df_annotation_dup['annotation'] = df_annotation_dup.apply(extract_annot, axis=1)
+        df_annotation_dup['annotated'] = (df_annotation_dup['annotation'] != '')
 
-    numWf = len(df_annotation_dup.workflowName)
-    if numWf > 0:
-        df_annotation_dup.workflowName = df_annotation_dup.workflowName.str.replace(fileLocationStr,'')
-        notAnnotatedWf = list(df_annotation_dup[df_annotation_dup.annotated == 0].dropna()
-                              .reset_index(drop=True).reset_index()
-                              .loc[:, ['index', 'workflowName']].T.to_dict().values())
-        wfAnnotationScore = 100 - (len(notAnnotatedWf) / numWf * 100)
+        numWf = len(df_annotation_dup.workflowName)
+        if numWf > 0:
+            df_annotation_dup.workflowName = df_annotation_dup.workflowName.str.replace(fileLocationStr,'')
+            notAnnotatedWf = list(df_annotation_dup[df_annotation_dup.annotated == 0].dropna()
+                                  .reset_index(drop=True).reset_index()
+                                  .loc[:, ['index', 'workflowName']].T.to_dict().values())
+            wfAnnotationScore = 100 - (len(notAnnotatedWf) / numWf * 100)
     else:
         [wfAnnotationScore, notAnnotatedWf] = [0, ["There is no invoked workflow in your project."]]
 
     # 6.Arguments should be at least mentioned in annotation
-    df_join_arg_annot = pd.merge(df_argument.copy().loc[:, ['argumentName', 'filePath']], df_annotation_dup.loc[:, ['workflowName', 'annotation']], left_on='filePath', right_on='workflowName', how='left').drop_duplicates(inplace=False)
-    df_join_arg_annot.annotation.fillna('')
-    def arginAnnot(df_join_row):
-        if df_join_row['annotation'] == '':
-            return False
-        else:
-            return str(df_join_row['argumentName']) in str(df_join_row['annotation'])
-    df_join_arg_annot['arginAnnot'] = df_join_arg_annot.apply(arginAnnot, axis=1)
-    if len(df_join_arg_annot) > 0:
-        df_join_arg_annot.filePath = df_join_arg_annot.filePath.str.replace(fileLocationStr, '')
-        missing_arguments_list = list(df_join_arg_annot[df_join_arg_annot['arginAnnot'] == False]
-                                      .reset_index(drop=True).reset_index()
-                                      .loc[:, ['index', 'argumentName', 'filePath']].T.to_dict().values())
+    if len(df_argument['filePath']) > 0:
+        df_join_arg_annot = pd.merge(df_argument.copy().loc[:, ['argumentName', 'filePath']], df_annotation_dup.loc[:, ['workflowName', 'annotation']], left_on='filePath', right_on='workflowName', how='left').drop_duplicates(inplace=False)
+        df_join_arg_annot.annotation.fillna('')
+        def arginAnnot(df_join_row):
+            if df_join_row['annotation'] == '':
+                return False
+            else:
+                return str(df_join_row['argumentName']) in str(df_join_row['annotation'])
+        df_join_arg_annot['arginAnnot'] = df_join_arg_annot.apply(arginAnnot, axis=1)
+        if len(df_join_arg_annot) > 0:
+            df_join_arg_annot.filePath = df_join_arg_annot.filePath.str.replace(fileLocationStr, '')
+            missing_arguments_list = list(df_join_arg_annot[df_join_arg_annot['arginAnnot'] == False]
+                                          .reset_index(drop=True).reset_index()
+                                          .loc[:, ['index', 'argumentName', 'filePath']].T.to_dict().values())
+        AnnotationArgumentScore = len(missing_arguments_list) / len(df_join_arg_annot) if len(
+            df_join_arg_annot) > 0 else 0
     else:
         missing_arguments_list = ["There is no argument in this project."]
-    AnnotationArgumentScore = len(missing_arguments_list)/len(df_join_arg_annot) if len(df_join_arg_annot) > 0 else 0
+        AnnotationArgumentScore = 0
+
 
     return [wfAnnotationScore, notAnnotatedWf, AnnotationArgumentScore, missing_arguments_list]
 # end 5. Annotations in invoked workflow

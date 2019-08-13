@@ -34,8 +34,11 @@
               </ul>
             </ul>
       </div>
+
+      <div id="uploader">
         <input type="file" name="file" id="file">
         <input type="submit" value="Upload" class="submitBtn">
+      </div>
     </form>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js">  
@@ -48,6 +51,11 @@
         });
     });
     </script>
+    <div id="download_buttons">
+      <a href="akoa_template/Queue_Template.zip" style="text-decoration: none" download><button>Download Queue Template</button></a>
+      <a href="akoa_template/Non-queue_Template.zip" style="text-decoration: none" download><button>Download Non-Queue Template</button></a>
+      <a href="akoa_template/Non-repetitive_Template.zip" style="text-decoration: none" download><button>Download Non-Repetitive Template</button></a>
+    </div>
     <div id="Progress"></div>
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
     <script type="text/javascript">
@@ -63,19 +71,6 @@
     });
     </script>
     <script src="dist/fileUpload.js" type="text/javascript"></script>
-    <div id=”dropzone”></div>
-    <script type="text/javascript">
-    var dropzone = document.getElementById('dropzone');
-    dropzone.ondrop = function(e) {
-      var length = e.dataTransfer.items.length;
-      for (var i = 0; i < length; i++) {
-        var entry = e.dataTransfer.items[i].webkitGetAsEntry();
-        if (entry.isFile) {
-          
-        } else if (entry.isDirectory) {
-    }
-  }
-};
-    </script>
+
   </body>
 </html>

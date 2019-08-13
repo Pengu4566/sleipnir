@@ -1,7 +1,8 @@
-def selector_check(df_selector, fileLocationStr, df_json):
+def selector_check(df_selector, fileLocationStr, df_json_exp):
     df_selector_dup = df_selector.copy()
-    df_json_dup = df_json.copy()
-
+    df_json_exp_dup = df_json_exp.copy()
+    df_selector_dup = df_selector_dup.merge(df_json_exp_dup, on=['filePath'], how='left')
+    df_selector_dup.fillna("Unknown", inplace=True)
     df_selector_dup.filePath = df_selector_dup.filePath.str.replace(fileLocationStr, '')
     df_selector_dup.selectorStr = df_selector_dup.selectorStr.str.replace("\"", "'")
     # df_selector_dup.to_csv('./selectors.csv')

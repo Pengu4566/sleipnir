@@ -40,6 +40,10 @@ export default class SelectorEvalBlock extends React.Component {
         {
           Header: "From File",
           accessor: "filePath"
+        },
+        {
+          Header: "From Project",
+          accessor: "projectId"
         }
       ];
       return (
