@@ -17,9 +17,10 @@ from dataframes import dataframe
 from grading_checks import naming, usage, documentation_logging, error_handling
 from soft_checks import activity_stats, project_folder_structure, project_structure, template_check, selector_check
 
-from flask import Flask, request, render_template, redirect, url_for, session, jsonify
+from flask import Flask, request, render_template, redirect, url_for, session, jsonify, Response
 from flask_session import Session
 from flask_socketio import SocketIO, emit
+import pdfkit
 
 # es = Elasticsearch(['https://098b8510b627461cb0e77d37d10c4511.us-east-1.aws.found.io:9243'],
 #                    http_auth=('elastic', '5mKdXBb77D2hLuukmTHwThkc'))
@@ -476,6 +477,18 @@ def project_structure_data():
     message = {'gexf': session.get("gexf")}
     return jsonify(message)
 
+
+@app.route("/getreport", methods=['GET'])
+def getReport():
+    config = pdfkit.configuration(wkhtmltopdf=(os.getcwd().replace("\\", "/")+'/wkhtmltox/bin/wkhtmltopdf.exe'))
+    options = {'quiet': ''}
+    report = pdfkit.from_url(url_for('.__main__'), False, options=options, configuration=config)
+    return Response(
+        report,
+        mimetype="application/pdf",
+        headers={"Content-disposition":
+                 "attachment; filename=Report.pdf"}
+    )
 
 
 
