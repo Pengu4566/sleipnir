@@ -481,8 +481,25 @@ def project_structure_data():
 @app.route("/getreport", methods=['GET'])
 def getReport():
     config = pdfkit.configuration(wkhtmltopdf=(os.getcwd().replace("\\", "/")+'/wkhtmltox/bin/wkhtmltopdf.exe'))
-    options = {'quiet': ''}
-    report = pdfkit.from_url(url_for('.__main__'), False, options=options, configuration=config)
+    html_string = render_template('report.html',
+                                 namingScore=session.get("namingScore"),
+                                 usageScore=session.get("usageScore"),
+                                 docScore=session.get("docScore"),
+                                 improperNamedVar={"data": session.get("improperNamedVar")},
+                                 unusedVar={"data": session.get("unusedVar")},
+                                 improperNamedArg={"data": session.get("improperNamedArg")},
+                                 improperNamedAct={"data": session.get("improperNamedAct")},
+                                 activityStats={"data": session.get("activityStats")},
+                                 noSsExp={"data": session.get("noSsExp")},
+                                 notAnnotWf={"data": session.get("notAnnotWf")},
+                                 noLMExp={"data": session.get("noLMExp")},
+                                 project_detail={"data": session.get("project_detail")},
+                                 missing_arguments_list={"data": session.get("missing_arguments_list")},
+                                 folderStructure=session.get("folderStructure"),
+                                 unusedArgument={"data": session.get("unusedArgument")},
+                                 selectorEval={"data": session.get('selector')})
+    report = pdfkit.from_string(html_string, False, configuration=config)
+
     return Response(
         report,
         mimetype="application/pdf",
