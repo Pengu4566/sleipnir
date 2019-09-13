@@ -16,15 +16,15 @@ fetch("/radar")
 
     option = {
       title: {
-        text: "Score",
+        text: "",
         subtext: "",
         top: "top",
         left: "center"
       },
       tooltip: {},
-      //legend: {
-      //    data: ['Allocated Budget', 'Actual Spending']
-      //},
+      // legend: {
+      //   data: ["Actual Score", "Tolerance"]
+      // },
       radar: {
         // shape: 'circle',
         name: {

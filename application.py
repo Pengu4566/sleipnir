@@ -82,13 +82,14 @@ def handle_upload():
         # get checks info
         def get_checks_info(ele_lst_info):
             return True if request.form.get(ele_lst_info) == ele_lst_info else False
-        lst_info = ['Naming', 'VariableNaming', 'ArgumentNaming', 'ActivityNaming',
-                    'Usage', 'VariableUsage', 'ArgumentUsage',
-                    'Documentation', 'WorkflowAnnotation', 'TryCatchLogging', 'TryCatchScreenshot', 'JsonLogging', 'ArgExpAnnot']
+        lst_info = ['VariableNaming', 'ArgumentNaming', 'ActivityNaming',
+                    'VariableUsage', 'ArgumentUsage',
+                    'WorkflowAnnotation', 'TryCatchLogging', 'TryCatchScreenshot', 'JsonLogging', 'ArgExpAnnot']
 
-        [session['naming'], session['varNaming'], session['argNaming'], session['actNaming'],
-         session['usage'], session['varUsage'], session['argUsage'],
-         session['documentation'], session['wfAnnot'], session['tcLog'], session['tcSs'], session['jsonLog'], session['arginAnnot']] = map(get_checks_info,lst_info)
+        [session['varNaming'], session['argNaming'], session['actNaming'],
+         session['varUsage'], session['argUsage'],
+         session['wfAnnot'], session['tcLog'], session['tcSs'], session['jsonLog'], session['arginAnnot']] = map(get_checks_info,lst_info)
+
         # check if the post request has the file part
         socketio.emit('progress', {'data': 'Getting File Info ...'})
         socketio.sleep(0.1)
@@ -109,12 +110,12 @@ def handle_upload():
             # save, unzip, and remove zip
             socketio.emit('progress', {'data': 'Saving File ...'})
             socketio.sleep(0.1)
-            generatedFileNaming = filename[:-4] + str(time.time()).replace(".", "") +\
+            generatedFileNaming = filename.replace(".zip","") + str(time.time()).replace(".", "") +\
                                   str(randint(1, 999999999999)) + ".zip"
             if os.path.isfile(os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming):
                 nameDup = True
                 while nameDup:
-                    generatedFileNaming = filename[:-4] + str(time.time()).replace(".", "") +\
+                    generatedFileNaming = filename.replace(".zip","") + str(time.time()).replace(".", "") +\
                                           str(randint(1, 999999999999)) + ".zip"
                     nameDup = os.path.isfile(os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming)
             file.save((os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming).replace("\\", "/"))
@@ -148,7 +149,6 @@ def handle_upload():
                 for file in f:
                     if '.xaml' in file:
                         files.append(os.path.join(r, file).replace("\\", "/"))
-            # print(files)
             fileLocationStr = (os.getcwd() + app.config['UPLOAD_PATH'] + generatedFolderName).replace("\\", "/") + "/"
             for r, d, f in os.walk(folderPath):
                 if len(d) == 1:
@@ -175,7 +175,9 @@ def processing():
     df_json = documentation_logging.grade_project_json_name_desc(folderPath)
     df_json_exp = pd.DataFrame(df_json.subfiles.tolist(), index=df_json['index']).stack().reset_index()
     df_json_exp.columns = ['projectId', 'fileIndex', 'filePath']
-    df_json_exp.drop(columns=['fileIndex'], inplace=True)
+    df_json_exp = pd.merge(df_json_exp, df_json.loc[:, ["mainFolder"]].reset_index(), how="left",
+                           left_on="projectId", right_on="index")
+    df_json_exp.drop(columns=['fileIndex', "index"], inplace=True)
 
     if session.get('jsonLog'):
         project_detail = list(df_json.copy().reset_index().loc[:, ['index', 'projectDetail']].T.to_dict().values())
@@ -191,43 +193,62 @@ def processing():
     socketio.sleep(0.1)
 
     lst_sub_df = [dataframe.populate_dataframe(files[i], df_json) for i in range(len(files))]
-    df_variable = pd.concat([x[0] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False)
-    df_argument = pd.concat([x[1] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False)
-    df_catches = pd.concat([x[2] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False)
-    df_activity = pd.concat([x[3] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False)
+
+    df_variable = pd.merge(pd.concat([x[0] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False),
+                           df_json_exp, how="left", on="filePath")
+    df_variable["filePath"] = df_variable.apply(lambda x: x["filePath"].replace(x["mainFolder"], ""), axis=1)
+    df_variable.drop(columns=['mainFolder'], inplace=True)
+
+    df_argument = pd.merge(pd.concat([x[1] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False),
+                           df_json_exp, how="left", on="filePath")
+    df_argument["filePath"] = df_argument.apply(lambda x: x["filePath"].replace(x["mainFolder"], ""), axis=1)
+    df_argument.drop(columns=['mainFolder'], inplace=True)
+
+    df_catches = pd.merge(pd.concat([x[2] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False),
+                          df_json_exp, how="left", on="filePath")
+    df_catches["filePath"] = df_catches.apply(lambda x: x["filePath"].replace(x["mainFolder"], ""), axis=1)
+    df_catches.drop(columns=['mainFolder'], inplace=True)
+
+    df_activity = pd.merge(pd.concat([x[3] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False),
+                           df_json_exp, how="left", on="filePath")
+    df_activity["filePath"] = df_activity.apply(lambda x: x["filePath"].replace(x["mainFolder"], ""), axis=1)
+    df_activity.drop(columns=['mainFolder'], inplace=True)
+
     df_annotation = pd.concat([x[4] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False)
-    df_selector = pd.concat([x[5] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False)
+
+    df_selector = pd.merge(pd.concat([x[5] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False),
+                           df_json_exp, how="left", on="filePath")
+    df_selector["filePath"] = df_selector.apply(lambda x: x["filePath"].replace(x["mainFolder"], ""), axis=1)
+    df_selector.drop(columns=['mainFolder'], inplace=True)
 
     dict_score = {}
     # level 1: grading checks
 
     # level 2: name
-    if session.get("naming"):
+    # if session.get("naming"):
+    if True:
         # level 3: variable naming
         if session.get('varNaming'):
-            [variableNamingScore, improperNamedVariable] = naming.grade_variable_name(df_variable=df_variable,
-                                                                                      fileLocationStr=fileLocationStr)
+            [variableNamingScore, improperNamedVariable] = naming.grade_variable_name(df_variable=df_variable)
             improperNamedVar = improperNamedVariable
         else:
-            improperNamedVar = ['Not evaluated']
+            improperNamedVar = []
             variableNamingScore = "[Not evaluated]"
 
         # level 3: argument naming
         if session.get('argNaming'):
-            [argumentNamingScore, improperNamedArguments] = naming.grade_argument_name(df_argument=df_argument,
-                                                                                       fileLocationStr=fileLocationStr)
+            [argumentNamingScore, improperNamedArguments] = naming.grade_argument_name(df_argument=df_argument)
             improperNamedArg = improperNamedArguments
         else:
-            improperNamedArg = ['Not evaluated']
+            improperNamedArg = []
             argumentNamingScore = "[Not evaluated]"
 
         # level 3: activity naming
         if session['actNaming']:
-            [activityNamingScore, improperNamedActivities] = naming.grade_activity_name(df_activity=df_activity,
-                                                                                        fileLocationStr=fileLocationStr)
+            [activityNamingScore, improperNamedActivities] = naming.grade_activity_name(df_activity=df_activity)
             improperNamedAct = improperNamedActivities
         else:
-            improperNamedAct = ['Not evaluated']
+            improperNamedAct = []
             activityNamingScore = "[Not evaluated]"
 
         lt_namingScore = [variableNamingScore, argumentNamingScore, activityNamingScore]
@@ -248,7 +269,8 @@ def processing():
     dict_score['naming'] = namingScore
 
     # level 2: usage
-    if session["usage"]:
+    # if session["usage"]:
+    if True:
         # level 3: variable usage
         if session['varUsage']:
             [variableUsageScore, unusedVariable] = usage.grade_variable_usage(df_variable=df_variable,
@@ -285,8 +307,8 @@ def processing():
     dict_score['usage'] = usageScore
 
     # level 2: documentation_logging
-    if session["documentation"]:
-
+    # if session["documentation"]:
+    if True:
         # level 3: log message in catches
         if session['tcLog']:
             [logMessageScore, noLMException] = documentation_logging.grade_log_message_in_catches(
@@ -355,10 +377,9 @@ def processing():
     lst_tolerance = []
     lst_checkName = []
     for checks in ['naming', 'usage', 'documentation']:
-        if session[checks]:
-            lst_score.append(dict_score[checks])
-            lst_tolerance.append(dict_tolerance[checks])
-            lst_checkName.append(checks.capitalize())
+        lst_score.append(dict_score[checks])
+        lst_tolerance.append(dict_tolerance[checks])
+        lst_checkName.append(checks.capitalize())
 
     # level 1: soft checks
     # level 2: activity stats

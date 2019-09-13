@@ -1,0 +1,490 @@
+﻿<Activity mc:Ignorable="sap sap2010 sads" x:Class="GetPerformanceMetrics" this:GetPerformanceMetrics.in_str_ar_processNames="[{&quot;chrome&quot;,&quot;iexplore&quot;}]" this:GetPerformanceMetrics.in_int_measurementDuration="10"
+ xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities"
+ xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+ xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities"
+ xmlns:s="clr-namespace:System;assembly=mscorlib"
+ xmlns:sads="http://schemas.microsoft.com/netfx/2010/xaml/activities/debugger"
+ xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation"
+ xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation"
+ xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib"
+ xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=mscorlib"
+ xmlns:sd="clr-namespace:System.Diagnostics;assembly=System"
+ xmlns:this="clr-namespace:"
+ xmlns:ui="http://schemas.uipath.com/workflow/activities"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_str_ar_processNames" Type="InArgument(s:String[])" />
+    <x:Property Name="in_int_measurementDuration" Type="InArgument(x:Int32)" />
+  </x:Members>
+  <mva:VisualBasic.Settings>
+    <x:Null />
+  </mva:VisualBasic.Settings>
+  <sap2010:WorkflowViewState.IdRef>GetPerformanceMetrics_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>Microsoft.VisualBasic.Devices</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.Studio.Plugin.Workflow</AssemblyReference>
+      <AssemblyReference>System.Configuration.Install</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>UiPath.Mail</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+      <AssemblyReference>System.ValueTuple</AssemblyReference>
+      <AssemblyReference>System.Collections.Immutable</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualStudio.Services.Common</AssemblyReference>
+      <AssemblyReference>System.Runtime.WindowsRuntime</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence sap2010:Annotation.AnnotationText="Checks CPU and RAM uses on the machine.&#xA;&#xA;Arguments:&#xA;in_str_ar_processNames&#xA;in_int_measurementDuration&#xA;&#xA;" DisplayName="GetPerformanceMetrics" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="sd:PerformanceCounter" Name="performanceCounterRAM" />
+      <Variable x:TypeArguments="sd:PerformanceCounter" Name="performanceCounterCPU" />
+      <Variable x:TypeArguments="scg:List(sd:PerformanceCounter)" Default="[new List(of System.Diagnostics.PerformanceCounter)]" Name="list_performanceCountersCPU" />
+      <Variable x:TypeArguments="scg:List(sd:PerformanceCounter)" Default="[new List(of System.Diagnostics.PerformanceCounter)]" Name="list_performanceCountersRAM" />
+      <Variable x:TypeArguments="x:Double" Name="double_totalRam" />
+      <Variable x:TypeArguments="x:Double" Name="double_tmp" />
+      <Variable x:TypeArguments="scg:Dictionary(x:String, x:Int64)" Name="dict_processToRAM" />
+      <Variable x:TypeArguments="scg:Dictionary(x:String, x:Int64)" Name="dict_processToCPU" />
+    </Sequence.Variables>
+    <TryCatch DisplayName="Try Catch - Log computer and process metrics" sap2010:WorkflowViewState.IdRef="TryCatch_1">
+      <TryCatch.Try>
+        <Sequence DisplayName="Log metrics" sap2010:WorkflowViewState.IdRef="Sequence_21">
+          <Sequence DisplayName="Declare constants" sap2010:WorkflowViewState.IdRef="Sequence_19">
+            <Assign sap2010:WorkflowViewState.IdRef="Assign_16">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:Double">[double_totalRam]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:Double">[Convert.ToInt64(new Microsoft.VisualBasic.Devices.ComputerInfo().TotalPhysicalMemory )*Math.Pow(1024,-3)]</InArgument>
+              </Assign.Value>
+            </Assign>
+          </Sequence>
+          <Assign DisplayName="Assign - RAM performance counter." sap2010:WorkflowViewState.IdRef="Assign_1">
+            <Assign.To>
+              <OutArgument x:TypeArguments="sd:PerformanceCounter">[performanceCounterRAM]</OutArgument>
+            </Assign.To>
+            <Assign.Value>
+              <InArgument x:TypeArguments="sd:PerformanceCounter">[new System.Diagnostics.PerformanceCounter("Memory", "Available MBytes")]</InArgument>
+            </Assign.Value>
+          </Assign>
+          <Sequence DisplayName="Set CPU performance counter" sap2010:WorkflowViewState.IdRef="Sequence_2">
+            <Assign DisplayName="Assign - CPU performance counter" sap2010:WorkflowViewState.IdRef="Assign_2">
+              <Assign.To>
+                <OutArgument x:TypeArguments="sd:PerformanceCounter">[performanceCounterCPU]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="sd:PerformanceCounter">[new System.Diagnostics.PerformanceCounter]</InArgument>
+              </Assign.Value>
+            </Assign>
+            <Assign DisplayName="Assign - Set category" sap2010:WorkflowViewState.IdRef="Assign_3">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:String">[performanceCounterCPU.CategoryName]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:String">Processor</InArgument>
+              </Assign.Value>
+            </Assign>
+            <Assign DisplayName="Assign - Set counter name" sap2010:WorkflowViewState.IdRef="Assign_4">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:String">[performanceCounterCPU.CounterName]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:String">% Processor Time</InArgument>
+              </Assign.Value>
+            </Assign>
+            <Assign DisplayName="Assign - Set instance name" sap2010:WorkflowViewState.IdRef="Assign_5">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:String">[performanceCounterCPU.InstanceName]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:String">_Total</InArgument>
+              </Assign.Value>
+            </Assign>
+          </Sequence>
+          <Sequence DisplayName="Get initial sample" sap2010:WorkflowViewState.IdRef="Sequence_11">
+            <Sequence.Variables>
+              <Variable x:TypeArguments="x:Int32" Name="int_tmp" />
+            </Sequence.Variables>
+            <InvokeMethod DisplayName="Invoke Method - Sample CPU" sap2010:WorkflowViewState.IdRef="InvokeMethod_4" MethodName="NextValue">
+              <InvokeMethod.TargetObject>
+                <InArgument x:TypeArguments="sd:PerformanceCounter">[performanceCounterCPU]</InArgument>
+              </InvokeMethod.TargetObject>
+            </InvokeMethod>
+            <InvokeMethod DisplayName="Invoke Method - Sample RAM" sap2010:WorkflowViewState.IdRef="InvokeMethod_5" MethodName="NextValue">
+              <InvokeMethod.TargetObject>
+                <InArgument x:TypeArguments="sd:PerformanceCounter">[performanceCounterRAM]</InArgument>
+              </InvokeMethod.TargetObject>
+            </InvokeMethod>
+          </Sequence>
+          <ui:ForEach x:TypeArguments="x:String" CurrentIndex="{x:Null}" DisplayName="For Each - Process name to check" sap2010:WorkflowViewState.IdRef="ForEach`1_5" Values="[in_str_ar_processNames]">
+            <ui:ForEach.Body>
+              <ActivityAction x:TypeArguments="x:String">
+                <ActivityAction.Argument>
+                  <DelegateInArgument x:TypeArguments="x:String" Name="processName" />
+                </ActivityAction.Argument>
+                <If Condition="[System.Diagnostics.Process.GetProcessesByName(processName.Trim).Length &gt; 0]" DisplayName="If - There are proceses open." sap2010:WorkflowViewState.IdRef="If_1">
+                  <If.Then>
+                    <Sequence DisplayName="Init performance counters." sap2010:WorkflowViewState.IdRef="Sequence_17">
+                      <ui:ForEach x:TypeArguments="x:String" CurrentIndex="{x:Null}" DisplayName="For Each - Process instance" sap2010:WorkflowViewState.IdRef="ForEach`1_8" Values="[new System.Diagnostics.PerformanceCounterCategory(&quot;Process&quot;).GetInstanceNames().Where(function(x) x.StartsWith(processName)).ToList]">
+                        <ui:ForEach.Body>
+                          <ActivityAction x:TypeArguments="x:String">
+                            <ActivityAction.Argument>
+                              <DelegateInArgument x:TypeArguments="x:String" Name="instance" />
+                            </ActivityAction.Argument>
+                            <Sequence DisplayName="Body" sap2010:WorkflowViewState.IdRef="Sequence_22">
+                              <TryCatch DisplayName="Try Catch - Set performance counter for instance." sap2010:WorkflowViewState.IdRef="TryCatch_2">
+                                <TryCatch.Try>
+                                  <Sequence DisplayName="Set Performance counters" sap2010:WorkflowViewState.IdRef="Sequence_23">
+                                    <Sequence DisplayName="Set up performance counter CPU" sap2010:WorkflowViewState.IdRef="Sequence_14">
+                                      <Sequence.Variables>
+                                        <Variable x:TypeArguments="sd:PerformanceCounter" Name="performanceCounter_tmp" />
+                                      </Sequence.Variables>
+                                      <Assign sap2010:WorkflowViewState.IdRef="Assign_11">
+                                        <Assign.To>
+                                          <OutArgument x:TypeArguments="sd:PerformanceCounter">[performanceCounter_tmp]</OutArgument>
+                                        </Assign.To>
+                                        <Assign.Value>
+                                          <InArgument x:TypeArguments="sd:PerformanceCounter">[new System.Diagnostics.PerformanceCounter("Process", "% Processor Time",instance)]</InArgument>
+                                        </Assign.Value>
+                                      </Assign>
+                                      <InvokeMethod DisplayName="Invoke Method - Sample CPU" sap2010:WorkflowViewState.IdRef="InvokeMethod_7" MethodName="NextValue">
+                                        <InvokeMethod.TargetObject>
+                                          <InArgument x:TypeArguments="sd:PerformanceCounter">[performanceCounter_tmp]</InArgument>
+                                        </InvokeMethod.TargetObject>
+                                      </InvokeMethod>
+                                      <AddToCollection x:TypeArguments="sd:PerformanceCounter" Collection="[list_performanceCountersCPU]" DisplayName="Add To Collection" sap2010:WorkflowViewState.IdRef="AddToCollection`1_1" Item="[performanceCounter_tmp]" />
+                                    </Sequence>
+                                    <Sequence DisplayName="Set up performance counters RAM" sap2010:WorkflowViewState.IdRef="Sequence_16">
+                                      <Sequence.Variables>
+                                        <Variable x:TypeArguments="sd:PerformanceCounter" Name="performanceCounter_tmp" />
+                                      </Sequence.Variables>
+                                      <Assign sap2010:WorkflowViewState.IdRef="Assign_12">
+                                        <Assign.To>
+                                          <OutArgument x:TypeArguments="sd:PerformanceCounter">[performanceCounter_tmp]</OutArgument>
+                                        </Assign.To>
+                                        <Assign.Value>
+                                          <InArgument x:TypeArguments="sd:PerformanceCounter">[new System.Diagnostics.PerformanceCounter("Process", "% Processor Time",processName.Trim)]</InArgument>
+                                        </Assign.Value>
+                                      </Assign>
+                                      <Assign DisplayName="Assign - Set category" sap2010:WorkflowViewState.IdRef="Assign_13">
+                                        <Assign.To>
+                                          <OutArgument x:TypeArguments="x:String">[performanceCounter_tmp.CategoryName]</OutArgument>
+                                        </Assign.To>
+                                        <Assign.Value>
+                                          <InArgument x:TypeArguments="x:String">Process</InArgument>
+                                        </Assign.Value>
+                                      </Assign>
+                                      <Assign DisplayName="Assign - Set counter name" sap2010:WorkflowViewState.IdRef="Assign_14">
+                                        <Assign.To>
+                                          <OutArgument x:TypeArguments="x:String">[performanceCounter_tmp.CounterName]</OutArgument>
+                                        </Assign.To>
+                                        <Assign.Value>
+                                          <InArgument x:TypeArguments="x:String">Working Set - Private</InArgument>
+                                        </Assign.Value>
+                                      </Assign>
+                                      <Assign DisplayName="Assign - Set instance name" sap2010:WorkflowViewState.IdRef="Assign_15">
+                                        <Assign.To>
+                                          <OutArgument x:TypeArguments="x:String">[performanceCounter_tmp.InstanceName]</OutArgument>
+                                        </Assign.To>
+                                        <Assign.Value>
+                                          <InArgument x:TypeArguments="x:String">[instance]</InArgument>
+                                        </Assign.Value>
+                                      </Assign>
+                                      <InvokeMethod DisplayName="Invoke Method - Sample CPU" sap2010:WorkflowViewState.IdRef="InvokeMethod_8" MethodName="NextValue">
+                                        <InvokeMethod.TargetObject>
+                                          <InArgument x:TypeArguments="sd:PerformanceCounter">[performanceCounter_tmp]</InArgument>
+                                        </InvokeMethod.TargetObject>
+                                      </InvokeMethod>
+                                      <AddToCollection x:TypeArguments="sd:PerformanceCounter" Collection="[list_performanceCountersRAM]" DisplayName="Add To Collection" sap2010:WorkflowViewState.IdRef="AddToCollection`1_2" Item="[performanceCounter_tmp]" />
+                                    </Sequence>
+                                  </Sequence>
+                                </TryCatch.Try>
+                                <TryCatch.Catches>
+                                  <Catch x:TypeArguments="s:Exception" sap2010:WorkflowViewState.IdRef="Catch`1_2">
+                                    <ActivityAction x:TypeArguments="s:Exception">
+                                      <ActivityAction.Argument>
+                                        <DelegateInArgument x:TypeArguments="s:Exception" Name="exception" />
+                                      </ActivityAction.Argument>
+                                      <ui:LogMessage DisplayName="Log Message" sap2010:WorkflowViewState.IdRef="LogMessage_9" Level="Trace" Message="[&quot;Failed to set performance counter for instance &quot; + instance]" />
+                                    </ActivityAction>
+                                  </Catch>
+                                </TryCatch.Catches>
+                              </TryCatch>
+                            </Sequence>
+                          </ActivityAction>
+                        </ui:ForEach.Body>
+                      </ui:ForEach>
+                    </Sequence>
+                  </If.Then>
+                </If>
+              </ActivityAction>
+            </ui:ForEach.Body>
+          </ui:ForEach>
+          <Delay DisplayName="Delay - measurement duration" Duration="[new Timespan(0,0,in_int_measurementDuration)]" sap2010:WorkflowViewState.IdRef="Delay_3" />
+          <Sequence DisplayName="Aggregate results" sap2010:WorkflowViewState.IdRef="Sequence_24">
+            <Assign sap2010:WorkflowViewState.IdRef="Assign_19">
+              <Assign.To>
+                <OutArgument x:TypeArguments="scg:Dictionary(x:String, x:Int64)">[dict_processToCPU]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="scg:Dictionary(x:String, x:Int64)">[in_str_ar_processNames.Select(function(name) name.Trim.ToUpper).ToDictionary(Function(x) x , Function(x) list_performanceCountersCPU.Where(Function(z) z.InstanceName.Trim.ToUpper.StartsWith(x)).Select(Function(w) Convert.ToInt64(w.NextValue())).Sum )]</InArgument>
+              </Assign.Value>
+            </Assign>
+            <Assign sap2010:WorkflowViewState.IdRef="Assign_20">
+              <Assign.To>
+                <OutArgument x:TypeArguments="scg:Dictionary(x:String, x:Int64)">[dict_processToRAM]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="scg:Dictionary(x:String, x:Int64)">[in_str_ar_processNames.Select(function(name) name.Trim.ToUpper).ToDictionary(function(x) x , function(x) list_performanceCountersRAM.Where(function(z) z.InstanceName.Trim.ToUpper.StartsWith(x)).Select(function(w) Convert.ToInt64(w.NextValue())).Sum )]</InArgument>
+              </Assign.Value>
+            </Assign>
+          </Sequence>
+          <Sequence DisplayName="Log results" sap2010:WorkflowViewState.IdRef="Sequence_18">
+            <Assign DisplayName="Assign - RAM used tmp" sap2010:WorkflowViewState.IdRef="Assign_17">
+              <Assign.To>
+                <OutArgument x:TypeArguments="x:Double">[double_tmp]</OutArgument>
+              </Assign.To>
+              <Assign.Value>
+                <InArgument x:TypeArguments="x:Double">[Math.Max((double_totalRam - Convert.ToInt64(performanceCounterRAM.NextValue())*Math.Pow(1024,-1))/double_totalRam, 0)]</InArgument>
+              </Assign.Value>
+            </Assign>
+            <ui:LogMessage DisplayName="Log Message" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[String.Format(&quot;[FRAMEWORK.DIAGNOSTICS] Machine CPU {0} %, Machine RAM {1} % &quot;, performanceCounterCPU.NextValue(), 100*Math.Round(double_tmp,2) )]" />
+            <ui:LogMessage DisplayName="Log Message" sap2010:WorkflowViewState.IdRef="LogMessage_11" Level="Info" Message="[String.Format(&quot;[FRAMEWORK.DIAGNOSTICS] Process CPU usage: {0}&quot;, Environment.NewLine + String.Join(Environment.NewLine, dict_processToCPU.Select(function(x) String.Format(&quot;{0}: ({1}%)&quot;, x.key,Math.Round((x.value/environment.ProcessorCount)),2)   )))]" />
+            <ui:LogMessage DisplayName="Log Message" sap2010:WorkflowViewState.IdRef="LogMessage_12" Level="Info" Message="[String.Format(&quot;[FRAMEWORK.DIAGNOSTICS] Process RAM usage (of {0} GB): {1}&quot;, Math.Round(double_totalRam,2),  Environment.NewLine + String.Join(Environment.NewLine, dict_processToRAM.Select(function(x) String.Format(&quot;{0}: ({1} MB)&quot;, x.Key, Math.Round(Math.Pow(1024,-2)*Convert.ToInt32(x.Value),2 )))))]" />
+          </Sequence>
+        </Sequence>
+      </TryCatch.Try>
+      <TryCatch.Catches>
+        <Catch x:TypeArguments="s:Exception" sap2010:WorkflowViewState.IdRef="Catch`1_1">
+          <ActivityAction x:TypeArguments="s:Exception">
+            <ActivityAction.Argument>
+              <DelegateInArgument x:TypeArguments="s:Exception" Name="exception" />
+            </ActivityAction.Argument>
+            <ui:LogMessage DisplayName="Log Message" sap2010:WorkflowViewState.IdRef="LogMessage_8" Level="Warn" Message="[&quot;[FRAMEWORK.DIAGNOSTICS] Failed to report on performance diagnostics. Reason: &quot; + exception.Message + &quot; Source: &quot; + exception.Source]" />
+          </ActivityAction>
+        </Catch>
+      </TryCatch.Catches>
+    </TryCatch>
+    <sads:DebugSymbol.Symbol>d1BDOlxVc2Vyc1xqb2hhblxEZXNrdG9wXFRlbXBsYXRlX1F1ZXVlXHRydW5rXEZyYW1ld29ya1xHZXRQZXJmb3JtYW5jZU1ldHJpY3MueGFtbFwB4QEB5AEBAwF9AakBAQJNA7QCDgIBAVFLUYEBAgEDUktSgQECAQJYBbICEAIBBFoJpgIUAgEJrgINrgKZAgIBBVsLZBYCAXRlC2wUAgFwbQuOARYCAV+PAQudARYCAVieAQuFAhgCASCGAguGAqMBAgEehwILmAIWAgEVmQILpQIWAgEKrgJ6rgKWAgIBBlwNYxYCAXVqQ2qMAQIBc2dEZ1sCAXFuDXUWAgFsdg19FgIBaH4NhQEWAgFkhgENjQEWAgFgkwENlwEcAgFcmAENnAEcAgFZngGuAZ4ByAECAVakARGCAhYCASGGAkaGAnYCAR+IAg2PAhYCARqQAg2XAhYCARaaAg2hAhYCARGiAg2iApsCAgEPowINowKOAwIBDaQCDaQCwQMCAQthOGGiAQIBeF45XkoCAXZzRXNwAgFvcEZwXQIBbXs4e0ECAWt4OXhdAgFpgwE4gwFIAgFngAE5gAFcAgFliwE4iwE+AgFjiAE5iAFdAgFhlQFFlQFcAgFdmgFFmgFcAgFapAEfpAFwAgEipgEVgAIgAgEkjQJRjQLNAgIBHYoCUooCZQIBG5UCUZUCzQICARmSAlKSAmUCARefAjifAq8BAgEUnAI5nAJFAgESogJ6ogKYAgIBEKMCe6MCiwMCAQ6kAnukAr4DAgEMpwEX/wEkAgElpwG1AacBxgICAVWtAR38ASgCASauAR/7ASoCASewASPvAS4CASv3ASf3AeIBAgEosQElwwEwAgFHxAEl7gEwAgEs9wGVAfcB3wECASm1ASe8ATACAVC9ASfBATYCAU3CASfCAYMCAgFIyAEnzwEwAgFC0AEn1wEwAgE+2AEn3wEwAgE64AEn5wEwAgE16AEn7AE2AgEy7QEn7QGDAgIBLboBX7oBsgECAVO3AWC3AXgCAVG/AV+/AXcCAU7CAWvCAYoBAgFLwgHmAcIBgAICAUnNAV/NAboBAgFFygFgygF4AgFD1QFS1QFZAgFB0gFT0gF4AgE/3QFS3QFnAgE92gFT2gF3AgE75QFS5QFcAgE44gFT4gF4AgE26gFf6gF3AgEz7QFr7QGKAQIBMO0B5gHtAYACAgEu</sads:DebugSymbol.Symbol>
+  </Sequence>
+  <sap2010:WorkflowViewState.ViewStateManager>
+    <sap2010:ViewStateManager>
+      <sap2010:ViewStateData Id="Assign_16" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Sequence_19" sap:VirtualizedContainerService.HintSize="619,184">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Assign_1" sap:VirtualizedContainerService.HintSize="619,60" />
+      <sap2010:ViewStateData Id="Assign_2" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_3" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_4" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_5" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Sequence_2" sap:VirtualizedContainerService.HintSize="619,51">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="InvokeMethod_4" sap:VirtualizedContainerService.HintSize="218,134" />
+      <sap2010:ViewStateData Id="InvokeMethod_5" sap:VirtualizedContainerService.HintSize="218,134" />
+      <sap2010:ViewStateData Id="Sequence_11" sap:VirtualizedContainerService.HintSize="619,51">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Assign_11" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="InvokeMethod_7" sap:VirtualizedContainerService.HintSize="242,134" />
+      <sap2010:ViewStateData Id="AddToCollection`1_1" sap:VirtualizedContainerService.HintSize="242,22" />
+      <sap2010:ViewStateData Id="Sequence_14" sap:VirtualizedContainerService.HintSize="200,51">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Assign_12" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_13" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_14" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_15" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="InvokeMethod_8" sap:VirtualizedContainerService.HintSize="242,134" />
+      <sap2010:ViewStateData Id="AddToCollection`1_2" sap:VirtualizedContainerService.HintSize="242,22" />
+      <sap2010:ViewStateData Id="Sequence_16" sap:VirtualizedContainerService.HintSize="200,51">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_23" sap:VirtualizedContainerService.HintSize="222,266">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="LogMessage_9" sap:VirtualizedContainerService.HintSize="314,91" />
+      <sap2010:ViewStateData Id="Catch`1_2" sap:VirtualizedContainerService.HintSize="404,21">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="TryCatch_2" sap:VirtualizedContainerService.HintSize="418,493">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_22" sap:VirtualizedContainerService.HintSize="440,617">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="ForEach`1_8" sap:VirtualizedContainerService.HintSize="456,751">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_17" sap:VirtualizedContainerService.HintSize="478,875">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="If_1" sap:VirtualizedContainerService.HintSize="603,1023">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="ForEach`1_5" sap:VirtualizedContainerService.HintSize="619,1157">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Delay_3" sap:VirtualizedContainerService.HintSize="619,22" />
+      <sap2010:ViewStateData Id="Assign_19" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Assign_20" sap:VirtualizedContainerService.HintSize="242,60" />
+      <sap2010:ViewStateData Id="Sequence_24" sap:VirtualizedContainerService.HintSize="619,51">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Assign_17" sap:VirtualizedContainerService.HintSize="314,60" />
+      <sap2010:ViewStateData Id="LogMessage_2" sap:VirtualizedContainerService.HintSize="314,91">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="LogMessage_11" sap:VirtualizedContainerService.HintSize="314,93" />
+      <sap2010:ViewStateData Id="LogMessage_12" sap:VirtualizedContainerService.HintSize="314,93" />
+      <sap2010:ViewStateData Id="Sequence_18" sap:VirtualizedContainerService.HintSize="619,51">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_21" sap:VirtualizedContainerService.HintSize="641,2031">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="LogMessage_8" sap:VirtualizedContainerService.HintSize="314,91" />
+      <sap2010:ViewStateData Id="Catch`1_1" sap:VirtualizedContainerService.HintSize="645,21">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="TryCatch_1" sap:VirtualizedContainerService.HintSize="659,2258" />
+      <sap2010:ViewStateData Id="Sequence_1" sap:VirtualizedContainerService.HintSize="681,2499">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="GetPerformanceMetrics_1" sap:VirtualizedContainerService.HintSize="721,2579" />
+    </sap2010:ViewStateManager>
+  </sap2010:WorkflowViewState.ViewStateManager>
+</Activity>

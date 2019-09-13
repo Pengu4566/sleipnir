@@ -15,7 +15,7 @@ $(document).ready(function() {
       parsedData = JSON.parse(text);
       if (parsedData["gexf"] != null) {
         myChart.hideLoading();
-        //console.log(xml)
+        // console.log(parsedData["gexf"]);
         var graph = echarts.dataTool.gexf.parse(parsedData["gexf"]);
 
         //var graph = echarts.dataTool.gexf.parse(xml);
@@ -34,7 +34,8 @@ $(document).ready(function() {
 
         option = {
           title: {
-            text: "Workflow Invocation Network",
+            // Workflow Invocation Network
+            text: "",
             subtext: "",
             top: "top",
             left: "center"
@@ -71,7 +72,7 @@ $(document).ready(function() {
                 normal: {
                   position: "right",
                   show: "true",
-                  color: "black"
+                  color: "grey"
                 }
               },
               force: {
@@ -87,11 +88,11 @@ $(document).ready(function() {
         myChart.hideLoading();
         option = {
           title: {
-            text: "Workflow Invocation Network",
+            text: "",
             subtext:
               "There is no invoking relationship in the project you uploaded.",
             top: "top",
-            left: "center"
+            left: "left"
           }
         };
         myChart.setOption(option);

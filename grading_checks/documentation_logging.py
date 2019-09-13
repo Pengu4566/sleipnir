@@ -93,7 +93,7 @@ def grade_project_json_name_desc(folderPath):
         project_detail = {'projectName':project_name, 'projectDescription': project_description}
         row = pd.DataFrame.from_dict({'fileLocation': [fileLocation],
                                       'projectDetail': [project_detail],
-                                      'mainFolder': [fileLocation[:-(len(fileName) + 1)]],
+                                      'mainFolder': [fileLocation[:-(len(fileName))]],
                                       'mainFile': [fileLocation[:-(len(fileName))]+mainFileName],
                                       'subfiles': [list(json_dic.values())[0]],
                                       'namingScore': [json_name_score],
