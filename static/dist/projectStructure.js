@@ -17,7 +17,6 @@ $(document).ready(function() {
         myChart.hideLoading();
         var graph = echarts.dataTool.gexf.parse(parsedData["gexf"]);
 
-        //var graph = echarts.dataTool.gexf.parse(xml);
         var categories = [];
 
         graph.nodes.forEach(function(node) {
