@@ -48,7 +48,7 @@ fetch("/radar")
           // areaStyle: {normal: {}},
           itemStyle: {
             normal: {
-              color: "blue"
+              color: "rgb(233,97,111)"
             }
           },
           data: [

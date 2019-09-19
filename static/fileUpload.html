@@ -15,8 +15,8 @@
       <div class="row justify-content-lg-center mt-5">
             <div class="col-lg-8">
                 <div class="main_div shadow-sm">
-                      <div class="d-flex header">
-                          <div class="d-flex align-self-center"><span class="ml-4 header_text">App help you to score your code</span></div>
+                      <div class="d-flex header" style="  background: linear-gradient(to top, rgb(233, 97, 111) 10%, rgb(243, 165, 130) 95%);">
+                          <div class="d-flex align-self-center"><span class="ml-4 header_text">Code Review App</span></div>
                       </div>
                       <form action="uploader" method="post" enctype="multipart/form-data" id="fileUploadForm">
                           <div class="accordion">
@@ -27,7 +27,7 @@
                                           <button class="btn heading-1 d-block" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" type="button">
                                             Step 1 - Settings <span class="pl-3" style="cursor: pointer;"><i class="fa fa-angle-down"></i></span>
                                           </button>
-                                          <span class="heading-2 ml-3">Please customize the App</span>
+                                          <span class="heading-2 ml-3">Please customize the your checks</span>
                                         </h5>
 
 
@@ -167,7 +167,7 @@
                                 var socket = io({transports: ['websocket']});
                                 socket.on('progress', function(msg) {
                                   console.log(msg.data);
-                                  $('#Progress').html('<p>'+msg.data+'</p>');
+                                  $('#Progress').html('<p style="margin: 0%;">'+msg.data+'</p>');
                                 });
                               });
                             </script> 

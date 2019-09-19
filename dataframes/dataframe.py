@@ -12,7 +12,6 @@ def populate_dataframe(filePath, df_json):
     lst_acts = root.findall('.//')
     lst_invokes = root.findall('.//{http://schemas.uipath.com/workflow/activities}InvokeWorkflowFile')
 
-
     # variables
     def extract_var_info(var):
         variableName = var.attrib['Name']
@@ -129,27 +128,25 @@ def populate_dataframe(filePath, df_json):
 
     # annotations
     if len(lst_invokes) > 0:
-
         invokedBy = filePath
-
         def extract_invoke_info(invoke):
             workflowName_temp = invoke.attrib['WorkflowFileName'].replace("\\", "/")
             workflowName = workflowName_temp
             if ':' not in workflowName_temp:
                 lst_workflowName = [i for i in df_json[df_json.subfiles.apply(lambda x: filePath in x)].mainFolder]
             if len(lst_workflowName) > 0:
-                lst_workflowName = [i + '/' + workflowName for i in lst_workflowName]
+                lst_workflowName = [i + workflowName for i in lst_workflowName]
             return pd.DataFrame.from_dict({'workflowName': lst_workflowName,
                                            'invokedBy': [invokedBy]*len(lst_workflowName),
-                                           'mainLocation': [j for j in [i for i in df_json[df_json.subfiles.apply(lambda x: filePath in x)].mainFolder]],
+                                           'mainFolder': [j for j in [i for i in df_json[df_json.subfiles.apply(lambda x: filePath in x)].mainFolder]],
                                            'annotated': [False]*len(lst_workflowName),
-                                           'annotation': ['']*len(lst_workflowName)})
+                                           'annotation': [""]*len(lst_workflowName)})
 
         lst_df_annot_rows = list(map(extract_invoke_info, lst_invokes))
 
         temp_df_annotation = pd.concat(lst_df_annot_rows, ignore_index=True)
     else:
-        temp_df_annotation = pd.DataFrame(columns=['workflowName', 'invokedBy', 'mainLocation', 'annotated', 'annotation'])
+        temp_df_annotation = pd.DataFrame(columns=['workflowName', 'invokedBy', 'mainFolder', 'annotated', 'annotation'])
 
     # selector
     lst_selectors = lst_acts.copy()

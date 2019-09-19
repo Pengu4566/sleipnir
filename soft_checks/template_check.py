@@ -4,7 +4,7 @@ def check_template(df_json, df_annotation, df_activity, df_json_exp):
     # omit '_Test.xaml', 'Test_Framework/RunAllTests.xaml'
     df_json_dup = df_json.loc[:, ['index', 'mainFolder', 'subfiles', 'mainFile']]
     df_json_dup.subfiles = df_json_dup.apply(lambda x: [subfile.replace(x['mainFolder']+'/', '') for subfile in x['subfiles']], axis=1)
-    df_annotation_dup = df_annotation.loc[:, ['mainLocation', 'workflowName', 'invokedBy']]
+    df_annotation_dup = df_annotation.loc[:, ['mainFolder', 'workflowName', 'invokedBy']]
 
     qTempInvokingData = {'workflowName': ['Framework/InitAllSettings.xaml', 'Framework/Gen_KillProcessesOfUser.xaml',
                                                  'Framework/InitAllApplications.xaml', 'Framework/GetTransactionItem.xaml',
@@ -43,10 +43,11 @@ def check_template(df_json, df_annotation, df_activity, df_json_exp):
     # df_nrTempInvoking.to_csv('./nrTempInvoke.csv')
 
     if len(df_annotation_dup) > 0:
+
         df_annotation_dup.workflowName = df_annotation_dup.apply(lambda x: x['workflowName']
-                                                                 .replace(x['mainLocation']+'/', ''), axis=1)
+                                                                 .replace(x['mainFolder']+'/', ''), axis=1)
         df_annotation_dup.invokedBy = df_annotation_dup.apply(lambda x: x['invokedBy']
-                                                              .replace(x['mainLocation']+'/', ''), axis=1)
+                                                              .replace(x['mainFolder']+'/', ''), axis=1)
         df_temp_invoking_check = pd.merge(df_annotation_dup, df_qTempInvoking, on=['workflowName', 'invokedBy'],
                                           how='left', indicator='qTempInvoke')
 
@@ -68,21 +69,19 @@ def check_template(df_json, df_annotation, df_activity, df_json_exp):
 
         # df = df_temp_invoking_check.loc[:, ['workflowName', 'invokedBy', 'qTempInvoke', 'nqTempInvoke', 'nrTempInvoke']]
         # df.to_csv('./test.csv')
-        df_match_invoke_byProject = df_temp_invoking_check.groupby('mainLocation')[
+        df_match_invoke_byProject = df_temp_invoking_check.groupby('mainFolder')[
             'qTempInvoke', 'nqTempInvoke', 'nrTempInvoke'].sum().reset_index(drop=False)
         df_match_invoke_byProject.qTempInvoke = df_match_invoke_byProject.qTempInvoke == len(df_qTempInvoking)
         df_match_invoke_byProject.nqTempInvoke = df_match_invoke_byProject.nqTempInvoke == len(df_nqTempInvoking)
         df_match_invoke_byProject.nrTempInvoke = df_match_invoke_byProject.nrTempInvoke == len(df_nrTempInvoking)
-        df_json_dup = pd.merge(df_json_dup, df_match_invoke_byProject, left_on=['mainFolder'],
-                               right_on=['mainLocation'], how='left')
+        df_json_dup = pd.merge(df_json_dup, df_match_invoke_byProject, on=['mainFolder'], how='left')
         # df_json_dup.to_csv("./test2.csv")
     else:
-        df_match_invoke_byProject = df_annotation_dup.copy().loc[:,["mainLocation"]]
+        df_match_invoke_byProject = df_annotation_dup.copy().loc[:,["mainFolder"]]
         df_match_invoke_byProject["qTempInvoke"] = False
         df_match_invoke_byProject["nqTempInvoke"] = False
         df_match_invoke_byProject["nrTempInvoke"] = False
-        df_json_dup = pd.merge(df_json_dup, df_match_invoke_byProject, left_on=['mainFolder'],
-                               right_on=['mainLocation'], how='left')
+        df_json_dup = pd.merge(df_json_dup, df_match_invoke_byProject, on=['mainFolder'], how='left')
 
     df_activity_dup = df_activity.loc[:, ['activityType', 'filePath']]
     df_json_dup['StateMachine'] = df_json_dup.apply(lambda x: 'StateMachine' in list(df_activity_dup[df_activity_dup['filePath']==x['mainFile']].activityType), axis=1)
@@ -100,25 +99,25 @@ def check_template(df_json, df_annotation, df_activity, df_json_exp):
     def template_comment(df_row):
         if all([df_row['Dispatcher'], not df_row['Performer']]):
             if any([df_row['qTempInvoke'], df_row['nqTempInvoke'], df_row['nrTempInvoke']]):
-                return "Dispatcher using New's template."
+                return "Dispatcher using AKOA template."
             elif df_row['StateMachine']:
-                return "Dispatcher not using New's template, but using State Machine."
+                return "Dispatcher not using AKOA template, but using State Machine."
             else:
-                return "Dispatcher using neither New's template nor State Machine."
+                return "Dispatcher using neither AKOA template nor State Machine."
         elif all([df_row['Performer'], not df_row['Dispatcher']]):
             if any([df_row['qTempInvoke'], df_row['nqTempInvoke'], df_row['nrTempInvoke']]):
-                return "Performer using New'se tmplate."
+                return "Performer using AKOA template."
             elif df_row['StateMachine']:
-                return "Performer not using New's template, but using State Machine."
+                return "Performer not using AKOA template, but using State Machine."
             else:
-                return "Performer using neither New's template nor State Machine."
+                return "Performer using neither AKOA template nor State Machine."
         elif all([df_row['Performer'], df_row['Dispatcher']]):
             if any([df_row['qTempInvoke'], df_row['nqTempInvoke'], df_row['nrTempInvoke']]):
-                return "Bridge performer using New's template."
+                return "Bridge performer using AKOA template."
             elif df_row['StateMachine']:
-                return "Bridge performer not using New's template, but using State Machine."
+                return "Bridge performer not using AKOA template, but using State Machine."
             else:
-                return "Bridge performer using neither New's template nor State Machine."
+                return "Bridge performer using neither AKOA template nor State Machine."
         else:
             return "Neither dispatcher nor performer."
 

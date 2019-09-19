@@ -14,44 +14,50 @@ import xml.etree.ElementTree as ET
 
 
 # 2. Log messages in catches
-def grade_log_message_in_catches(df_catches, fileLocationStr):
+def grade_log_message_in_catches(df_catches):
     # columns=['Catch Id', 'Screenshot Included', 'filePath', 'Log Message Included']
     df_catches_dup = df_catches.loc[:, :]
-    df_catches_dup.filePath = df_catches_dup.filePath.str.replace(fileLocationStr,'')
     numCatch = len(df_catches_dup['Log Message Included'])
     if numCatch > 0:
         # checks if try/catch activities have log messages within them
         logMessageScore = df_catches_dup['Log Message Included'].sum() / numCatch * 100
         if df_catches_dup['Log Message Included'].sum() < numCatch:
-            noLMException = list(df_catches_dup[df_catches_dup['Log Message Included'] == False].dropna()
-                                 .reset_index(drop=True).reset_index()
-                                 .loc[:, ['index', 'Catch Id', 'filePath']].T.to_dict().values())
+            df_catches_dup['type'] = "Error Logging"
+            df_catches_dup['error'] = "No log message used in catch block"
+            df_catches_dup.rename(columns={'Catch Id': 'name', 'filePath': 'file', 'projectId': 'project'},
+                                  inplace=True)
+            df_catches_dup['file'] = df_catches_dup.apply(lambda x: x['file'].replace(x['mainFolder'], ""), axis=1)
+            noLMException = df_catches_dup[df_catches_dup['Log Message Included'] == False].dropna()\
+                                .loc[:, ['name', 'file', 'type', 'error', 'project']]
         else:
-            noLMException = []
+            noLMException = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
 
     else:
-        [logMessageScore, noLMException] = [0, ["There is no catch in your project."]]
+        [logMessageScore, noLMException] = [0, pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])]
 
     return [logMessageScore, noLMException]
 # end 2. Log messages in catches
 
 # 3. Screenshot in catches
-def grade_screenshot_in_catches(df_catches, fileLocationStr):
+def grade_screenshot_in_catches(df_catches):
     df_catches_dup = df_catches.loc[:, :]
-    df_catches_dup.filePath = df_catches_dup.filePath.str.replace(fileLocationStr,'')
     numCatch = len(df_catches_dup['Screenshot Included'])
     if numCatch > 0:
         # checks if try/catch activities have screenshots within them
         screenshotScore = df_catches_dup['Screenshot Included'].sum() / numCatch * 100
         if df_catches_dup['Screenshot Included'].sum() < numCatch:
-            noSsException = list(df_catches[df_catches['Screenshot Included'] == False].dropna()
-                                 .reset_index(drop=True).reset_index()
-                                 .loc[:, ['index', 'Catch Id', 'filePath']].T.to_dict().values())
+            df_catches_dup['type'] = "Error Logging"
+            df_catches_dup['error'] = "No screen shot used in catch block"
+            df_catches_dup.rename(columns={'Catch Id': 'name', 'filePath': 'file', 'projectId': 'project'},
+                                  inplace=True)
+            df_catches_dup['file'] = df_catches_dup.apply(lambda x: x['file'].replace(x['mainFolder'], ""), axis=1)
+            noSsException = df_catches[df_catches['Screenshot Included'] == False].dropna()\
+                                .loc[:, ['name', 'file', 'type', 'error', 'project']]
         else:
-            noSsException = []
+            noSsException = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
 
     else:
-        [screenshotScore, noSsException] = [0, ["There is no catch in your project."]]
+        [screenshotScore, noSsException] = [0, pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])]
 
     return [screenshotScore, noSsException]
 # end 3. Screenshot in catches
@@ -90,7 +96,7 @@ def grade_project_json_name_desc(folderPath):
             json_name_score = 100
         else:
             json_name_score = 0
-        project_detail = {'projectName':project_name, 'projectDescription': project_description}
+        project_detail = {'projectName': project_name, 'projectDescription': project_description}
         row = pd.DataFrame.from_dict({'fileLocation': [fileLocation],
                                       'projectDetail': [project_detail],
                                       'mainFolder': [fileLocation[:-(len(fileName))]],
@@ -115,11 +121,16 @@ def grade_project_json_name_desc(folderPath):
 # end 4. Project.json (name and description)
 
 # 5. Annotations in invoked workflow
-def grade_annotation_in_workflow(df_annotation, fileLocationStr, df_argument):
-    # columns=['workflowName', 'invokedBy', 'mainLocation', 'annotated', 'annotation']
+def grade_annotation_in_workflow(df_annotation, df_argument):
     df_annotation_dup = df_annotation.copy()
-    if len(df_annotation_dup['workflowName']) > 0:
-        df_annotation_dup['fileExists'] = df_annotation_dup.apply(lambda x: os.path.exists(x['workflowName']), axis=1)
+    df_join_arg_annot = pd.merge(df_argument.copy().loc[:, ['argumentName', 'filePath', 'projectId']],
+                                 df_annotation_dup.loc[:, ['workflowName', 'invokedBy', 'annotation', 'mainFolder']],
+                                 left_on='filePath', right_on='workflowName', how='inner').drop_duplicates(inplace=False)
+    df_join_arg_annot.annotation.fillna('')
+
+    # columns=['workflowName', 'invokedBy', 'mainLocation', 'annotated', 'annotation']
+    if len(df_join_arg_annot['workflowName']) > 0:
+        df_join_arg_annot['fileExists'] = df_join_arg_annot.apply(lambda x: os.path.exists(x['workflowName']), axis=1)
         def extract_annot(df_row):
             wfPath = df_row['workflowName']
             try:
@@ -138,23 +149,29 @@ def grade_annotation_in_workflow(df_annotation, fileLocationStr, df_argument):
                 annot_text = 'Cannot find file'
             return annot_text
 
-        df_annotation_dup['annotation'] = df_annotation_dup.apply(extract_annot, axis=1)
-        df_annotation_dup['annotated'] = (df_annotation_dup['annotation'] != '')
-
-        numWf = len(df_annotation_dup.workflowName)
+        df_join_arg_annot['annotation'] = df_join_arg_annot.apply(extract_annot, axis=1)
+        df_join_arg_annot['annotated'] = (df_join_arg_annot['annotation'] != '')
+        numWf = len(df_join_arg_annot.workflowName)
         if numWf > 0:
-            df_annotation_dup.workflowName = df_annotation_dup.workflowName.str.replace(fileLocationStr,'')
-            notAnnotatedWf = list(df_annotation_dup[df_annotation_dup.annotated == 0].dropna()
-                                  .reset_index(drop=True).reset_index()
-                                  .loc[:, ['index', 'workflowName']].T.to_dict().values())
+            df_join_arg_annot.rename(columns={'workflowName': 'name', 'invokedBy': 'file', 'projectId': 'project'},
+                                     inplace=True)
+            df_join_arg_annot['type'] = "Workflow Annotation"
+            df_join_arg_annot['error'] = "Invoked but not annotated"
+            df_join_arg_annot['file'] = df_join_arg_annot.apply(lambda x: x['file'].replace(x['mainFolder'], ""),
+                                                                axis=1)
+            df_join_arg_annot['name'] = df_join_arg_annot.apply(lambda x: x['name'].replace(x['mainFolder'], ""),
+                                                                axis=1)
+            df_join_arg_annot_dup = df_join_arg_annot.loc[:, ['name', 'file', 'type', 'error', 'project', 'annotated']]\
+                .drop_duplicates(inplace=False)
+            notAnnotatedWf = df_join_arg_annot_dup[df_join_arg_annot_dup.annotated == 0].dropna()\
+                                 .loc[:, ['name', 'file', 'type', 'error', 'project']]
             wfAnnotationScore = 100 - (len(notAnnotatedWf) / numWf * 100)
     else:
-        [wfAnnotationScore, notAnnotatedWf] = [0, ["There is no invoked workflow in your project."]]
+        [wfAnnotationScore, notAnnotatedWf] = [0, pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])]
 
     # 6.Arguments should be at least mentioned in annotation
-    if len(df_argument['filePath']) > 0:
-        df_join_arg_annot = pd.merge(df_argument.copy().loc[:, ['argumentName', 'filePath']], df_annotation_dup.loc[:, ['workflowName', 'annotation']], left_on='filePath', right_on='workflowName', how='left').drop_duplicates(inplace=False)
-        df_join_arg_annot.annotation.fillna('')
+    if len(df_join_arg_annot['filePath']) > 0:
+
         def arginAnnot(df_join_row):
             if df_join_row['annotation'] == '':
                 return False
@@ -162,18 +179,17 @@ def grade_annotation_in_workflow(df_annotation, fileLocationStr, df_argument):
                 return str(df_join_row['argumentName']) in str(df_join_row['annotation'])
         df_join_arg_annot['arginAnnot'] = df_join_arg_annot.apply(arginAnnot, axis=1)
         if len(df_join_arg_annot) > 0:
-            df_join_arg_annot.filePath = df_join_arg_annot.filePath.str.replace(fileLocationStr, '')
-            missing_arguments_list = list(df_join_arg_annot[df_join_arg_annot['arginAnnot'] == False]
-                                          .reset_index(drop=True).reset_index()
-                                          .loc[:, ['index', 'argumentName', 'filePath']].T.to_dict().values())
-        AnnotationArgumentScore = len(missing_arguments_list) / len(df_join_arg_annot) if len(
-            df_join_arg_annot) > 0 else 0
+            df_join_arg_annot['type'] = "Argument in Annotation"
+            df_join_arg_annot['error'] = "Argument is not mentioned in annotation"
+            missing_arguments = df_join_arg_annot[df_join_arg_annot['arginAnnot'] == False]\
+                                         .loc[:, ['name', 'file', 'type', 'error', 'project']]
+        AnnotationArgumentScore = len(missing_arguments) / len(df_join_arg_annot) if len(df_join_arg_annot) > 0 else 0
     else:
-        missing_arguments_list = ["There is no argument in this project."]
+        missing_arguments = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
         AnnotationArgumentScore = 0
 
 
-    return [wfAnnotationScore, notAnnotatedWf, AnnotationArgumentScore, missing_arguments_list]
+    return [wfAnnotationScore, notAnnotatedWf, AnnotationArgumentScore, missing_arguments]
 # end 5. Annotations in invoked workflow
 # end 6.Arguments should be at least mentioned in annotation
 

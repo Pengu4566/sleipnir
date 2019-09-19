@@ -14,10 +14,10 @@ def generate_gexf(df_annotation, fileLocationStr):
         df_invokeWf = df_annotation_dup.loc[:, ['workflowName', 'invokedBy']].drop_duplicates()
         #combine source and target with no dupes
         df_node_list = list(pd.concat([df_invokeWf.loc[:, 'invokedBy'], df_invokeWf.loc[:, 'workflowName']], ignore_index= True).drop_duplicates())
+        df_node_list_wl = [(node, {'label': node.split("/")[-1].replace(".xaml", "")}) for node in df_node_list]
         # translate workflow calls to a path graph
-        # df_invokeWf.to_csv(path_or_buf="template_invoking_structure.csv", index=False, header=True)
         G = nx.DiGraph();
-        G.add_nodes_from(df_node_list)
+        G.add_nodes_from(df_node_list_wl)
 
         for index, row in df_invokeWf.iterrows():
             G.add_edge(row['invokedBy'], row['workflowName'])

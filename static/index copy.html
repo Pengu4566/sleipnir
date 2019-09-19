@@ -24,7 +24,7 @@
               <div class="row justify-content-lg-center mt-2">
                     <div class="col-lg-12">
                           <div class="main_div shadow-sm">
-                                <div class="d-flex header" style="background: linear-gradient(to top, rgb(233,97,111) 10%, rgb(243,165,130) 95%)">
+                                <div class="d-flex header">
                                     <div class="d-flex align-self-center"><span class="ml-4 header_text">Please review your results</span></div>
                                 </div>
                                 <div class="content">
@@ -35,7 +35,7 @@
                                                 Score
                                               </span>
                                                 <span class="heading-2 d-block"></span>
-                                                <span class="heading-2 d-block">Below diagram shows your score.</span>
+                                                <span class="heading-2 d-block">Some text about graph goes here</span>
                                                 <div class="graph mt-4" id="radarChart" style="vertical-align: middle; background-color: white;"></div>
                                                 <script src="dist/radarChart.js" type="text/javascript"></script>
                                             </div>
@@ -46,7 +46,7 @@
                                             <span class="heading-1 d-block">
                                               Workflow Invocation Network
                                             </span>
-                                              <span class="heading-2 d-block">The below diagram show how workflows invoke each other. Scroll up or down to zoom.</span>
+                                              <span class="heading-2 d-block">Some text about graph goes here</span>
                                               <div class="graph mt-4" id="projectStructure" style="background-color: white;">
 
                                               </div>
@@ -86,13 +86,14 @@
                                     </div>
                                 </div>
 
-                                <div class="content" style="display: none;">
+                                <div class="content">
                                     <div class="row justify-content-lg-left">
                                         <div class="col-lg-12">
                                             <div class="ml-4 mt-4 mb-4">
                                               <span class="heading-1 d-block">
-                                                Project Compliance Backlog
+                                                Table with results
                                               </span>
+                                                <span class="heading-2 mb-3 d-block">Some text about filters goes here</span>
                                                   <div class="form-group has-search d-inline-block" style="width:185px;">
                                                     <span class="fa fa-search form-control-feedback"></span>
                                                     <input type="text" class="form-control input-custom" placeholder="Search">
@@ -152,9 +153,7 @@
                                     <div class="row">
                                         <div class="col-lg-12">
                                             <div class="ml-4 mt-4 mb-4">
-                                                <span class="heading-1 d-block">
-                                                    Table with results
-                                                </span>
+                                                <span class="heading-2 mb-3 d-block">Some text about table goes here</span>
                                             </div>
                                             <div class="col-lg-12">
                                                 <div id="table1"></div>
@@ -169,7 +168,7 @@
                                       <div class="col-lg-12">
                                           <div class="ml-4 mt-4 mb-4">
                                               <span class="heading-1 d-block">Selectors Overview</span>
-                                              <span class="heading-2 mb-3 d-block">Here is an list of all selectors.</span>
+                                              <span class="heading-2 mb-3 d-block">Some text about table goes here</span>
                                           </div>
                                           <div class="col-lg-12">
                                               <div id="selectorTable"></div>
@@ -182,15 +181,15 @@
 
                                 <div class="content">
                                   <div class="row">
-                                      <div class="col-lg-12">
+                                      <div class="col-lg-8">
                                         <div class="ml-4 mt-4 mb-4">
                                           <span class="heading-1 d-block">Activity Statistics</span>
-                                          <span class="heading-2 mb-3 d-block">Here is a summary of how many times each activities is used in the uploaded files. </span>
+                                          <span class="heading-2 mb-3 d-block">Some text about table goes here</span>
                                         </div>
                                         <div class="col-lg-12" id="actStatsTable"></div>
                                         <script>window.actStats = JSON.parse('{{actStats|tojson|safe}}');</script>
                                       </div>
-                                      <!-- <div class="col-lg-4" id="actStatsChecks"></div> -->
+                                      <div class="col-lg-4" id="actStatsChecks"></div>
                                   </div>
                                 </div>
 
@@ -201,7 +200,7 @@
                                     <span class="heading-1 d-block">
                                       Project File Structure
                                     </span>
-                                    <span class="heading-2 mb-3 d-block">Below diagram shows the folder structure of the uploaded project. Drill down by clicking on any of the folder. Drill up by click on the middle circle.</span>
+                                    <span class="heading-2 mb-3 d-block">Some text about table goes here</span>
                                   </div>
                                   <div id="folderStructure" style="height: 1000px; background-color: white;"></div>
                                   <script src="dist/folderStructure.js" type="text/javascript"></script>

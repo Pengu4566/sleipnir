@@ -227,9 +227,23 @@ body {
   padding-left: 15px;
 
   padding-bottom: 10px;
-  height: 227px;
+  height: 500px;
 }
 
 .form-check {
   margin-bottom: 4px;
+}
+
+/* .ReactTable .rt-table .rt-thead.-header {
+  background: linear-gradient(
+
+  );
+} */
+
+.ReactTable .rt-tr-group:hover {
+  background-image: linear-gradient(
+    to top,
+    rgb(243, 165, 130),
+    rgba(7, 3, 3, 0)
+  );
 }

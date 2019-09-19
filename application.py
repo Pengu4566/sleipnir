@@ -196,30 +196,20 @@ def processing():
 
     df_variable = pd.merge(pd.concat([x[0] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False),
                            df_json_exp, how="left", on="filePath")
-    df_variable["filePath"] = df_variable.apply(lambda x: x["filePath"].replace(x["mainFolder"], ""), axis=1)
-    df_variable.drop(columns=['mainFolder'], inplace=True)
 
     df_argument = pd.merge(pd.concat([x[1] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False),
                            df_json_exp, how="left", on="filePath")
-    df_argument["filePath"] = df_argument.apply(lambda x: x["filePath"].replace(x["mainFolder"], ""), axis=1)
-    df_argument.drop(columns=['mainFolder'], inplace=True)
 
     df_catches = pd.merge(pd.concat([x[2] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False),
                           df_json_exp, how="left", on="filePath")
-    df_catches["filePath"] = df_catches.apply(lambda x: x["filePath"].replace(x["mainFolder"], ""), axis=1)
-    df_catches.drop(columns=['mainFolder'], inplace=True)
 
     df_activity = pd.merge(pd.concat([x[3] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False),
                            df_json_exp, how="left", on="filePath")
-    df_activity["filePath"] = df_activity.apply(lambda x: x["filePath"].replace(x["mainFolder"], ""), axis=1)
-    df_activity.drop(columns=['mainFolder'], inplace=True)
 
     df_annotation = pd.concat([x[4] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False)
 
     df_selector = pd.merge(pd.concat([x[5] for x in lst_sub_df], ignore_index=True).drop_duplicates(inplace=False),
                            df_json_exp, how="left", on="filePath")
-    df_selector["filePath"] = df_selector.apply(lambda x: x["filePath"].replace(x["mainFolder"], ""), axis=1)
-    df_selector.drop(columns=['mainFolder'], inplace=True)
 
     dict_score = {}
     # level 1: grading checks
@@ -232,7 +222,7 @@ def processing():
             [variableNamingScore, improperNamedVariable] = naming.grade_variable_name(df_variable=df_variable)
             improperNamedVar = improperNamedVariable
         else:
-            improperNamedVar = []
+            improperNamedVar = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
             variableNamingScore = "[Not evaluated]"
 
         # level 3: argument naming
@@ -240,7 +230,7 @@ def processing():
             [argumentNamingScore, improperNamedArguments] = naming.grade_argument_name(df_argument=df_argument)
             improperNamedArg = improperNamedArguments
         else:
-            improperNamedArg = []
+            improperNamedArg = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
             argumentNamingScore = "[Not evaluated]"
 
         # level 3: activity naming
@@ -248,7 +238,7 @@ def processing():
             [activityNamingScore, improperNamedActivities] = naming.grade_activity_name(df_activity=df_activity)
             improperNamedAct = improperNamedActivities
         else:
-            improperNamedAct = []
+            improperNamedAct = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
             activityNamingScore = "[Not evaluated]"
 
         lt_namingScore = [variableNamingScore, argumentNamingScore, activityNamingScore]
@@ -261,9 +251,9 @@ def processing():
         namingScore = int(namingScore / count)
 
     else:
-        improperNamedVar = ['Not evaluated']
-        improperNamedArg = ['Not evaluated']
-        improperNamedAct = ['Not evaluated']
+        improperNamedVar = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
+        improperNamedArg = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
+        improperNamedAct = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
         namingScore = "[Not evaluated]"
 
     dict_score['naming'] = namingScore
@@ -273,20 +263,18 @@ def processing():
     if True:
         # level 3: variable usage
         if session['varUsage']:
-            [variableUsageScore, unusedVariable] = usage.grade_variable_usage(df_variable=df_variable,
-                                                                              fileLocationStr=fileLocationStr)
+            [variableUsageScore, unusedVariable] = usage.grade_variable_usage(df_variable=df_variable)
             unusedVar = unusedVariable
         else:
-            unusedVar = ['Not evaluated']
+            unusedVar = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
             variableUsageScore = "[Not evaluated]"
 
         # level 3: argument usage
         if session['argUsage']:
-            [argumentUsageScore, unusedArgument] = usage.grade_argument_usage(df_argument=df_argument,
-                                                                              fileLocationStr=fileLocationStr)
+            [argumentUsageScore, unusedArgument] = usage.grade_argument_usage(df_argument=df_argument)
             unusedArgument = unusedArgument
         else:
-            unusedArgument = ['Not evaluated']
+            unusedArgument = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
             argumentUsageScore = "[Not evaluated]"
 
         # level 2: usage score
@@ -300,8 +288,8 @@ def processing():
         usageScore = int(usageScore / count)
 
     else:
-        unusedVar = ['Not evaluated']
-        unusedArgument = ['Not evaluated']
+        unusedVar = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
+        unusedArgument = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
         usageScore = "[Not evaluated]"
 
     dict_score['usage'] = usageScore
@@ -311,40 +299,37 @@ def processing():
     if True:
         # level 3: log message in catches
         if session['tcLog']:
-            [logMessageScore, noLMException] = documentation_logging.grade_log_message_in_catches(
-                df_catches=df_catches, fileLocationStr=fileLocationStr)
+            [logMessageScore, noLMException] = documentation_logging.grade_log_message_in_catches(df_catches=df_catches)
 
             noLMExp = noLMException
         else:
             logMessageScore = "[Not evaluated]"
-            noLMExp = ['Not evaluated']
+            noLMExp = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
 
         # level 3: screenshot in catches
         if session['tcSs']:
-            [screenshotScore, noSsException] = documentation_logging.grade_screenshot_in_catches(
-                df_catches=df_catches, fileLocationStr=fileLocationStr)
+            [screenshotScore, noSsException] = documentation_logging.grade_screenshot_in_catches(df_catches=df_catches)
             noSsExp = noSsException
         else:
             screenshotScore = "[Not evaluated]"
-            noSsExp = ['Not evaluated']
+            noSsExp = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
 
         # level 3: workflow annotation
-        [wfAnnotationScore, notAnnotatedWf, AnnotationArgumentScore, missing_arguments_list] =\
+        [wfAnnotationScore, notAnnotatedWf, AnnotationArgumentScore, missing_arguments] =\
             documentation_logging.grade_annotation_in_workflow(df_annotation=df_annotation,
-                                                               fileLocationStr=fileLocationStr,
                                                                df_argument=df_argument)
         if session['wfAnnot']:
             notAnnotWf = notAnnotatedWf
         else:
             wfAnnotationScore = "[Not evaluated]"
-            notAnnotWf = ['Not evaluated']
+            notAnnotWf = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
 
         # level 3: Arguments should be at least mentioned in annotation
         # outputs a percentage score of the number of correct arguments and a list of missing arguments
         if session['arginAnnot']:
-            missing_arguments_list = missing_arguments_list
+            missing_arguments = missing_arguments
         else:
-            missing_arguments_list = ['Not evaluated']
+            missing_arguments = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
             AnnotationArgumentScore = "[Not evaluated]"
 
         # level 3: Comments
@@ -362,10 +347,10 @@ def processing():
         docScore = int(docScore / count)
 
     else:
-        noSsExp = ['Not evaluated']
-        notAnnotWf = ['Not evaluated']
-        noLMExp = ['Not evaluated']
-        missing_arguments_list = ['Not evaluated']
+        noSsExp = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
+        notAnnotWf = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
+        noLMExp = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
+        missing_arguments = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
         project_detail = ['Not evaluated']
         docScore = "[Not evaluated]"
 
@@ -383,9 +368,10 @@ def processing():
 
     # level 1: soft checks
     # level 2: activity stats
-    activityStats = activity_stats.get_activity_stats(df_activity=df_activity, fileLocationStr=fileLocationStr,
-                                                      df_json_exp=df_json_exp)
+
+    activityStats = activity_stats.get_activity_stats(df_activity=df_activity)
     # level 2: folder structure
+
     folderStructure = project_folder_structure.list_files(fileLocationStr=fileLocationStr)
     # level 2: project structure
     gexf = project_structure.generate_gexf(df_annotation=df_annotation, fileLocationStr=fileLocationStr)
@@ -397,25 +383,33 @@ def processing():
         project['templateComment'] = df_templateComment[df_templateComment['index'] == project['index']].template_comment.values[0]
 
     #level 2: check selectors
-    lst_selector_data = selector_check.selector_check(df_selector=df_selector, fileLocationStr=fileLocationStr,
-                                                     df_json_exp=df_json_exp)
+    lst_selector_data = selector_check.selector_check(df_selector=df_selector)
 
     # pass along the variables
+    df_table1 = pd.concat([improperNamedVar, unusedVar, improperNamedArg, unusedArgument,
+                           improperNamedAct, noSsExp, noLMExp,
+                           notAnnotWf, missing_arguments], ignore_index=True)
+    table1File = list(df_table1.file.drop_duplicates(inplace=False))
+    table1Type = list(df_table1.type.drop_duplicates(inplace=False))
+    table1Error = list(df_table1['error'].drop_duplicates(inplace=False))
+    table1Project = list(df_table1.project.drop_duplicates(inplace=False))
+
     session['namingScore'] = namingScore
     session['usageScore'] = usageScore
     session['docScore'] = docScore
-    session['improperNamedVar'] = improperNamedVar
-    session['unusedVar'] = unusedVar
-    session['improperNamedArg'] = improperNamedArg
-    session['improperNamedAct'] = improperNamedAct
+    session['table1'] = list(df_table1.reset_index(drop=True).reset_index(drop=False).T.to_dict().values())
+    session['table1File'] = table1File
+    session['table1Type'] = table1Type
+    session['table1Error'] = table1Error
+    session['table1Project'] = table1Project
+    session['fileList'] = list(pd.concat([improperNamedVar, unusedVar, improperNamedArg, unusedArgument,
+                                   improperNamedAct, noSsExp, noLMExp,
+                                   notAnnotWf, missing_arguments], ignore_index=True).file
+                               .drop_duplicates(inplace=False).reset_index(drop=True).reset_index(drop=False)
+                               .T.to_dict().values())
     session['activityStats'] = activityStats
-    session['noSsExp'] = noSsExp
-    session['notAnnotWf'] = notAnnotWf
-    session['noLMExp'] = noLMExp
     session['project_detail'] = project_detail
-    session['missing_arguments_list'] = missing_arguments_list
     session['folderStructure'] = folderStructure
-    session['unusedArgument'] = unusedArgument
     session['gexf'] = gexf
     session['selector'] = lst_selector_data
 
@@ -435,19 +429,13 @@ def __main__():
                                namingScore=session.get("namingScore"),
                                usageScore=session.get("usageScore"),
                                docScore=session.get("docScore"),
-                               improperNamedVar={"data": session.get("improperNamedVar")},
-                               unusedVar={"data": session.get("unusedVar")},
-                               improperNamedArg={"data": session.get("improperNamedArg")},
-                               improperNamedAct={"data": session.get("improperNamedAct")},
-                               activityStats={"data": session.get("activityStats")},
-                               noSsExp={"data": session.get("noSsExp")},
-                               notAnnotWf={"data": session.get("notAnnotWf")},
-                               noLMExp={"data": session.get("noLMExp")},
-                               project_detail={"data": session.get("project_detail")},
-                               missing_arguments_list={"data": session.get("missing_arguments_list")},
-                               folderStructure=session.get("folderStructure"),
-                               unusedArgument={"data": session.get("unusedArgument")},
-                               selectorEval={"data": session.get('selector')})
+                               table1={'data': session.get("table1"), 'file': session.get('table1File'),
+                                       'type': session.get('table1Type'), 'error': session.get('table1Error'),
+                                       'project': session.get('table1Project')},
+                               actStats={'data': session.get('activityStats'),
+                                         'file': session.get('fileList')},
+                               project_detail={'data': session.get("project_detail")},
+                               selectorEval={'data': session.get('selector')})
 
 
 @app.route("/retry")
@@ -496,6 +484,12 @@ def radar_plot_data():
 @app.route("/structure", methods=['GET'])
 def project_structure_data():
     message = {'gexf': session.get("gexf")}
+    return jsonify(message)
+
+
+@app.route("/folder", methods=['GET'])
+def folder_graph():
+    message = session.get("folderStructure")
     return jsonify(message)
 
 

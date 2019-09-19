@@ -15,7 +15,6 @@ $(document).ready(function() {
       parsedData = JSON.parse(text);
       if (parsedData["gexf"] != null) {
         myChart.hideLoading();
-        // console.log(parsedData["gexf"]);
         var graph = echarts.dataTool.gexf.parse(parsedData["gexf"]);
 
         //var graph = echarts.dataTool.gexf.parse(xml);
@@ -40,7 +39,16 @@ $(document).ready(function() {
             top: "top",
             left: "center"
           },
-          tooltip: {},
+          tooltip: {
+            show: true,
+            formatter: function(params) {
+              if (params.data.source != null) {
+                return `<div>${params.data.source} invokes ${params.data.target}</div>`;
+              } else {
+                return params.data.id;
+              }
+            }
+          },
           legend: [
             {
               // selectedMode: 'single',
@@ -59,7 +67,7 @@ $(document).ready(function() {
               data: graph.nodes,
               itemStyle: {
                 normal: {
-                  color: "blue"
+                  color: "rgb(233,97,111)"
                 }
               },
               links: graph.links,
@@ -72,7 +80,7 @@ $(document).ready(function() {
                 normal: {
                   position: "right",
                   show: "true",
-                  color: "grey"
+                  color: "black"
                 }
               },
               force: {
