@@ -175,12 +175,26 @@ def processing():
     df_json = documentation_logging.grade_project_json_name_desc(folderPath)
     df_json_exp = pd.DataFrame(df_json.subfiles.tolist(), index=df_json['index']).stack().reset_index()
     df_json_exp.columns = ['projectId', 'fileIndex', 'filePath']
-    df_json_exp = pd.merge(df_json_exp, df_json.loc[:, ["mainFolder"]].reset_index(), how="left",
+    lst_name = []
+    df_json['projectName'] = df_json.apply(lambda x: x['projectDetail']['projectName'], axis=1)
+    for name in list(df_json['projectName']):
+        if name not in lst_name:
+            lst_name.append(name)
+        else:
+            count = 2
+            dup_name = name + '_' + str(count)
+            while dup_name in lst_name:
+                count += 1
+                dup_name = name + '_' + str(count)
+            lst_name.append(dup_name)
+    df_json['projectName'] = lst_name
+    df_json_exp = pd.merge(df_json_exp, df_json.loc[:, ["mainFolder", 'projectName']].reset_index(), how="left",
                            left_on="projectId", right_on="index")
     df_json_exp.drop(columns=['fileIndex', "index"], inplace=True)
 
     if session.get('jsonLog'):
-        project_detail = list(df_json.copy().reset_index().loc[:, ['index', 'projectDetail']].T.to_dict().values())
+        project_detail = list(df_json.copy().reset_index().loc[:, ['index', 'projectDetail', 'projectName']]
+                              .T.to_dict().values())
         json_name_score = df_json.namingScore.sum() / len(df_json.namingScore)
         json_description_score = df_json.descriptionScore.sum() / len(df_json.descriptionScore)
     else:
@@ -389,10 +403,15 @@ def processing():
     df_table1 = pd.concat([improperNamedVar, unusedVar, improperNamedArg, unusedArgument,
                            improperNamedAct, noSsExp, noLMExp,
                            notAnnotWf, missing_arguments], ignore_index=True)
-    table1File = list(df_table1.file.drop_duplicates(inplace=False))
-    table1Type = list(df_table1.type.drop_duplicates(inplace=False))
-    table1Error = list(df_table1['error'].drop_duplicates(inplace=False))
-    table1Project = list(df_table1.project.drop_duplicates(inplace=False))
+
+    table1File = list(df_table1.loc[:, ['file']].drop_duplicates(inplace=False).sort_values('file').reset_index(drop=True)
+                      .reset_index(drop=False).T.to_dict().values())
+    table1Type = list(df_table1.loc[:, ['type']].drop_duplicates(inplace=False).sort_values('type').reset_index(drop=True)
+                      .reset_index(drop=False).T.to_dict().values())
+    table1Error = list(df_table1.loc[:, ['error']].drop_duplicates(inplace=False).sort_values('error')
+                       .reset_index(drop=True).reset_index(drop=False).T.to_dict().values())
+    table1Project = list(df_table1.loc[:, ['project']].drop_duplicates(inplace=False).sort_values('project')
+                         .reset_index(drop=True).reset_index(drop=False).T.to_dict().values())
 
     session['namingScore'] = namingScore
     session['usageScore'] = usageScore

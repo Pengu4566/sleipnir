@@ -144,6 +144,7 @@
                             <label class="btn btn-primary ml-3 mt-2 pt-2 pb-2 pl-3 pr-3">
                               <img class="upload_img" src="dist/cloud-computing.png"> <span class="btn_text pl-1">Choose File</span> <input type="file" name="file" id="file" hidden>
                              </label>
+                             <script></script>
                           </div>
                         </div>
 
@@ -155,23 +156,23 @@
                             </button>
                           </h5>
                           <div class="d-flex justify-content-center">
-                          <label id="uploadText" class="d-flex justify-content-center btn btn-primary pt-2 pb-2 pr-3" style="width: 95%;">
+                          <button id="uploadText" class="d-flex justify-content-center btn btn-primary pt-2 pb-2 pr-3" style="width: 95%;">
                             <input type="submit" value="Upload" class="submitBtn" hidden><span class="d-flex btn_text"><div id="Progress">Upload</div></span>
-                            <script type="text/javascript">
-                              $(document).ready(function () {
-                                  $("#fileUploadForm").submit(function () {
-                                      $(".submitBtn").attr("disabled", true);
-                                  });
+
+                          </button>
+                          <script type="text/javascript">
+                            $("#fileUploadForm").submit(function () {
+                              console.log("clicked");
+                                $("#uploadText").attr("disabled", true);
+                            });
+                            $(document).ready(function(){
+                              var socket = io({transports: ['websocket']});
+                              socket.on('progress', function(msg) {
+                                console.log(msg.data);
+                                $('#Progress').html('<p style="margin: 0%;">'+msg.data+'</p>');
                               });
-                              $(document).ready(function(){
-                                var socket = io({transports: ['websocket']});
-                                socket.on('progress', function(msg) {
-                                  console.log(msg.data);
-                                  $('#Progress').html('<p style="margin: 0%;">'+msg.data+'</p>');
-                                });
-                              });
-                            </script> 
-                          </label>
+                            });
+                          </script> 
                          </div>
                         </div>                     
                       </form>

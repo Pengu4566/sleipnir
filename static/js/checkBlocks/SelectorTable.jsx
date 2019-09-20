@@ -25,20 +25,21 @@ export default class SelectorTable extends React.Component {
       },
       {
         Header: "Project",
-        accessor: "projectId"
+        accessor: "projectName"
       }
     ];
     return (
       <ReactTable
         columns={columns}
         data={this.props.name.data}
+        defaultPageSize={10}
         filterable
         defaultFilterMethod={(filter, row) =>
           String(row[filter.id])
             .toLowerCase()
             .includes(filter.value.toLowerCase())
         }
-        defaultPageSize={10}
+        showFilters={false}
         showPageSizeOptions={false}
       />
     );

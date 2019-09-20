@@ -8,10 +8,10 @@ import "react-table/react-table.css";
 
 export default class Table1ContentHTML extends React.Component {
   render() {
-    if (this.props.name.data == []) {
+    if (this.props.name == []) {
       return;
     } else {
-      var data = this.props.name.data;
+      var data = this.props.name;
 
       const columns = [
         {
@@ -46,14 +46,15 @@ export default class Table1ContentHTML extends React.Component {
         <ReactTable
           className="table table_fixed ml-2 mr-2"
           columns={columns}
-          data={this.props.name.data}
+          data={this.props.name}
+          defaultPageSize={10}
           filterable
           defaultFilterMethod={(filter, row) =>
             String(row[filter.id])
               .toLowerCase()
               .includes(filter.value.toLowerCase())
           }
-          defaultPageSize={10}
+          showFilters={false}
           showPageSizeOptions={false}
         />
       );

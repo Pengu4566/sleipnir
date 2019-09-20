@@ -8,11 +8,12 @@ export default class JsonLogBlock extends React.Component {
       {
         Header: "Project ID",
         accessor: "index",
-        id: "index"
+        id: "index",
+        show: false
       },
       {
         Header: "Project Name",
-        accessor: "projectDetail.projectName"
+        accessor: "projectName"
       },
       {
         Header: "Project Description",

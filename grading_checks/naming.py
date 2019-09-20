@@ -72,8 +72,8 @@ def grade_variable_name(df_variable):
         df_variable_dup['properNamed'] = df_variable_dup.apply(lambda x: True if len(x["error"]) == 0 else False,
                                                                axis=1)
         df_variable_dup['type'] = "Variable Naming"
-        df_variable_dup.rename(columns={'variableName': 'name', 'filePath': 'file', 'projectId': 'project'}, inplace=True)
-        df_variable_dup['file'] = df_variable_dup.apply(lambda x: x['file'].replace(x['mainFolder'], ""), axis=1)
+        df_variable_dup.rename(columns={'variableName': 'name', 'filePath': 'file', 'projectName': 'project'}, inplace=True)
+        df_variable_dup['file'] = df_variable_dup.apply(lambda x: x['file'].replace(str(x['mainFolder']), ""), axis=1)
         # return lists
         improperNamedVariable = df_variable_dup.loc[df_variable_dup.properNamed == False].dropna()\
                                     .loc[:, ['name', 'file', 'type', 'error', 'project']]
@@ -142,9 +142,9 @@ def grade_argument_name(df_argument):
         # return lists
         argumentNamingScore = df_argument_dup.properNamed.sum() / numArgument
         df_argument_dup['type'] = "Argument Naming"
-        df_argument_dup.rename(columns={'argumentName': 'name', 'filePath': 'file', 'projectId': 'project'},
+        df_argument_dup.rename(columns={'argumentName': 'name', 'filePath': 'file', 'projectName': 'project'},
                                inplace=True)
-        df_argument_dup['file'] = df_argument_dup.apply(lambda x: x['file'].replace(x['mainFolder'], ""), axis=1)
+        df_argument_dup['file'] = df_argument_dup.apply(lambda x: x['file'].replace(str(x['mainFolder']), ""), axis=1)
         improperNamedArguments = df_argument_dup[df_argument_dup['properNamed'] == False].dropna()\
                                      .loc[:, ['name', 'file', 'type', 'error', 'project']]
     else:
@@ -164,11 +164,11 @@ def grade_activity_name(df_activity):
         df_activity_dup = df_activity.copy()
         # df_activity_dup.filePath = df_activity_dup.filePath.str.replace(fileLocationStr,'')
         activityNamingScore = df_activity_dup['customizedName'].sum() / len(df_activity_dup.customizedName) * 100
-        df_activity_dup.rename(columns={'activityName': 'name', 'filePath': 'file', 'projectId': 'project'},
+        df_activity_dup.rename(columns={'activityName': 'name', 'filePath': 'file', 'projectName': 'project'},
                                inplace=True)
         df_activity_dup['type'] = "Activity Naming"
         df_activity_dup['error'] = "Used activity default name"
-        df_activity_dup['file'] = df_activity_dup.apply(lambda x: x['file'].replace(x['mainFolder'], ""), axis=1)
+        df_activity_dup['file'] = df_activity_dup.apply(lambda x: x['file'].replace(str(x['mainFolder']), ""), axis=1)
         improperNamedActivities = df_activity_dup[df_activity_dup['customizedName'] != True].dropna()\
                                       .loc[:, ['name', 'file', 'type', 'error', 'project']]
     else:

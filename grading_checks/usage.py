@@ -23,9 +23,9 @@ def grade_variable_usage(df_variable):
         # df_variable_dup.filePath = df_variable_dup.filePath.str.replace(fileLocationStr, '')
         df_variable_dup['type'] = "Variable Usage"
         df_variable_dup['error'] = "Declared but not used"
-        df_variable_dup.rename(columns={'variableName': 'name', 'filePath': 'file', 'projectId': 'project'},
+        df_variable_dup.rename(columns={'variableName': 'name', 'filePath': 'file', 'projectName': 'project'},
                                inplace=True)
-        df_variable_dup['file'] = df_variable_dup.apply(lambda x: x['file'].replace(x['mainFolder'], ""), axis=1)
+        df_variable_dup['file'] = df_variable_dup.apply(lambda x: x['file'].replace(str(x['mainFolder']), ""), axis=1)
         unusedVariable = df_variable_dup.loc[df_variable_dup['count'] == 1].dropna()\
                              .loc[:, ['name', 'file', 'type', 'error', 'project']]
         variableUsageScore = len(df_variable_dup.loc[df_variable_dup['count'] > 1]['count']) / numVariables * 100
@@ -44,9 +44,9 @@ def grade_argument_usage(df_argument):
         # df_argument_dup.filePath = df_argument_dup.filePath.str.replace(fileLocationStr, '')
         df_argument_dup['type'] = "Argument Usage"
         df_argument_dup['error'] = "Declared but not used"
-        df_argument_dup.rename(columns={'argumentName': 'name', 'filePath': 'file', 'projectId': 'project'},
+        df_argument_dup.rename(columns={'argumentName': 'name', 'filePath': 'file', 'projectName': 'project'},
                                inplace=True)
-        df_argument_dup['file'] = df_argument_dup.apply(lambda x: x['file'].replace(x['mainFolder'], ""), axis=1)
+        df_argument_dup['file'] = df_argument_dup.apply(lambda x: x['file'].replace(str(x['mainFolder']), ""), axis=1)
         unusedArgument = df_argument_dup.loc[df_argument_dup['count'] == 1].dropna()\
                              .loc[:, ['name', 'file', 'type', 'error', 'project']]
         argumentUsageScore = len(df_argument_dup.loc[df_argument_dup['count'] > 1]['count']) / numArguments * 100

@@ -29,8 +29,8 @@ body {
     to top,
     rgb(233, 97, 111) 10%,
     rgb(243, 165, 130) 95%
-  );
-  border-color: transparent;
+  ) !important;
+  border-color: transparent !important;
 }
 .btn-primary:hover,
 .btn-primary:active {
@@ -121,7 +121,7 @@ body {
 }
 
 .bg-primary {
-  background-color: #4692ca !important;
+  background-color: transparent !important;
 }
 .text-primary {
   color: #ff6600 !important;
@@ -361,6 +361,7 @@ body {
 
 .upload_img {
   width: 20px;
+  background-color: transparent !important;
 }
 
 /*new_styles*/
@@ -372,7 +373,7 @@ body {
 
 .header {
   height: 70px;
-  background-color: #4692ca;
+  background-color: transparent;
 }
 
 .header_text {

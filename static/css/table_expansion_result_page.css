@@ -25,19 +25,22 @@ body {
 }
 
 .btn-primary {
-  background-color: #4692ca;
-  border-color: #4692ca;
+  background: linear-gradient(
+    to top,
+    rgb(233, 97, 111) 10%,
+    rgb(243, 165, 130) 95%
+  );
+  border-color: white;
 }
 .btn-primary:hover,
 .btn-primary:active {
-  background-color: #007bff !important;
-  border-color: #007bff !important;
+  background-color: rgb(233, 97, 111) !important;
   box-shadow: none !important;
 }
-.btn-outline-primary {
+/* .btn-outline-primary {
   border-color: #ff6600 !important;
   color: #ff6600 !important;
-}
+} */
 .btn-outline-primary:hover {
   background-color: #ff6600 !important;
   color: #ffffff !important;
@@ -152,16 +155,16 @@ body {
 }
 
 .form-control:focus {
-  border-color: #4692ca !important;
+  border-color: white !important;
 }
 
 .table .thead-dark th {
-  background-color: #4692ca !important;
-  border-color: #4692ca !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
   border: none !important;
   font-weight: normal;
-  border-right: 1px solid #4692ca !important;
-  border-bottom: 2px solid #4692ca !important;
+  border-right: 1px solid transparent !important;
+  border-bottom: 2px solid transparent !important;
   padding-left: 20px;
   padding-top: 12px;
   padding-bottom: 12px;
@@ -183,20 +186,6 @@ body {
   border-bottom: 1px solid #dee2e6;
 }
 
-.page-link {
-  color: #4692ca;
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-  padding-right: 0.5rem;
-  padding-left: 0.5rem;
-  font-size: 12px;
-  font-weight: normal;
-}
-
-.page-link:hover {
-  color: #4692ca;
-}
-
 .checkbox tr td {
   border: none;
   padding-top: 5px;
@@ -208,7 +197,11 @@ body {
 }
 
 .top-card {
-  background-color: #4692ca;
+  background: linear-gradient(
+    to top,
+    rgb(233, 97, 111) 10%,
+    rgb(243, 165, 130) 95%
+  );
   width: 100%;
   height: 45px;
   margin-bottom: 14px;
@@ -225,7 +218,6 @@ body {
 .content-box {
   width: 100%;
   padding-left: 15px;
-
   padding-bottom: 10px;
   height: 500px;
 }
@@ -234,16 +226,29 @@ body {
   margin-bottom: 4px;
 }
 
-/* .ReactTable .rt-table .rt-thead.-header {
-  background: linear-gradient(
-
-  );
-} */
-
 .ReactTable .rt-tr-group:hover {
   background-image: linear-gradient(
     to top,
     rgb(243, 165, 130),
-    rgba(7, 3, 3, 0)
+    rgb(255, 255, 255)
   );
+}
+
+.dropdown-item {
+  border: 0px !important;
+  outline: 0px !important;
+}
+
+.dropdown-item:focus,
+.dropdown-item:active,
+.dropdown-item::selection {
+  background: linear-gradient(
+    to top,
+    rgb(233, 97, 111) 10%,
+    rgb(243, 165, 130) 95%
+  );
+}
+
+.btn-primary {
+  border: 0px !important;
 }

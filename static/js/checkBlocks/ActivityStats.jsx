@@ -50,6 +50,7 @@ export default class ActivityStatsBlock extends React.Component {
             .toLowerCase()
             .includes(filter.value.toLowerCase())
         }
+        showFilters={false}
         defaultPageSize={10}
         showPageSizeOptions={false}
         defaultSorted={[

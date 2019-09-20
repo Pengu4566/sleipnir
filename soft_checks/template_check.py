@@ -3,7 +3,7 @@ import pandas as pd
 def check_template(df_json, df_annotation, df_activity, df_json_exp):
     # omit '_Test.xaml', 'Test_Framework/RunAllTests.xaml'
     df_json_dup = df_json.loc[:, ['index', 'mainFolder', 'subfiles', 'mainFile']]
-    df_json_dup.subfiles = df_json_dup.apply(lambda x: [subfile.replace(x['mainFolder']+'/', '') for subfile in x['subfiles']], axis=1)
+    df_json_dup.subfiles = df_json_dup.apply(lambda x: [subfile.replace(str(x['mainFolder'])+'/', '') for subfile in x['subfiles']], axis=1)
     df_annotation_dup = df_annotation.loc[:, ['mainFolder', 'workflowName', 'invokedBy']]
 
     qTempInvokingData = {'workflowName': ['Framework/InitAllSettings.xaml', 'Framework/Gen_KillProcessesOfUser.xaml',
@@ -45,9 +45,9 @@ def check_template(df_json, df_annotation, df_activity, df_json_exp):
     if len(df_annotation_dup) > 0:
 
         df_annotation_dup.workflowName = df_annotation_dup.apply(lambda x: x['workflowName']
-                                                                 .replace(x['mainFolder']+'/', ''), axis=1)
+                                                                 .replace(str(x['mainFolder'])+'/', ''), axis=1)
         df_annotation_dup.invokedBy = df_annotation_dup.apply(lambda x: x['invokedBy']
-                                                              .replace(x['mainFolder']+'/', ''), axis=1)
+                                                              .replace(str(x['mainFolder'])+'/', ''), axis=1)
         df_temp_invoking_check = pd.merge(df_annotation_dup, df_qTempInvoking, on=['workflowName', 'invokedBy'],
                                           how='left', indicator='qTempInvoke')
 
