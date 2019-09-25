@@ -4,6 +4,7 @@ import "react-table/react-table.css";
 
 export default class JsonLogBlock extends React.Component {
   render() {
+    var data = JSON.parse(this.props.name.replace(/'/g, '"')).data;
     const columns = [
       {
         Header: "Project ID",
@@ -25,12 +26,12 @@ export default class JsonLogBlock extends React.Component {
       }
     ];
 
-    let pgSize = this.props.name.data.length;
+    let pgSize = data.length;
 
     return (
       <ReactTable
         columns={columns}
-        data={this.props.name.data}
+        data={data}
         defaultPageSize={pgSize}
         showPageSizeOptions={false}
         showPagination={false}

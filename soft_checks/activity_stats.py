@@ -9,8 +9,8 @@ def get_activity_stats(df_activity):
         df_activity_dup = df_activity_dup.groupby(['activityType', 'filePath', 'projectName']).size().reset_index(drop=False)
         df_activity_dup.columns = ['activityType', 'file', 'project', 'count']
         df_activity_dup.fillna("Unknown", inplace=True)
-        return list(df_activity_dup.reset_index().T.to_dict().values())
+        return df_activity_dup
     else:
-        return []
+        return pd.DataFrame(columns=['activityType', 'file', 'project', 'count'])
 
 # end activity stats

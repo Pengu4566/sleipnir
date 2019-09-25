@@ -23,16 +23,23 @@
                                 <div id="accordion">
                                       <div class="card rounded-0 bg-light">
                                       <div class="card-header height_auto border-0 rounded-0 pl-4" id="headingOne" style="background-color: white;">
-                                        <h5 class="mb-0">
-                                          <button class="btn heading-1 d-block" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" type="button">
-                                            Step 1 - Settings <span class="pl-3" style="cursor: pointer;"><i class="fa fa-angle-down"></i></span>
+                                        <h5 class="mb-2">
+                                          <button class="btn heading-1 d-block" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" type="button" onclick="myFunction()">
+                                            Step 1 - Settings <span class="pl-3" style="cursor: pointer;"><i id="angle" class="fa fa-angle-down" ></i></span>
                                           </button>
+                                          <script>
+                                            function myFunction() {
+                                                if (document.getElementById("angle").className == "fa fa-angle-down") {
+                                                  document.getElementById("angle").className = "fa fa-angle-up";
+                                                }
+                                                else {
+                                                  document.getElementById("angle").className = "fa fa-angle-down";
+                                                }
+                                            }
+                                          </script>
                                           <span class="heading-2 ml-3">Please customize the your checks</span>
                                         </h5>
-
-
                                       </div>
-
                                       <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
                                         <div class="card-body" style="background-color: white;">
                                           <div class="row justify-content-lg-center pl-2">
@@ -135,10 +142,10 @@
                           <div class="card rounded-0 bg-light border-top-none border-bottom-none">
                           <div class="card-header height_auto border-0 rounded-0 pl-4" id="headingOne" style="background-color: white;">
                             <h5 class="mb-0">
-                              <button class="btn heading-1 d-block">
+                              <div class="heading-1 d-block ml-3 mb-2">
                                 Step 2 - Choose File
-                              </button>
-                              <span class="heading-2 ml-3">Please upload the file in .zip format</span>
+                              </div>
+                              <span class="heading-2 ml-3 mb-3">Please upload the file in .zip format</span>
 
                             </h5>
                             <label class="btn btn-primary ml-3 mt-2 pt-2 pb-2 pl-3 pr-3">
@@ -151,9 +158,9 @@
                         <div class="card rounded-0 border-top-none">
                         <div class="card-header height_auto border-0 rounded-0 pl-4 mb-2" id="headingOne" style="background-color: white;">
                           <h5 class="mb-0">
-                            <button class="btn heading-1 d-block">
+                            <div class="heading-1 d-block ml-3 mb-3">
                               Step 3 - Press & Go
-                            </button>
+                            </div>
                           </h5>
                           <div class="d-flex justify-content-center">
                           <button id="uploadText" class="d-flex justify-content-center btn btn-primary pt-2 pb-2 pr-3" style="width: 95%;">
@@ -162,7 +169,6 @@
                           </button>
                           <script type="text/javascript">
                             $("#fileUploadForm").submit(function () {
-                              console.log("clicked");
                                 $("#uploadText").attr("disabled", true);
                             });
                             $(document).ready(function(){
@@ -176,10 +182,46 @@
                          </div>
                         </div>                     
                       </form>
-                      </div>
+
+                      <div class="accordion1">
+                          <div id="accordion1">
+                                <div class="card rounded-0 bg-light">
+                                <div class="card-header height_auto border-0 rounded-0 pl-4" id="headingOne" style="background-color: white;">
+                                  <h5 class="mb-2">
+                                    <button class="btn heading-1 d-block" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo" type="button" onclick="myFunction1()">
+                                      AKOA Template Download <span class="pl-3" style="cursor: pointer;"><i id="angle1" class="fa fa-angle-down" ></i></span>
+                                    </button>
+                                    <script>
+                                      function myFunction1() {
+                                          if (document.getElementById("angle1").className == "fa fa-angle-down") {
+                                            document.getElementById("angle1").className = "fa fa-angle-up";
+                                          }
+                                          else {
+                                            document.getElementById("angle1").className = "fa fa-angle-down";
+                                          }
+                                      }
+                                    </script>
+                                  </h5>
+                                </div>
+                                <div id="collapseTwo" class="collapse" aria-labelledby="headingOne" data-parent="#accordion1" style="justify-content: center; text-align:center;">
+                                    <div class="heading-1 d-block mb-2 mt-2">
+                                      Queue Template <a href="./akoa_template/Queue_Template.zip" download><i class="fa fa-download ml-3"></i></a>
+                                    </div>
+                                    <div class="heading-1 d-block mb-2 mt-2">
+                                      Non-Queue Template<a href="./akoa_template/Non-queue_Template.zip" download><i class="fa fa-download ml-3"></i></a>
+                                    </div>
+                                    <div class="heading-1 d-block mb-2 mt-2">
+                                      Non-Repetitive Template<a href="./akoa_template/Non-repetitive_Template.zip" download><i class="fa fa-download ml-3"></i></a>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                    </div>
             </div>
       </div>
 </div>
+
+
         <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>

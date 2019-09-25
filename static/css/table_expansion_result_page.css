@@ -31,16 +31,14 @@ body {
     rgb(243, 165, 130) 95%
   );
   border-color: white;
+  vertical-align: top;
 }
 .btn-primary:hover,
 .btn-primary:active {
   background-color: rgb(233, 97, 111) !important;
   box-shadow: none !important;
 }
-/* .btn-outline-primary {
-  border-color: #ff6600 !important;
-  color: #ff6600 !important;
-} */
+
 .btn-outline-primary:hover {
   background-color: #ff6600 !important;
   color: #ffffff !important;
@@ -56,8 +54,6 @@ body {
 .form-control:focus {
   box-shadow: none !important;
 }
-
-/*new_styles*/
 
 .main_div {
   height: auto;
@@ -140,7 +136,7 @@ body {
 }
 
 .dropdown-toggle::after {
-  margin-left: 110px !important;
+  margin-left: 95px !important;
 }
 
 .extra-button-styles {
@@ -227,6 +223,22 @@ body {
 }
 
 .ReactTable .rt-tr-group:hover {
+  background-image: linear-gradient(
+    to top,
+    rgb(243, 165, 130),
+    rgb(255, 255, 255)
+  );
+}
+
+/* .ReactTable .rt-thead.-header {
+    background: linear-gradient(
+    to top,
+    rgba(233, 97, 111, 0.5) 10%,
+    rgba(243, 165, 130, 0.5) 95%
+  );
+} */
+
+.ReactTable .rt-thead .rt-th.-cursor-pointer:hover {
   background-image: linear-gradient(
     to top,
     rgb(243, 165, 130),

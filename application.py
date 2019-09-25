@@ -383,9 +383,16 @@ def processing():
     # level 1: soft checks
     # level 2: activity stats
 
-    activityStats = activity_stats.get_activity_stats(df_activity=df_activity)
-    # level 2: folder structure
+    # activityStats = activity_stats.get_activity_stats(df_activity=df_activity)
+    df_activityStats = activity_stats.get_activity_stats(df_activity=df_activity)
+    activityStats = list(df_activityStats.reset_index(drop=True).reset_index(drop=False).T.to_dict().values())
+    activityTypes = [{'index': -1, 'activityType': 'All Activities'}] + list(df_activityStats.loc[:, ['activityType']]
+                                                                             .drop_duplicates(inplace=False)
+                                                                             .sort_values('activityType')
+                                                                             .reset_index(drop=True)
+                                                                             .reset_index(drop=False).T.to_dict().values())
 
+    # level 2: folder structure
     folderStructure = project_folder_structure.list_files(fileLocationStr=fileLocationStr)
     # level 2: project structure
     gexf = project_structure.generate_gexf(df_annotation=df_annotation, fileLocationStr=fileLocationStr)
@@ -404,14 +411,19 @@ def processing():
                            improperNamedAct, noSsExp, noLMExp,
                            notAnnotWf, missing_arguments], ignore_index=True)
 
-    table1File = list(df_table1.loc[:, ['file']].drop_duplicates(inplace=False).sort_values('file').reset_index(drop=True)
-                      .reset_index(drop=False).T.to_dict().values())
-    table1Type = list(df_table1.loc[:, ['type']].drop_duplicates(inplace=False).sort_values('type').reset_index(drop=True)
-                      .reset_index(drop=False).T.to_dict().values())
-    table1Error = list(df_table1.loc[:, ['error']].drop_duplicates(inplace=False).sort_values('error')
-                       .reset_index(drop=True).reset_index(drop=False).T.to_dict().values())
-    table1Project = list(df_table1.loc[:, ['project']].drop_duplicates(inplace=False).sort_values('project')
-                         .reset_index(drop=True).reset_index(drop=False).T.to_dict().values())
+    table1File = [{'index': -1, 'file': 'All Files'}] + list(df_table1.loc[:, ['file']].drop_duplicates(inplace=False)
+                                                       .sort_values('file').reset_index(drop=True)
+                                                       .reset_index(drop=False).T.to_dict().values())
+    table1Type = [{'index': -1, 'type': 'All Types'}] + list(df_table1.loc[:, ['type']].drop_duplicates(inplace=False)
+                                                       .sort_values('type').reset_index(drop=True)
+                                                       .reset_index(drop=False).T.to_dict().values())
+    table1Error = [{'index': -1, 'error': 'All Errors'}] + list(df_table1.loc[:, ['error']].drop_duplicates(inplace=False)
+                                                         .sort_values('error').reset_index(drop=True)
+                                                         .reset_index(drop=False).T.to_dict().values())
+    table1Project = [{'index': -1, 'project': 'All Projects'}] + list(df_table1.loc[:, ['project']]
+                                                             .drop_duplicates(inplace=False).sort_values('project')
+                                                             .reset_index(drop=True).reset_index(drop=False)
+                                                             .T.to_dict().values())
 
     session['namingScore'] = namingScore
     session['usageScore'] = usageScore
@@ -421,16 +433,13 @@ def processing():
     session['table1Type'] = table1Type
     session['table1Error'] = table1Error
     session['table1Project'] = table1Project
-    session['fileList'] = list(pd.concat([improperNamedVar, unusedVar, improperNamedArg, unusedArgument,
-                                   improperNamedAct, noSsExp, noLMExp,
-                                   notAnnotWf, missing_arguments], ignore_index=True).file
-                               .drop_duplicates(inplace=False).reset_index(drop=True).reset_index(drop=False)
-                               .T.to_dict().values())
     session['activityStats'] = activityStats
+    session['activityTypes'] = activityTypes
     session['project_detail'] = project_detail
     session['folderStructure'] = folderStructure
     session['gexf'] = gexf
     session['selector'] = lst_selector_data
+
 
     ##########################################################################################################
 
@@ -439,7 +448,6 @@ def processing():
 
 @app.route("/analyze")
 def __main__():
-
     with app.app_context():
         # clear out content in file folder
         shutil.rmtree(session.get("folderPath"))
@@ -448,13 +456,19 @@ def __main__():
                                namingScore=session.get("namingScore"),
                                usageScore=session.get("usageScore"),
                                docScore=session.get("docScore"),
-                               table1={'data': session.get("table1"), 'file': session.get('table1File'),
-                                       'type': session.get('table1Type'), 'error': session.get('table1Error'),
+                               table1={'data': session.get("table1"),
+                                       'file': session.get('table1File'),
+                                       'type': session.get('table1Type'),
+                                       'error': session.get('table1Error'),
                                        'project': session.get('table1Project')},
-                               actStats={'data': session.get('activityStats'),
-                                         'file': session.get('fileList')},
-                               project_detail={'data': session.get("project_detail")},
-                               selectorEval={'data': session.get('selector')})
+                               actStats={"data": session.get('activityStats'),
+                                         "activity": session.get('activityTypes'),
+                                         "file": session.get('table1File'),
+                                         "project": session.get('table1Project')},
+                               project_detail={"data": session.get("project_detail")},
+                               selectorEval={"data": session.get('selector'),
+                                             "file": session.get('table1File'),
+                                             "project": session.get('table1Project')})
 
 
 @app.route("/retry")
@@ -531,7 +545,7 @@ def getReport():
                                  missing_arguments_list={"data": session.get("missing_arguments_list")},
                                  folderStructure=session.get("folderStructure"),
                                  unusedArgument={"data": session.get("unusedArgument")},
-                                 selectorEval={"data": session.get('selector')})
+                                 selectorEval=str({"data": session.get('selector')}).replace("\"", "'"))
     report = pdfkit.from_string(html_string, False, configuration=config)
 
     return Response(

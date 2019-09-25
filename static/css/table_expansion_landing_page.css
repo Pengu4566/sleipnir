@@ -416,3 +416,18 @@ body {
 .btn_text {
   font-weight: 100;
 }
+
+a {
+  color: rgb(243, 165, 130) !important;
+  border: 0px;
+}
+
+a:hover,
+a:active,
+a:focus {
+  color: rgb(233, 97, 111) !important;
+}
+
+li {
+  border: 0px !important;
+}

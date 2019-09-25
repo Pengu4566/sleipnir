@@ -154,7 +154,8 @@ def populate_dataframe(filePath, df_json):
 
     if len(lst_selectors) > 0:
         def extract_selector_str(ele):
-            return ele.attrib['Selector']
+            return ele.attrib['Selector'].replace("'", "").replace("\"", "")\
+                .replace("<", "").replace("[", "").replace("]", "").replace(">", "")
         lst_selectors_str = list(map(extract_selector_str, lst_selectors))
 
         temp_df_selector_data = {'selectorStr': lst_selectors_str, 'filePath': [filePath]*len(lst_selectors)}
