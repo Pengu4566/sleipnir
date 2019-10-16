@@ -22,7 +22,7 @@ This program is a code grading tool for the UiPath software suite. It intakes .x
 The goal is to help develop better code by offering guidelines for development as well as giving the uploader a score from **1 to 100?**. The grading criteria can be customized/enabled/disabled to various coding standards and best practices to better suit the development team using this software. 
 
 ### Upload Scren
-![upload screen](screenshots/upload screen.PNG)
+![upload screen](screenshots/uploadscreen.PNG)
 
 ### Results Screen
 ![results screen](screenshots/super-screenshot.jpg)
