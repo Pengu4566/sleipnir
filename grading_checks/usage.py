@@ -2,12 +2,6 @@
 import os
 from builtins import len, open, list
 import pandas as pd
-import untangle
-import re
-import matplotlib.pyplot as plt
-import zipfile
-from math import pi
-from werkzeug.utils import secure_filename
 # end package import
 
 # function module for usage
