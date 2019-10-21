@@ -12,6 +12,7 @@ products:
 This is a minimal sample app that demonstrates how to run a Python Flask application on Azure App Service on Linux.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 For more information, please see the [Python on App Service quickstart](https://docs.microsoft.com/en-us/azure/app-service/containers/quickstart-python).
 =======
 - Naming
@@ -46,6 +47,9 @@ The sections on the screenshot are described as follows:
 ## Activity Statistics
 ## Project File Structure
 >>>>>>> parent of 0ab22da0... Update README.md
+=======
+For more information, please see the [Python on App Service quickstart](https://docs.microsoft.com/en-us/azure/app-service/containers/quickstart-python).
+>>>>>>> parent of e3347635... Update README.md
 
 # Contributing
 
