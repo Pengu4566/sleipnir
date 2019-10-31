@@ -1,20 +1,11 @@
----
-topic: Python Flask sample for Azure App Service (Linux)
-languages:
-  - python
-products:
-  - Azure App Service
-  - Azure Web Apps
----
 
-# Python Flask sample for Azure App Service (Linux)
+# Sleipnir
 
-This is a minimal sample app that demonstrates how to run a Python Flask application on Azure App Service on Linux.
+Link!
+[http://sleipnir.azurewebsites.net](http://sleipnir.azurewebsites.net)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-For more information, please see the [Python on App Service quickstart](https://docs.microsoft.com/en-us/azure/app-service/containers/quickstart-python).
-=======
+This program is a code grading tool for the UiPath software suite. It intakes .xaml files from UiPath Studio projects (as a project zip file) and analyzes various metrics about the uploaded code including:
+
 - Naming
 - Variable Naming
 - Argument Naming
@@ -29,10 +20,10 @@ For more information, please see the [Python on App Service quickstart](https://
 - Project.Json Logging
 - Argument Explanation in Annotation 
 
-The goal is to help develop better code by offering guidelines for development as well as giving the uploader a score from **1 to 100?**. The grading criteria can be customized/enabled/disabled to various coding standards and best practices to better suit the development team using this software. 
+The goal is to help develop better code by offering guidelines for development as well as giving the uploader a score from 1 to 100?. The grading criteria can be customized/enabled/disabled to various coding standards and best practices to better suit the development team using this software. 
 
 ### Upload Scren
-![upload screen](screenshots/upload screen.PNG)
+![upload screen](screenshots/uploadscreen.PNG)
 
 ### Results Screen
 ![results screen](screenshots/super-screenshot.jpg)
@@ -46,11 +37,3 @@ The sections on the screenshot are described as follows:
 ## Selectors Overview
 ## Activity Statistics
 ## Project File Structure
->>>>>>> parent of 0ab22da0... Update README.md
-=======
-For more information, please see the [Python on App Service quickstart](https://docs.microsoft.com/en-us/azure/app-service/containers/quickstart-python).
->>>>>>> parent of e3347635... Update README.md
-
-# Contributing
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
