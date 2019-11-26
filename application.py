@@ -17,7 +17,7 @@ from dataframes import dataframe
 from grading_checks import naming, usage, documentation_logging, error_handling
 from soft_checks import activity_stats, project_folder_structure, project_structure, template_check, selector_check
 
-from flask import Flask, request, render_template, redirect, url_for, session, jsonify, Response
+from flask import Flask, request, render_template, redirect, url_for, session, jsonify, Response, send_file
 from flask_session import Session
 from flask_socketio import SocketIO, emit
 import pdfkit
@@ -505,7 +505,19 @@ def delete_pics():
 #     return jsonify(result)
 
 
-# echarts graphs go here
+@app.route("/download/queue")
+def return_file_queue():
+    return send_file(os.getcwd().replace("\\", "/") + '/static/akoa_template/Queue_Template.zip', attachment_filename='Queue Template.zip')
+
+@app.route("/download/nonqueue")
+def return_file_nonqueue():
+    return send_file(os.getcwd().replace("\\", "/") + '/static/akoa_template/Non-queue_Template.zip', attachment_filename='Non-Queue Template.zip')
+
+@app.route("/download/nonrepetitive")
+def return_file_nonrepetitive():
+    return send_file(os.getcwd().replace("\\", "/") + '/static/akoa_template/Non-repetitive_Template.zip', attachment_filename='Non-Repetitive Template.zip')
+
+
 @app.route("/radar", methods=['GET'])
 def radar_plot_data():
     message = {'usage': session.get("usageScore"),

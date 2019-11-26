@@ -22,6 +22,32 @@ const config = {
       {
         test: /\.css$/,
         loader: ["style-loader", "css-loader"]
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf)$/,
+        loader: "url-loader?limit=100000"
+      },
+      {
+        test: /\.(png|svg|jpg|gif)$/,
+        use: ["file-loader"]
+      },
+      {
+        test: /\.(sass|scss)$/,
+        include: /index/,
+        use: [
+          { loader: "style-loader" },
+          { loader: "css-loader", options: { modules: false } },
+          { loader: "sass-loader" }
+        ]
+      },
+      {
+        test: /\.(sass|scss)$/,
+        exclude: /index/,
+        use: [
+          { loader: "style-loader" },
+          { loader: "css-loader", options: { modules: true } },
+          { loader: "sass-loader" }
+        ]
       }
     ]
   }

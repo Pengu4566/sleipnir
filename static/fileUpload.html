@@ -1,232 +1,38 @@
 <html>
-    <head>
-        <link rel="shortcut icon" type="image/x-icon" href="dist/favicon.ico" />
-        <title>Sleipnir</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-        <script src="http://code.jquery.com/jquery-1.11.3.min.js" charset="utf-8"></script>
-</head>
+  <head>
+    <link rel="shortcut icon" type="image/x-icon" href="dist/favicon.ico" />
+    <title>Sleipnir</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <script
+      src="http://code.jquery.com/jquery-1.11.3.min.js"
+      charset="utf-8"
+    ></script>
+  </head>
 
-    <body>
+  <body style="background-color: whitesmoke;">
+    <div class="container" id="fileUploadContainer"></div>
 
-<div class="container">
-      <div class="row justify-content-lg-center mt-5">
-            <div class="col-lg-8">
-                <div class="main_div shadow-sm">
-                      <div class="d-flex header" style="  background: linear-gradient(to top, rgb(233, 97, 111) 10%, rgb(243, 165, 130) 95%);">
-                          <div class="d-flex align-self-center"><span class="ml-4 header_text">Code Review App</span></div>
-                      </div>
-                      <form action="uploader" method="post" enctype="multipart/form-data" id="fileUploadForm">
-                          <div class="accordion">
-                                <div id="accordion">
-                                      <div class="card rounded-0 bg-light">
-                                      <div class="card-header height_auto border-0 rounded-0 pl-4" id="headingOne" style="background-color: white;">
-                                        <h5 class="mb-2">
-                                          <button class="btn heading-1 d-block" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" type="button" onclick="myFunction()">
-                                            Step 1 - Settings <span class="pl-3" style="cursor: pointer;"><i id="angle" class="fa fa-angle-down" ></i></span>
-                                          </button>
-                                          <script>
-                                            function myFunction() {
-                                                if (document.getElementById("angle").className == "fa fa-angle-down") {
-                                                  document.getElementById("angle").className = "fa fa-angle-up";
-                                                }
-                                                else {
-                                                  document.getElementById("angle").className = "fa fa-angle-down";
-                                                }
-                                            }
-                                          </script>
-                                          <span class="heading-2 ml-3">Please customize the your checks</span>
-                                        </h5>
-                                      </div>
-                                      <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
-                                        <div class="card-body" style="background-color: white;">
-                                          <div class="row justify-content-lg-center pl-2">
-                                              <div class="col-lg-4" style="padding-left:30px;">
-                                                <div class="check_boxes">
-                                                    <span class="d-block mb-2" style="font-weight:bold;">Naming</span>
-
-                                                      <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="defaultCheck1" name="VariableNaming" value="VariableNaming" checked>
-                                                        <label class="form-check-label" for="defaultCheck1">
-                                                          Variable Naming
-                                                        </label>
-                                                      </div>
-
-                                                      <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="defaultCheck1" name="ArgumentNaming" value="ArgumentNaming" checked>
-                                                        <label class="form-check-label" for="defaultCheck1">
-                                                          Argument Naming
-                                                        </label>
-                                                      </div>
-
-                                                        <div class="form-check">
-                                                          <input class="form-check-input" type="checkbox" id="defaultCheck1" name="ActivityNaming" value="ActivityNaming" checked>
-                                                          <label class="form-check-label" for="defaultCheck1">
-                                                            Activity Naming
-                                                          </label>
-                                                        </div>
-                                                      </div>
-                                              </div>
-
-
-                                              <div class="col-lg-4" style="padding-left:30px;">
-                                                <div class="check_boxes">
-                                                    <span class="d-block mb-2" style="font-weight:bold;">Usage</span>
-
-                                                      <div class="form-check">
-                                                          <input class="form-check-input" type="checkbox" id="defaultCheck1" name="VariableUsage" value="VariableUsage" checked>
-                                                          <label class="form-check-label" for="defaultCheck1">
-                                                            Variable Usage
-                                                          </label>
-                                                        </div>
-
-                                                      <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" id="defaultCheck1" name="ArgumentUsage" value="ArgumentUsage" checked>
-                                                        <label class="form-check-label" for="defaultCheck1">
-                                                          Argument Usage
-                                                        </label>
-                                                      </div>
-
-                                                      </div>
-                                              </div>
-
-                                              <div class="col-lg-4" style="padding-left:30px;">
-                                                <div class="check_boxes">
-                                                    <span class="d-block mb-2" style="font-weight:bold;">Documentation</span>
-
-                                                    <div class="form-check">
-                                                      <input class="form-check-input" type="checkbox" id="defaultCheck1" name="WorkflowAnnotation" value="WorkflowAnnotation" checked>
-                                                      <label class="form-check-label" for="defaultCheck1">
-                                                      Workflow Annotation
-                                                      </label>
-                                                    </div>
-
-                                      <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="defaultCheck1" name="TryCatchLogging" value="TryCatchLogging" checked>
-                                        <label class="form-check-label" for="defaultCheck1">
-                                          Try Catch Logging
-                                        </label>
-                                      </div>
-
-                                      <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="defaultCheck1" name="TryCatchScreenshot" value="TryCatchScreenshot" checked>
-                                        <label class="form-check-label" for="defaultCheck1">
-                                          Try Catch Screenshot
-                                        </label>
-                                      </div>
-
-                                      <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="defaultCheck1" name="JsonLogging" value="JsonLogging" checked>
-                                        <label class="form-check-label" for="defaultCheck1">
-                                          Project.Json Loggin
-                                        </label>
-                                      </div>
-
-                                      <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="defaultCheck1" name="ArgExpAnnot" value="ArgExpAnnot" checked>
-                                        <label class="form-check-label" for="defaultCheck1">
-                                          Argument Explanation in Annotation
-                                        </label>
-                                      </div>
-                                                      </div>
-                                              </div>
-                                          </div>
-                                      </div>
-                                      </div>
-                              </div>
-                          </div>
-                          </div>
-                          
-                          <div class="card rounded-0 bg-light border-top-none border-bottom-none">
-                          <div class="card-header height_auto border-0 rounded-0 pl-4" id="headingOne" style="background-color: white;">
-                            <h5 class="mb-0">
-                              <div class="heading-1 d-block ml-3 mb-2">
-                                Step 2 - Choose File
-                              </div>
-                              <span class="heading-2 ml-3 mb-3">Please upload the file in .zip format</span>
-
-                            </h5>
-                            <label class="btn btn-primary ml-3 mt-2 pt-2 pb-2 pl-3 pr-3">
-                              <img class="upload_img" src="dist/cloud-computing.png"> <span class="btn_text pl-1">Choose File</span> <input type="file" name="file" id="file" hidden>
-                             </label>
-                             <script></script>
-                          </div>
-                        </div>
-
-                        <div class="card rounded-0 border-top-none">
-                        <div class="card-header height_auto border-0 rounded-0 pl-4 mb-2" id="headingOne" style="background-color: white;">
-                          <h5 class="mb-0">
-                            <div class="heading-1 d-block ml-3 mb-3">
-                              Step 3 - Press & Go
-                            </div>
-                          </h5>
-                          <div class="d-flex justify-content-center">
-                          <button id="uploadText" class="d-flex justify-content-center btn btn-primary pt-2 pb-2 pr-3" style="width: 95%;">
-                            <input type="submit" value="Upload" class="submitBtn" hidden><span class="d-flex btn_text"><div id="Progress">Upload</div></span>
-
-                          </button>
-                          <script type="text/javascript">
-                            $("#fileUploadForm").submit(function () {
-                                $("#uploadText").attr("disabled", true);
-                            });
-                            $(document).ready(function(){
-                              var socket = io({transports: ['websocket']});
-                              socket.on('progress', function(msg) {
-                                console.log(msg.data);
-                                $('#Progress').html('<p style="margin: 0%;">'+msg.data+'</p>');
-                              });
-                            });
-                          </script> 
-                         </div>
-                        </div>                     
-                      </form>
-
-                      <div class="accordion1">
-                          <div id="accordion1">
-                                <div class="card rounded-0 bg-light">
-                                <div class="card-header height_auto border-0 rounded-0 pl-4" id="headingOne" style="background-color: white;">
-                                  <h5 class="mb-2">
-                                    <button class="btn heading-1 d-block" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo" type="button" onclick="myFunction1()">
-                                      AKOA Template Download <span class="pl-3" style="cursor: pointer;"><i id="angle1" class="fa fa-angle-down" ></i></span>
-                                    </button>
-                                    <script>
-                                      function myFunction1() {
-                                          if (document.getElementById("angle1").className == "fa fa-angle-down") {
-                                            document.getElementById("angle1").className = "fa fa-angle-up";
-                                          }
-                                          else {
-                                            document.getElementById("angle1").className = "fa fa-angle-down";
-                                          }
-                                      }
-                                    </script>
-                                  </h5>
-                                </div>
-                                <div id="collapseTwo" class="collapse" aria-labelledby="headingOne" data-parent="#accordion1" style="justify-content: center; text-align:center;">
-                                    <div class="heading-1 d-block mb-2 mt-2">
-                                      Queue Template <a href="/akoa_template/Queue_Template.zip" download><i class="fa fa-download ml-3"></i></a>
-                                    </div>
-                                    <div class="heading-1 d-block mb-2 mt-2">
-                                      Non-Queue Template<a href="/akoa_template/Non-queue_Template.zip" download><i class="fa fa-download ml-3"></i></a>
-                                    </div>
-                                    <div class="heading-1 d-block mb-2 mt-2">
-                                      Non-Repetitive Template<a href="/akoa_template/Non-repetitive_Template.zip" download><i class="fa fa-download ml-3"></i></a>
-                                    </div>
-                                </div>
-                        </div>
-                    </div>
-                    </div>
-            </div>
-      </div>
-</div>
-
-
-        <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
-        <script src="http://code.jquery.com/jquery-1.11.3.min.js" charset="utf-8"></script>
-        <script src="dist/fileUpload.js" type="text/javascript"></script>
-    </body>
+    <script
+      src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"
+      integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I="
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
+    <script
+      src="http://code.jquery.com/jquery-1.11.3.min.js"
+      charset="utf-8"
+    ></script>
+    <script src="dist/fileUpload.js" type="text/javascript"></script>
+  </body>
 </html>

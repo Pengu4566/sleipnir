@@ -25,19 +25,19 @@ body {
 }
 
 .btn-primary {
+  background-color: transparent;
   background: linear-gradient(
     to top,
     rgb(233, 97, 111) 10%,
     rgb(243, 165, 130) 95%
   ) !important;
-  border-color: transparent !important;
+  border-color: transparent;
+  border: transparent;
 }
 .btn-primary:hover,
-.btn-primary:active {
+.btn-primary:active,
+.btn-primary:focus {
   background: rgb(233, 97, 111) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
-  animation-duration: 0.01s;
 }
 .btn-outline-primary {
   border-color: transparent !important;
