@@ -1,4 +1,5 @@
 import os
+import json
 import pandas as pd
 import zipfile
 from werkzeug.utils import secure_filename
@@ -17,7 +18,7 @@ from dataframes import dataframe
 from grading_checks import naming, usage, documentation_logging, error_handling
 from soft_checks import activity_stats, project_folder_structure, project_structure, template_check, selector_check
 
-from flask import Flask, request, render_template, redirect, url_for, session, jsonify, Response, send_file
+from flask import Flask, request, render_template, redirect, url_for, session, jsonify, Response, send_file, make_response
 from flask_session import Session
 from flask_socketio import SocketIO, emit
 import pdfkit
@@ -53,6 +54,10 @@ df_invokeWf = []
 @app.route('/')
 def upload():
     with app.app_context():
+        folderPathList = [os.getcwd().replace("\\", "/") + app.config['UPLOAD_PATH'] + path for path in os.listdir(os.getcwd() + app.config['UPLOAD_PATH'])]
+        filteredFolderPathList = [path for path in folderPathList if time.time() - os.path.getmtime(path) > 900]
+        for folder in filteredFolderPathList:
+            shutil.rmtree(folder, True)
         return render_template('fileUpload.html')
 
 
@@ -69,103 +74,9 @@ def connect():
         thread = socketio.start_background_task(target=background_thread)
 
 
-@app.route("/uploader", methods=['GET', 'POST'])
-def handle_upload():
-
-    if request.method == 'POST':
-        socketio.emit('progress', {'data': str(request.remote_addr)})
-        socketio.sleep(0.1)
-
-        socketio.emit('progress', {'data': 'Getting Check Info ...'})
-        socketio.sleep(0.1)
-
-        # get checks info
-        def get_checks_info(ele_lst_info):
-            return True if request.form.get(ele_lst_info) == ele_lst_info else False
-        lst_info = ['VariableNaming', 'ArgumentNaming', 'ActivityNaming',
-                    'VariableUsage', 'ArgumentUsage',
-                    'WorkflowAnnotation', 'TryCatchLogging', 'TryCatchScreenshot', 'JsonLogging', 'ArgExpAnnot']
-
-        [session['varNaming'], session['argNaming'], session['actNaming'],
-         session['varUsage'], session['argUsage'],
-         session['wfAnnot'], session['tcLog'], session['tcSs'], session['jsonLog'], session['arginAnnot']] = map(get_checks_info,lst_info)
-
-        # check if the post request has the file part
-        socketio.emit('progress', {'data': 'Getting File Info ...'})
-        socketio.sleep(0.1)
-
-        if ('file' not in request.files) or (request.files['file'].filename == ''):
-            return "You must pick a file! Use your browser's back button and try again."
-        file = request.files['file']
-
-        def allowed_file(file_name):
-            return '.' in file_name and file_name.rsplit('.', 1)[1] in app.config['ALLOWED_EXTENSIONS']
-
-        if not allowed_file(file.filename):
-            with app.app_context():
-                return render_template("wrongFile.html")
-        elif file and allowed_file(file.filename):
-            filename = secure_filename(file.filename).replace("\\", "/")
-
-            # save, unzip, and remove zip
-            socketio.emit('progress', {'data': 'Saving File ...'})
-            socketio.sleep(0.1)
-            generatedFileNaming = filename.replace(".zip","") + str(time.time()).replace(".", "") +\
-                                  str(randint(1, 999999999999)) + ".zip"
-            if os.path.isfile(os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming):
-                nameDup = True
-                while nameDup:
-                    generatedFileNaming = filename.replace(".zip","") + str(time.time()).replace(".", "") +\
-                                          str(randint(1, 999999999999)) + ".zip"
-                    nameDup = os.path.isfile(os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming)
-            file.save((os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming).replace("\\", "/"))
-            generatedFolderName = filename[:-4] + str(time.time()).replace(".", "") + str(randint(1, 999999999999))
-
-            if os.path.isdir((os.getcwd() + app.config['UPLOAD_PATH'] + generatedFolderName).replace("\\", "/")):
-                folderExist = True
-                while folderExist:
-                    generatedFolderName = filename[:-4] + str(time.time()).replace(".", "") +\
-                                          str(randint(1, 999999999999))
-                    folderExist = os.path.isdir((os.getcwd() + app.config['UPLOAD_PATH'] +
-                                                 generatedFolderName).replace("\\", "/"))
-
-            folderPath = (os.getcwd() + app.config['UPLOAD_PATH'] + generatedFolderName).replace("\\", "/")
-
-            socketio.emit('progress', {'data': 'Unzipping ...'})
-            socketio.sleep(0.1)
-
-            zipFile = zipfile.ZipFile((os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming).replace("\\", "/"))
-            zipFile.extractall(folderPath)
-            zipFile.close()
-
-            os.remove((os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming).replace("\\", "/"))
-            session['folderPath'] = folderPath
-
-            ##########################################################################################################
-            global gexf
-            # file processing
-            files = []
-            for r, d, f in os.walk(folderPath):
-                for file in f:
-                    if '.xaml' in file:
-                        files.append(os.path.join(r, file).replace("\\", "/"))
-            fileLocationStr = (os.getcwd() + app.config['UPLOAD_PATH'] + generatedFolderName).replace("\\", "/") + "/"
-            for r, d, f in os.walk(folderPath):
-                if len(d) == 1:
-                    fileLocationStr = r.replace("\\","/") + "/" + d[0] + "/"
-                else:
-                    break
-            session['fileLocationStr'] = fileLocationStr
-            session['files'] = files
-            # checks for empty files list, program should end if this gets triggered
-            if (files == []):
-                return "Could not find project files! Did you put them in the right place?"
-            else:
-                return redirect(url_for('processing'))
-
-
-@app.route("/processing")
+@app.route("/processing", methods=["POST"])
 def processing():
+    requestData=json.loads(str(request.data, encoding="utf-8"))
 
     # Get related info from Project.json (name and description)
     folderPath = session.get('folderPath')
@@ -192,7 +103,7 @@ def processing():
                            left_on="projectId", right_on="index")
     df_json_exp.drop(columns=['fileIndex', "index"], inplace=True)
 
-    if session.get('jsonLog'):
+    if requestData["setting"]["jsonLog"]:
         project_detail = list(df_json.copy().reset_index().loc[:, ['index', 'projectDetail', 'projectName']]
                               .T.to_dict().values())
         json_name_score = df_json.namingScore.sum() / len(df_json.namingScore)
@@ -232,7 +143,7 @@ def processing():
     # if session.get("naming"):
     if True:
         # level 3: variable naming
-        if session.get('varNaming'):
+        if requestData["setting"]['varName']:
             [variableNamingScore, improperNamedVariable] = naming.grade_variable_name(df_variable=df_variable)
             improperNamedVar = improperNamedVariable
         else:
@@ -240,7 +151,7 @@ def processing():
             variableNamingScore = "[Not evaluated]"
 
         # level 3: argument naming
-        if session.get('argNaming'):
+        if requestData["setting"]['argName']:
             [argumentNamingScore, improperNamedArguments] = naming.grade_argument_name(df_argument=df_argument)
             improperNamedArg = improperNamedArguments
         else:
@@ -248,7 +159,7 @@ def processing():
             argumentNamingScore = "[Not evaluated]"
 
         # level 3: activity naming
-        if session['actNaming']:
+        if requestData["setting"]['actName']:
             [activityNamingScore, improperNamedActivities] = naming.grade_activity_name(df_activity=df_activity)
             improperNamedAct = improperNamedActivities
         else:
@@ -262,7 +173,10 @@ def processing():
             if i != "[Not evaluated]":
                 namingScore += i
                 count += 1
-        namingScore = int(namingScore / count)
+        if count==0:
+            namingScore = "[Not evaluated]"
+        else:
+            namingScore = int(namingScore / count)
 
     else:
         improperNamedVar = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
@@ -276,7 +190,7 @@ def processing():
     # if session["usage"]:
     if True:
         # level 3: variable usage
-        if session['varUsage']:
+        if requestData["setting"]['varUsage']:
             [variableUsageScore, unusedVariable] = usage.grade_variable_usage(df_variable=df_variable)
             unusedVar = unusedVariable
         else:
@@ -284,7 +198,7 @@ def processing():
             variableUsageScore = "[Not evaluated]"
 
         # level 3: argument usage
-        if session['argUsage']:
+        if requestData["setting"]['argUsage']:
             [argumentUsageScore, unusedArgument] = usage.grade_argument_usage(df_argument=df_argument)
             unusedArgument = unusedArgument
         else:
@@ -299,7 +213,10 @@ def processing():
             if i != "[Not evaluated]":
                 usageScore += i
                 count += 1
-        usageScore = int(usageScore / count)
+        if count==0:
+            usageScore = "[Not evaluated]"
+        else:
+            usageScore = int(usageScore / count)
 
     else:
         unusedVar = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
@@ -312,7 +229,7 @@ def processing():
     # if session["documentation"]:
     if True:
         # level 3: log message in catches
-        if session['tcLog']:
+        if requestData["setting"]['tcLog']:
             [logMessageScore, noLMException] = documentation_logging.grade_log_message_in_catches(df_catches=df_catches)
 
             noLMExp = noLMException
@@ -321,7 +238,7 @@ def processing():
             noLMExp = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
 
         # level 3: screenshot in catches
-        if session['tcSs']:
+        if requestData["setting"]['tcSs']:
             [screenshotScore, noSsException] = documentation_logging.grade_screenshot_in_catches(df_catches=df_catches)
             noSsExp = noSsException
         else:
@@ -332,7 +249,7 @@ def processing():
         [wfAnnotationScore, notAnnotatedWf, AnnotationArgumentScore, missing_arguments] =\
             documentation_logging.grade_annotation_in_workflow(df_annotation=df_annotation,
                                                                df_argument=df_argument)
-        if session['wfAnnot']:
+        if requestData["setting"]['wfAnnot']:
             notAnnotWf = notAnnotatedWf
         else:
             wfAnnotationScore = "[Not evaluated]"
@@ -340,7 +257,7 @@ def processing():
 
         # level 3: Arguments should be at least mentioned in annotation
         # outputs a percentage score of the number of correct arguments and a list of missing arguments
-        if session['arginAnnot']:
+        if requestData["setting"]['argExp']:
             missing_arguments = missing_arguments
         else:
             missing_arguments = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
@@ -358,7 +275,10 @@ def processing():
             if i != "[Not evaluated]":
                 docScore += i
                 count += 1
-        docScore = int(docScore / count)
+        if count==0:
+            docScore = "[Not evaluated]"
+        else:
+            docScore = int(docScore / count)
 
     else:
         noSsExp = pd.DataFrame(columns=['name', 'file', 'type', 'error', 'project'])
@@ -394,8 +314,11 @@ def processing():
 
     # level 2: folder structure
     folderStructure = project_folder_structure.list_files(fileLocationStr=fileLocationStr)
+    session['folderStructure'] = folderStructure
+
     # level 2: project structure
     gexf = project_structure.generate_gexf(df_annotation=df_annotation, fileLocationStr=fileLocationStr)
+    session['gexf'] = gexf
 
     #level 2: check template
     df_templateComment = template_check.check_template(df_json_exp=df_json_exp, df_annotation=df_annotation,
@@ -436,45 +359,88 @@ def processing():
     session['activityStats'] = activityStats
     session['activityTypes'] = activityTypes
     session['project_detail'] = project_detail
-    session['folderStructure'] = folderStructure
-    session['gexf'] = gexf
     session['selector'] = lst_selector_data
 
 
-    ##########################################################################################################
-
-    return redirect(url_for('.__main__'))
-
-
-@app.route("/analyze")
-def __main__():
-    with app.app_context():
-        # clear out content in file folder
-        shutil.rmtree(session.get("folderPath"))
-
-        return render_template('index.html',
-                               namingScore=session.get("namingScore"),
-                               usageScore=session.get("usageScore"),
-                               docScore=session.get("docScore"),
-                               table1={'data': session.get("table1"),
-                                       'file': session.get('table1File'),
-                                       'type': session.get('table1Type'),
-                                       'error': session.get('table1Error'),
-                                       'project': session.get('table1Project')},
-                               actStats={"data": session.get('activityStats'),
-                                         "activity": session.get('activityTypes'),
-                                         "file": session.get('table1File'),
-                                         "project": session.get('table1Project')},
-                               project_detail={"data": session.get("project_detail")},
-                               selectorEval={"data": session.get('selector'),
-                                             "file": session.get('table1File'),
-                                             "project": session.get('table1Project')})
+    resp = jsonify({"result": render_template('index.html',
+                                               namingScore=namingScore,
+                                               usageScore=usageScore,
+                                               docScore=docScore,
+                                               table1={'data': list(df_table1.reset_index(drop=True).reset_index(drop=False).T.to_dict().values()),
+                                                       'file': table1File,
+                                                       'type': table1Type,
+                                                       'error': table1Error,
+                                                       'project': table1Project},
+                                               actStats={"data": activityStats,
+                                                         "activity": activityTypes,
+                                                         "file": table1File,
+                                                         "project": table1Project},
+                                               project_detail={"data": project_detail},
+                                               selectorEval={"data": lst_selector_data,
+                                                             "file": table1File,
+                                                             "project": table1Project})})
+    return make_response(resp, 200)
 
 
 @app.route("/retry")
 def delete_pics():
     with app.app_context():
         return redirect(url_for('upload'))
+
+
+@app.route("/fileUploading", methods=["POST"])
+def fileUploading():
+    with app.app_context():
+        file = request.files['file']
+        filename = secure_filename(file.filename).replace("\\", "/")
+        generatedFileNaming = filename.replace(".zip", "") + str(time.time()).replace(".", "") + \
+                              str(randint(1, 999999999999)) + ".zip"
+        if os.path.isfile(os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming):
+            nameDup = True
+            while nameDup:
+                generatedFileNaming = filename.replace(".zip", "") + str(time.time()).replace(".", "") + \
+                                      str(randint(1, 999999999999)) + ".zip"
+                nameDup = os.path.isfile(os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming)
+        file.save((os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming).replace("\\", "/"))
+        generatedFolderName = filename[:-4] + str(time.time()).replace(".", "") + str(randint(1, 999999999999))
+
+        if os.path.isdir((os.getcwd() + app.config['UPLOAD_PATH'] + generatedFolderName).replace("\\", "/")):
+            folderExist = True
+            while folderExist:
+                generatedFolderName = filename[:-4] + str(time.time()).replace(".", "") + \
+                                      str(randint(1, 999999999999))
+                folderExist = os.path.isdir((os.getcwd() + app.config['UPLOAD_PATH'] +
+                                             generatedFolderName).replace("\\", "/"))
+
+        folderPath = (os.getcwd() + app.config['UPLOAD_PATH'] + generatedFolderName).replace("\\", "/")
+
+        zipFile = zipfile.ZipFile(
+            (os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming).replace("\\", "/"))
+        zipFile.extractall(folderPath)
+        zipFile.close()
+
+        os.remove((os.getcwd() + app.config['UPLOAD_PATH'] + generatedFileNaming).replace("\\", "/"))
+        session['folderPath'] = folderPath
+
+        files = []
+        for r, d, f in os.walk(folderPath):
+            for file in f:
+                if '.xaml' in file:
+                    files.append(os.path.join(r, file).replace("\\", "/"))
+        fileLocationStr = (os.getcwd() + app.config['UPLOAD_PATH'] + generatedFolderName).replace("\\", "/") + "/"
+        for r, d, f in os.walk(folderPath):
+            if len(d) == 1:
+                fileLocationStr = r.replace("\\", "/") + "/" + d[0] + "/"
+            else:
+                break
+        session['fileLocationStr'] = fileLocationStr
+        session['files'] = files
+        if (files == []):
+            return {"message": "There is no xaml file in the zip file."}, 400
+        else:
+            resp = jsonify({"message": "File uploaded successfully.", "fileLocation": folderPath})
+            return make_response(resp, 200)
+
 
 
 # @app.route("/elastic")

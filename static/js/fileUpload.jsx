@@ -1,17 +1,41 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import classnames from "classnames";
+import "../css/checkTabs.css";
 import styles from "../scss/landing_page.scss";
+import CheckTabs from "./checkTabs";
+import Spinner from "react-bootstrap/Spinner";
+import Loader from "react-loader-spinner";
+import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 
 class FileUploader extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       settingExpand: true,
-      downloadExpand: false
+      downloadExpand: false,
+      setting: {
+        varName: true,
+        argName: true,
+        actName: true,
+        varUsage: true,
+        argUsage: true,
+        wfAnnot: true,
+        tcLog: true,
+        tcSs: true,
+        jsonLog: true,
+        argExp: true
+      },
+      fileName: "",
+      uploading: false,
+      analyzing: false,
+      filePath: ""
     };
     this.ExpandSetting = this.ExpandSetting.bind(this);
     this.ExpandDownload = this.ExpandDownload.bind(this);
+    this.OnChooseFile = this.OnChooseFile.bind(this);
+    this.GetSetting = this.GetSetting.bind(this);
+    this.OnUpload = this.OnUpload.bind(this);
   }
 
   ExpandSetting() {
@@ -20,6 +44,79 @@ class FileUploader extends React.Component {
 
   ExpandDownload() {
     this.setState({ downloadExpand: !this.state.downloadExpand });
+  }
+
+  GetSetting(childState) {
+    this.setState({ setting: childState });
+  }
+
+  OnChooseFile(e) {
+    e.preventDefault();
+    if (this.state.filePath != "") {
+    }
+    let files = e.target.files[0];
+    let filePath = e.target.files[0].name;
+    var form_data = new FormData();
+    if (
+      filePath.toLowerCase().endsWith(".zip") &&
+      filePath.replace(".", "").length == filePath.length - 1
+    ) {
+      this.setState(
+        {
+          fileName: filePath,
+          uploading: true
+        },
+        () => {
+          form_data.append("file", files);
+          $.ajax({
+            url: "/fileUploading",
+            type: "POST",
+            data: form_data,
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function(e) {},
+            error: function(e) {
+              alert("File Error. Please upload a valid zip file.");
+            }
+          }).then(response => {
+            this.setState({
+              filePath: response.fileLocation,
+              uploading: false
+            });
+          });
+          // .catch(error => {
+          //   alert("File Error. Please upload a valid zip file.");
+          // });
+        }
+      );
+    } else {
+      window.alert("Please choose a zip file with project(s) zipped inside.");
+    }
+  }
+
+  OnUpload(e) {
+    e.preventDefault();
+    if (this.state.filePath == "") {
+      window.alert("Please choose a zip file to upload first.");
+    } else {
+      this.setState({ analyzing: true }, () => {
+        $.ajax({
+          url: "/processing",
+          type: "POST",
+          data: JSON.stringify(this.state),
+          contentType: "json/application",
+          dataType: "json",
+          success: function(response) {
+            document.write(response.result);
+          },
+          error: function(e) {
+            console.log(e);
+            window.alert("Failed to analyze. Please upload a valid zip file.");
+          }
+        });
+      });
+    }
   }
 
   render() {
@@ -35,453 +132,186 @@ class FileUploader extends React.Component {
                   </span>
                 </div>
               </div>
-              <form
-                action="uploader"
-                method="post"
-                encType="multipart/form-data"
-                id="fileUploadForm"
-              >
-                <div className={classnames("accordion")}>
-                  <div id="accordion">
+
+              <div className={classnames("accordion")}>
+                <div id="accordion">
+                  <div
+                    className={classnames(
+                      "card",
+                      "rounded-0",
+                      "bg-light",
+                      styles["card-cust"]
+                    )}
+                  >
                     <div
                       className={classnames(
-                        "card",
+                        "card-header",
+                        "height_auto",
+                        "border-0",
                         "rounded-0",
-                        "bg-light",
-                        styles["card-cust"]
+                        "pl-4",
+                        styles["card-header-cust"]
                       )}
+                    >
+                      <h5 className={classnames("mb-2")}>
+                        <button
+                          className={classnames(
+                            "btn",
+                            "heading-1",
+                            "d-block",
+                            styles["heading-1-cust"]
+                          )}
+                          type="button"
+                          onClick={() => this.ExpandSetting()}
+                        >
+                          Step 1 - Settings{" "}
+                          <span className={classnames("pl-3")}>
+                            {this.state.settingExpand ? (
+                              <i className={classnames("fa fa-angle-up")}></i>
+                            ) : (
+                              <i className={classnames("fa fa-angle-down")}></i>
+                            )}
+                          </span>
+                        </button>
+                        <span className={classnames(styles["heading-2"])}>
+                          Please customize the your checks
+                        </span>
+                      </h5>
+                    </div>
+                    <div
+                      className={classnames("collapse")}
+                      style={{
+                        display: this.state.settingExpand ? "block" : "none"
+                      }}
                     >
                       <div
                         className={classnames(
-                          "card-header",
-                          "height_auto",
-                          "border-0",
-                          "rounded-0",
-                          "pl-4",
-                          styles["card-header-cust"]
+                          "card-body",
+                          "pb-4",
+                          styles["card-body-cust"],
+                          styles["card-body-download-cust"]
                         )}
                       >
-                        <h5 className={classnames("mb-2")}>
-                          <button
-                            className={classnames(
-                              "btn",
-                              "heading-1",
-                              "d-block",
-                              styles["heading-1-cust"]
-                            )}
-                            type="button"
-                            onClick={() => this.ExpandSetting()}
-                          >
-                            Step 1 - Settings{" "}
-                            <span className={classnames("pl-3")}>
-                              {this.state.settingExpand ? (
-                                <i className={classnames("fa fa-angle-up")}></i>
-                              ) : (
-                                <i
-                                  className={classnames("fa fa-angle-down")}
-                                ></i>
-                              )}
-                            </span>
-                          </button>
-                          <span className={classnames(styles["heading-2"])}>
-                            Please customize the your checks
-                          </span>
-                        </h5>
-                      </div>
-                      <div
-                        className={classnames("collapse")}
-                        style={{
-                          display: this.state.settingExpand ? "block" : "none"
-                        }}
-                      >
-                        <div
-                          className={classnames(
-                            "card-body",
-                            "pb-4",
-                            styles["card-body-cust"],
-                            styles["card-body-download-cust"]
-                          )}
-                        >
-                          <div
-                            className={classnames(
-                              "row justify-content-lg-center pl-2"
-                            )}
-                          >
-                            <div className={classnames("col-lg-4")}>
-                              <div
-                                className={classnames(styles["check_boxes"])}
-                              >
-                                <span
-                                  className={classnames(
-                                    "d-block mb-2",
-                                    styles["category-cust"]
-                                  )}
-                                >
-                                  Naming
-                                </span>
-                                <div className={classnames("form-check")}>
-                                  <input
-                                    className={classnames("form-check-input")}
-                                    type="checkbox"
-                                    id="defaultCheck1"
-                                    name="VariableNaming"
-                                    value="VariableNaming"
-                                    defaultChecked
-                                  ></input>
-                                  <label
-                                    className={classnames(
-                                      styles["form-check-label"]
-                                    )}
-                                    htmlFor="defaultCheck1"
-                                  >
-                                    Variable Naming
-                                  </label>
-                                </div>
-
-                                <div
-                                  className={classnames(styles["form-check"])}
-                                >
-                                  <input
-                                    className={classnames(
-                                      styles["form-check-input"]
-                                    )}
-                                    type="checkbox"
-                                    id="defaultCheck1"
-                                    name="ArgumentNaming"
-                                    value="ArgumentNaming"
-                                    defaultChecked
-                                  ></input>
-                                  <label
-                                    className={classnames(
-                                      styles["form-check-label"]
-                                    )}
-                                    htmlFor="defaultCheck1"
-                                  >
-                                    Argument Naming
-                                  </label>
-                                </div>
-
-                                <div
-                                  className={classnames(styles["form-check"])}
-                                >
-                                  <input
-                                    className={classnames(
-                                      styles["form-check-input"]
-                                    )}
-                                    type="checkbox"
-                                    id="defaultCheck1"
-                                    name="ActivityNaming"
-                                    value="ActivityNaming"
-                                    defaultChecked
-                                  ></input>
-                                  <label
-                                    className={classnames(
-                                      styles["form-check-label"]
-                                    )}
-                                    htmlFor="defaultCheck1"
-                                  >
-                                    Activity Naming
-                                  </label>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div
-                              className={classnames(styles["col-lg-4"])}
-                              style={{ paddingLeft: "30px" }}
-                            >
-                              <div
-                                className={classnames(styles["check_boxes"])}
-                              >
-                                <span
-                                  className={classnames(
-                                    "d-block mb-2",
-                                    styles["category-cust"]
-                                  )}
-                                >
-                                  Usage
-                                </span>
-
-                                <div
-                                  className={classnames(styles["form-check"])}
-                                >
-                                  <input
-                                    className={classnames(
-                                      styles["form-check-input"]
-                                    )}
-                                    type="checkbox"
-                                    id="defaultCheck1"
-                                    name="VariableUsage"
-                                    value="VariableUsage"
-                                    defaultChecked
-                                  ></input>
-                                  <label
-                                    className={classnames(
-                                      styles["form-check-label"]
-                                    )}
-                                    htmlFor="defaultCheck1"
-                                  >
-                                    Variable Usage
-                                  </label>
-                                </div>
-
-                                <div
-                                  className={classnames(styles["form-check"])}
-                                >
-                                  <input
-                                    className={classnames(
-                                      styles["form-check-input"]
-                                    )}
-                                    type="checkbox"
-                                    id="defaultCheck1"
-                                    name="ArgumentUsage"
-                                    value="ArgumentUsage"
-                                    defaultChecked
-                                  ></input>
-                                  <label
-                                    className={classnames(
-                                      styles["form-check-label"]
-                                    )}
-                                    htmlFor="defaultCheck1"
-                                  >
-                                    Argument Usage
-                                  </label>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div
-                              className={classnames(styles["col-lg-4"])}
-                              style={{ paddingLeft: "30px" }}
-                            >
-                              <div
-                                className={classnames(styles["check_boxes"])}
-                              >
-                                <span
-                                  className={classnames(
-                                    "d-block mb-2",
-                                    styles["category-cust"]
-                                  )}
-                                >
-                                  Documentation
-                                </span>
-
-                                <div
-                                  className={classnames(styles["form-check"])}
-                                >
-                                  <input
-                                    className={classnames(
-                                      styles["form-check-input"]
-                                    )}
-                                    type="checkbox"
-                                    id="defaultCheck1"
-                                    name="WorkflowAnnotation"
-                                    value="WorkflowAnnotation"
-                                    defaultChecked
-                                  ></input>
-                                  <label
-                                    className={classnames(
-                                      styles["form-check-label"]
-                                    )}
-                                    htmlFor="defaultCheck1"
-                                  >
-                                    Workflow Annotation
-                                  </label>
-                                </div>
-
-                                <div
-                                  className={classnames(styles["form-check"])}
-                                >
-                                  <input
-                                    className={classnames(
-                                      styles["form-check-input"]
-                                    )}
-                                    type="checkbox"
-                                    id="defaultCheck1"
-                                    name="TryCatchLogging"
-                                    value="TryCatchLogging"
-                                    defaultChecked
-                                  ></input>
-                                  <label
-                                    className={classnames(
-                                      styles["form-check-label"]
-                                    )}
-                                    htmlFor="defaultCheck1"
-                                  >
-                                    Try Catch Logging
-                                  </label>
-                                </div>
-
-                                <div
-                                  className={classnames(styles["form-check"])}
-                                >
-                                  <input
-                                    className={classnames(
-                                      styles["form-check-input"]
-                                    )}
-                                    type="checkbox"
-                                    id="defaultCheck1"
-                                    name="TryCatchScreenshot"
-                                    value="TryCatchScreenshot"
-                                    defaultChecked
-                                  ></input>
-                                  <label
-                                    className={classnames(
-                                      styles["form-check-label"]
-                                    )}
-                                    htmlFor="defaultCheck1"
-                                  >
-                                    Try Catch Screenshot
-                                  </label>
-                                </div>
-
-                                <div
-                                  className={classnames(styles["form-check"])}
-                                >
-                                  <input
-                                    className={classnames(
-                                      styles["form-check-input"]
-                                    )}
-                                    type="checkbox"
-                                    id="defaultCheck1"
-                                    name="JsonLogging"
-                                    value="JsonLogging"
-                                    defaultChecked
-                                  ></input>
-                                  <label
-                                    className={classnames(
-                                      styles["form-check-label"]
-                                    )}
-                                    htmlFor="defaultCheck1"
-                                  >
-                                    Project.Json Logging
-                                  </label>
-                                </div>
-
-                                <div
-                                  className={classnames(styles["form-check"])}
-                                >
-                                  <input
-                                    className={classnames(
-                                      styles["form-check-input"]
-                                    )}
-                                    type="checkbox"
-                                    id="defaultCheck1"
-                                    name="ArgExpAnnot"
-                                    value="ArgExpAnnot"
-                                    defaultChecked
-                                  ></input>
-                                  <label
-                                    className={classnames(
-                                      styles["form-check-label"]
-                                    )}
-                                    htmlFor="defaultCheck1"
-                                  >
-                                    Argument Explanation in Annotation
-                                  </label>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+                        <CheckTabs getSetting={this.GetSetting} />
                       </div>
                     </div>
                   </div>
                 </div>
+              </div>
 
+              <div
+                className={classnames(
+                  "card rounded-0 bg-light border-top-none border-bottom-none"
+                )}
+              >
                 <div
                   className={classnames(
-                    "card rounded-0 bg-light border-top-none border-bottom-none"
+                    "card-header",
+                    "height_auto",
+                    "border-0",
+                    "rounded-0",
+                    "pl-4",
+                    styles["card-header-cust"]
                   )}
                 >
-                  <div
-                    className={classnames(
-                      "card-header",
-                      "height_auto",
-                      "border-0",
-                      "rounded-0",
-                      "pl-4",
-                      styles["card-header-cust"]
-                    )}
-                  >
-                    <h5
-                      className={classnames("mb-3", "mt-2", "d-inline-block")}
-                    >
-                      <div
-                        className={classnames(
-                          "heading-1",
-                          "d-block",
-                          "pb-2",
-                          styles["heading-1-cust"]
-                        )}
-                      >
-                        Step 2 - Choose File
-                      </div>
-                      <span className={classnames(styles["heading-2"])}>
-                        Please upload the file in .zip format
-                      </span>
-                    </h5>
-                    <label
+                  <h5 className={classnames("mb-3", "mt-2", "d-inline-block")}>
+                    <div
                       className={classnames(
-                        "btn btn-primary ml-0 mt-2 pt-2 pb-2 pl-3 pr-3",
-                        styles["btn-primary-cust"],
-                        styles["upload-button-cust"]
+                        "heading-1",
+                        "d-block",
+                        "pb-2",
+                        styles["heading-1-cust"]
                       )}
                     >
-                      <span className={classnames("btn_text pl-1")}>
-                        <i className={classnames("fa fa-upload")}></i>
-                        &nbsp;&nbsp; Choose File
-                      </span>
-                      <input type="file" name="file" id="file" hidden></input>
-                    </label>
-                  </div>
-                </div>
-
-                <div className={classnames("card rounded-0 border-top-none")}>
-                  <div
+                      Step 2 - Choose File
+                    </div>
+                    <span className={classnames(styles["heading-2"])}>
+                      {this.state.fileName == ""
+                        ? "Please upload the file in .zip format"
+                        : "File Chosen: " + this.state.fileName}
+                    </span>
+                  </h5>
+                  <label
                     className={classnames(
-                      "card-header",
-                      "height_auto",
-                      "border-0",
-                      "rounded-0",
-                      "pl-4",
-                      styles["card-header-cust"]
+                      "btn btn-primary ml-0 mt-2 pt-2 pb-2 pl-3 pr-3",
+                      styles["btn-primary-cust"],
+                      styles["upload-button-cust"]
                     )}
                   >
-                    <h5 className={classnames(styles["mb-0"])}>
-                      <div
+                    {this.state.uploading ? (
+                      <span
                         className={classnames(
-                          "heading-1",
-                          "d-block",
-                          "pb-2",
-                          styles["heading-1-cust"]
+                          "btn_text pl-1",
+                          styles["upload-span-cust"]
                         )}
                       >
-                        Step 3 - Press &amp; Go
-                      </div>
-                    </h5>
+                        <Spinner animation="border" variant="light" size="sm" />
+                        {"  "}Uploading ...
+                      </span>
+                    ) : (
+                      <span
+                        className={
+                          (classnames("btn_text pl-1"),
+                          styles["upload-span-cust"])
+                        }
+                      >
+                        <i className={classnames("fa fa-upload")}></i>
+                        {"  "} Choose File
+                      </span>
+                    )}
+                    <input
+                      type="file"
+                      name="file"
+                      id="file"
+                      onChange={e => this.OnChooseFile(e)}
+                      hidden
+                      disabled={this.state.uploading || this.state.analyzing}
+                    ></input>
+                  </label>
+                </div>
+              </div>
+
+              <div className={classnames("card rounded-0 border-top-none")}>
+                <div
+                  className={classnames(
+                    "card-header",
+                    "height_auto",
+                    "border-0",
+                    "rounded-0",
+                    "pl-4",
+                    styles["card-header-cust"]
+                  )}
+                >
+                  <h5 className={classnames(styles["mb-0"])}>
                     <div
-                      className={classnames("d-flex justify-content-center")}
+                      className={classnames(
+                        "heading-1",
+                        "d-block",
+                        "pb-2",
+                        styles["heading-1-cust"]
+                      )}
                     >
-                      <button
-                        id="uploadText"
-                        className={classnames(
-                          "d-flex justify-content-center btn btn-primary pt-2 pb-2 pr-0",
-                          styles["btn-primary-cust"]
-                        )}
-                        style={{ width: "100%" }}
-                      >
-                        <input
-                          type="submit"
-                          value="Upload"
-                          className={classnames(styles["submitBtn"])}
-                          hidden
-                        ></input>
-                        <span className={classnames("d-flex btn_text")}>
-                          <div id="Progress">Upload</div>
-                        </span>
-                      </button>
-                      {/* <script type="text/javascript">
+                      Step 3 - Press &amp; Go
+                    </div>
+                  </h5>
+                  <div className={classnames("d-flex justify-content-center")}>
+                    <button
+                      id="uploadText"
+                      onClick={e => this.OnUpload(e)}
+                      className={classnames(
+                        "d-flex justify-content-center btn btn-primary pt-2 pb-2 pr-0",
+                        styles["btn-primary-cust"]
+                      )}
+                      style={{ width: "100%" }}
+                      disabled={
+                        this.state.filePath == "" || this.state.analyzing
+                      }
+                    >
+                      <span className={classnames("d-flex btn_text")}>
+                        <div id="Progress">Analyze</div>
+                      </span>
+                    </button>
+                    {/* <script type="text/javascript">
                       $("#fileUploadForm").submit(function () {
                         $("#uploadText").attr("disabled", true);
                       });
@@ -493,16 +323,15 @@ class FileUploader extends React.Component {
                         });
                       });
                     </script> */}
-                    </div>
                   </div>
                 </div>
-              </form>
+              </div>
 
-              <div className={classnames(styles["accordion1"])}>
+              <div className={classnames("accordion1")}>
                 <div id="accordion1">
                   <div
                     className={classnames(
-                      "card rounded-0 bg-light mb-3",
+                      "card rounded-0 bg-light mb-5",
                       styles["card-cust"]
                     )}
                   >

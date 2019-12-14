@@ -1,6 +1,23 @@
 @import "akoa/config";
 @import "bootstrap/config";
 
+.toggle-label-cust {
+  margin-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.toggle-cust {
+  margin-bottom: 0.5rem;
+  text-align: right;
+  float: right;
+}
+
+.form-check-cust {
+  padding: 0px;
+  margin-bottom: 0.3rem;
+  display: block;
+}
+
 .btn-primary-cust {
   background-color: transparent;
   background: linear-gradient(
@@ -11,6 +28,12 @@
   border-color: transparent;
   border: transparent;
 }
+
+.btn-primary-cust:disabled {
+  opacity: 0.6;
+  background: $akoa-sunrise !important;
+}
+
 .btn-primary-cust:hover,
 .btn-primary-cust:active,
 .btn-primary-cust:focus {
@@ -25,6 +48,16 @@
 .upload-button-cust {
   vertical-align: middle;
   float: right;
+  width: 150px;
+  height: 35x;
+  text-align: center;
+}
+
+.upload-span-cust {
+  vertical-align: middle;
+  width: 150px;
+  height: 35x;
+  text-align: center;
 }
 
 .card-cust {
@@ -42,6 +75,7 @@
 .card-body-cust {
   background: white;
   background-color: white;
+  padding-top: 0px;
 }
 
 .category-cust {

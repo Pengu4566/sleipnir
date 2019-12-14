@@ -61,7 +61,7 @@ export default class SelectorTable extends React.Component {
           <div className="col-lg-12">
             <div className="ml-4 mt-4 mb-4">
               <span className="heading-1 d-block">Selectors Overview</span>
-              <span class="heading-2 mb-3 d-block">
+              <span className="heading-2 mb-3 d-block">
                 Here is a table of all selectors.
               </span>
             </div>
