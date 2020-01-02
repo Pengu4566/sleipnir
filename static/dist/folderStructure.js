@@ -3,32 +3,101 @@ fetch("/folder")
     return response.text();
   })
   .then(function(text) {
-    var data = JSON.parse(text);
+    var diskData = JSON.parse(text);
+
+    myChart.showLoading();
 
     var sunburst = echarts.init(document.getElementById("folderStructure"));
-    option = {
-      tooltip: {
-        show: true,
-        formatter: function(params) {
-          let name = params.data.name;
-          let size = (params.data.value * 0.001).toFixed(0);
-          return `<div>${name}: ${size}KB</div>`;
-        }
-      },
-      series: {
-        type: "sunburst",
-        data: data,
-        highlightPolicy: "ancestor",
-        radius: ["0%", "100%"],
-        label: {
-          show: true,
-          rotate: "radial"
+
+    sunburst.setOption(option = {
+
+        title: {
+            text: 'Disk Usage',
+            left: 'center'
         },
-        itemStyle: {
-          borderWidth: 2
+
+        tooltip: {
+            formatter: function (info) {
+                var value = info.value;
+                var treePathInfo = info.treePathInfo;
+                var treePath = [];
+
+                for (var i = 1; i < treePathInfo.length; i++) {
+                    treePath.push(treePathInfo[i].name);
+                }
+
+                return [
+                    '<div class="tooltip-title">' + formatUtil.encodeHTML(treePath.join('/')) + '</div>',
+                    'Disk Usage: ' + formatUtil.addCommas((value/1024).toFixed(2)) + ' KB',
+                ].join('');
+            }
         },
-        sort: null
-      }
-    };
-    sunburst.setOption(option);
+
+        series: [
+            {
+                name: 'Project Disk Usage',
+                type: 'treemap',
+                visibleMin: 100,
+                label: {
+                    show: true,
+                    formatter: '{b}'
+                },
+                upperLabel: {
+                    show: true,
+                    height: 22
+                },
+                itemStyle: {
+                    borderColor: '#fff'
+                },
+                levels: getLevelOption(),
+                data: diskData
+            }
+        ]
+    });
   });
+
+function colorMappingChange(value) {
+        var levelOption = getLevelOption(value);
+        chart.setOption({
+            series: [{
+                levels: levelOption
+            }]
+        });
+    }
+
+    var formatUtil = echarts.format;
+
+    function getLevelOption() {
+        return [
+            {
+                itemStyle: {
+                    borderColor: '#777',
+                    borderWidth: 0,
+                    gapWidth: 1
+                },
+                upperLabel: {
+                    show: false
+                }
+            },
+            {
+                itemStyle: {
+                    borderColor: '#555',
+                    borderWidth: 5,
+                    gapWidth: 1
+                },
+                emphasis: {
+                    itemStyle: {
+                        borderColor: '#ddd'
+                    }
+                }
+            },
+            {
+                colorSaturation: [0.35, 0.5],
+                itemStyle: {
+                    borderWidth: 3,
+                    gapWidth: 1,
+                    borderColorSaturation: 0.6
+                }
+            }
+        ];
+    }
