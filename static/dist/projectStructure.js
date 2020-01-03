@@ -3,6 +3,7 @@ var myChart = echarts.init(document.getElementById("projectStructure"));
 
 myChart.title = "Project Structure";
 //myChart.showLoading();
+myChart.hideLoading();
 $(document).ready(function() {
   //$.get('dist/project_structure_graph.gexf', function (xml) {
 
@@ -92,7 +93,7 @@ $(document).ready(function() {
       }
       //}, 'xml');}
       else {
-        myChart.hideLoading();
+        //myChart.hideLoading();
         option = {
           title: {
             text: "",
