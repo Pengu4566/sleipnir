@@ -2,6 +2,7 @@ const webpack = require("webpack");
 
 const config = {
   entry: {
+    login: __dirname + "/js/login.jsx",
     index: __dirname + "/js/index.jsx",
     fileUpload: __dirname + "/js/fileUpload.jsx"
   },

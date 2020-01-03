@@ -29,6 +29,11 @@
   border: transparent;
 }
 
+.upload-button-disable-cust {
+  opacity: 0.6;
+  background: $akoa-sunrise !important;
+}
+
 .btn-primary-cust:disabled {
   opacity: 0.6;
   background: $akoa-sunrise !important;
@@ -98,9 +103,21 @@
     $akoa-sunrise-light 95%
   );
   .header_text {
+    float: left;
     font-size: 20px;
     color: white;
     font-weight: bold;
+    line-height: 70px;
+  }
+  .username-cust {
+    margin-left: auto;
+    float: right;
+    text-align: right;
+    .logout-cust:hover,
+    .logout-cust:active,
+    .logout-cust:focus {
+      font-size: 25px;
+    }
   }
 }
 

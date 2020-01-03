@@ -71,7 +71,7 @@ export default class ActivityStatsBlock extends React.Component {
         <div className="row justify-content-lg-left">
           <div className="col-lg-12">
             <div className="ml-4 mt-4 mb-4">
-              <span className="heading-1 d-block">Activity Statistics</span>
+              <span className="subheading-1 d-block">Activity Statistics</span>
               <span className="heading-2 mb-3 d-block">
                 Here is a summary of how many times each activities is used in
                 the uploaded files.

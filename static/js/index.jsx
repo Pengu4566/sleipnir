@@ -5,6 +5,12 @@ import JsonLogBlock from "./checkBlocks/JsonLogBlock";
 import ActivityStatsBlock from "./checkBlocks/ActivityStats";
 import SelectorTable from "./checkBlocks/SelectorTable";
 import Table1 from "./checkBlocks/Table1Filters";
+import ResultHeader from "./resultHeader";
+
+ReactDOM.render(
+  <ResultHeader username={username} user_id={user_id} />,
+  document.getElementById("resultHeader")
+);
 
 ReactDOM.render(
   <JsonLogBlock name={window.projectOverviewTableData} />,

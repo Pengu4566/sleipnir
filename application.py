@@ -21,6 +21,8 @@ from soft_checks import activity_stats, project_folder_structure, project_struct
 from flask import Flask, request, render_template, redirect, url_for, session, jsonify, Response, send_file, make_response
 from flask_session import Session
 from flask_socketio import SocketIO, emit
+from flask_mysqldb import MySQL
+import MySQLdb.cursors
 import pdfkit
 
 # es = Elasticsearch(['https://098b8510b627461cb0e77d37d10c4511.us-east-1.aws.found.io:9243'],
@@ -36,6 +38,13 @@ app.config['SESSION_TYPE'] = 'filesystem'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
 app.config['SECRET_KEY'] = randint(0,99999999999999999999)
 
+app.config['MYSQL_HOST'] = 'us-sql01.mysql.database.azure.com'
+app.config['MYSQL_PORT'] = 3306
+app.config['MYSQL_USER'] = 'us-evalsql01@us-sql01'
+app.config['MYSQL_PASSWORD'] = 'LoraSQL123'
+app.config['MYSQL_DB'] = 'sleipnir'
+mysql = MySQL(app)
+
 # Check Configuration section for more details
 Session(app)
 socketio = SocketIO(app, async_mode="eventlet")
@@ -50,15 +59,80 @@ df_invokeWf = []
 
 ######
 
+@app.route("/")
+def login():
+    with app.app_context():
+        folderPathList = [os.getcwd().replace("\\", "/") + app.config['UPLOAD_PATH'] + path for path in
+                          os.listdir(os.getcwd() + app.config['UPLOAD_PATH'])]
+        filteredFolderPathList = [path for path in folderPathList if time.time() - os.path.getmtime(path) > 900]
+        for folder in filteredFolderPathList:
+            shutil.rmtree(folder, True)
+        sessionPathList = [os.getcwd().replace("\\", "/") + '/flask_session/' + path for path in
+                          os.listdir(os.getcwd() + '/flask_session/')]
+        filteredSessionPathList = [path for path in sessionPathList if time.time() - os.path.getmtime(path) > 900]
+        for ses in filteredSessionPathList:
+            print(ses)
+            os.remove(ses)
 
-@app.route('/')
+        if session.get("loggedin"):
+            return redirect(url_for('upload'))
+        else:
+            return render_template('login.html')
+
+@app.route("/login", methods=['POST'])
+def validate_user():
+    with app.app_context():
+        requestData = json.loads(str(request.data, encoding="utf-8"))
+        tenant = requestData['tenant']
+        username = requestData['username']
+        password = requestData['password']
+
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT id FROM tenants WHERE tenant_name = %s", (tenant,))
+        tenant_record = cursor.fetchone()
+        if tenant_record:
+            tenant_id = tenant_record["id"]
+            cursor.execute('SELECT id FROM users WHERE username = %s AND password = %s AND tenant_id = %s', (username, password, tenant_id,))
+            user_record = cursor.fetchone()
+            if user_record:
+                user_id = user_record["id"]
+                resp = jsonify({"result": render_template('fileUpload.html',
+                                                          username=username,
+                                                          user_id=user_id)})
+                session['loggedin'] = True
+                session['id'] = user_id
+                session['username'] = username
+                return make_response(resp, 200)
+            else:
+                resp = jsonify({"message": "User not exists"})
+                return make_response(resp, 400)
+        else:
+            resp = jsonify({"message": "Tenant not exists"})
+            return make_response(resp, 400)
+
+
+@app.route('/logout')
+def logout():
+    with app.app_context():
+        session.pop('loggedin', None)
+        session.pop('user_id', None)
+        session.pop('username', None)
+        return redirect(url_for('login'))
+
+
+@app.route('/upload')
 def upload():
     with app.app_context():
         folderPathList = [os.getcwd().replace("\\", "/") + app.config['UPLOAD_PATH'] + path for path in os.listdir(os.getcwd() + app.config['UPLOAD_PATH'])]
         filteredFolderPathList = [path for path in folderPathList if time.time() - os.path.getmtime(path) > 900]
         for folder in filteredFolderPathList:
             shutil.rmtree(folder, True)
-        return render_template('fileUpload.html')
+        if session.get('loggedin'):
+            return render_template('fileUpload.html',
+                                   username=session.get('username'),
+                                   user_id=session.get('user_id'))
+        else:
+            return "Please login first"
 
 
 def background_thread():
@@ -361,26 +435,31 @@ def processing():
     session['project_detail'] = project_detail
     session['selector'] = lst_selector_data
 
-
-    resp = jsonify({"result": render_template('index.html',
-                                               namingScore=namingScore,
-                                               usageScore=usageScore,
-                                               docScore=docScore,
-                                               table1={'data': list(df_table1.reset_index(drop=True).reset_index(drop=False).T.to_dict().values()),
-                                                       'file': table1File,
-                                                       'type': table1Type,
-                                                       'error': table1Error,
-                                                       'project': table1Project},
-                                               actStats={"data": activityStats,
-                                                         "activity": activityTypes,
-                                                         "file": table1File,
-                                                         "project": table1Project},
-                                               project_detail={"data": project_detail},
-                                               selectorEval={"data": lst_selector_data,
-                                                             "file": table1File,
-                                                             "project": table1Project})})
+    resp = jsonify({"result": "success"})
     return make_response(resp, 200)
 
+@app.route("/result")
+def result():
+    with app.app_context():
+        return render_template('index.html',
+                               username=session.get('username'),
+                               user_id=session.get('user_id'),
+                               namingScore=session['namingScore'],
+                               usageScore=session['usageScore'],
+                               docScore=session['docScore'],
+                               table1={'data': session['table1'],
+                                       'file': session['table1File'],
+                                       'type': session['table1Type'],
+                                       'error': session['table1Error'],
+                                       'project': session['table1Project']},
+                               actStats={"data": session['activityStats'],
+                                         "activity": session['activityTypes'],
+                                         "file": session['table1File'],
+                                         "project": session['table1Project']},
+                               project_detail={"data": session['project_detail']},
+                               selectorEval={"data": session['selector'],
+                                             "file": session['table1File'],
+                                             "project": session['table1Project']})
 
 @app.route("/retry")
 def delete_pics():

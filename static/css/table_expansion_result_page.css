@@ -80,17 +80,16 @@ body {
   text-decoration: none;
 }
 
-.heading-1:hover {
-  text-decoration: none;
-}
-
-.heading-1:focus {
-  box-shadow: none;
-}
-
 .heading-2 {
   font-weight: bold;
   font-size: 12px;
+}
+
+.subheading-1 {
+  font-weight: bold;
+  font-size: 24px;
+  color: black;
+  text-decoration: none;
 }
 
 .height_auto {

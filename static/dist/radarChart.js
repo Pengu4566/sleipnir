@@ -43,7 +43,7 @@ fetch("/radar")
       },
       series: [
         {
-          name: "Budget vs spending",
+          name: "Score",
           type: "radar",
           // areaStyle: {normal: {}},
           itemStyle: {
@@ -58,7 +58,7 @@ fetch("/radar")
                 parsedData["documentation"],
                 parsedData["naming"]
               ],
-              name: "Allocated Budget"
+              name: "Score"
             }
           ]
         }

@@ -48,25 +48,15 @@
       <i class="fa fa-refresh"></i>
       <span>&nbsp;Retry</span>
     </button>
-    <!-- <script>
-      $(document).ready(function() {
-        $("#retryButton").click(function() {
-          this.window.location = "/retry";
-        });
-      });
-    </script> -->
     <div class="container">
       <div class="row justify-content-lg-center mt-2">
         <div class="col-lg-12">
           <div class="main_div shadow-sm">
-            <div
-              class="d-flex header"
-              style="background: linear-gradient(to top, rgb(233,97,111) 10%, rgb(243,165,130) 95%)"
-            >
-              <div class="d-flex align-self-center">
-                <span class="ml-4 header_text">Please review your results</span>
-              </div>
-            </div>
+            <div id="resultHeader" class="d-flex header"></div>
+            <script>
+              window.username = "{{ username | safe }}";
+              window.user_id = "{{ user_id | safe }}";
+            </script>
             <div class="content">
               <div class="row justify-content-lg-center">
                 <div class="col-lg-6">

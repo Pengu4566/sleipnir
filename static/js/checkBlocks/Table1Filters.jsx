@@ -87,7 +87,7 @@ export default class Table1 extends React.Component {
         <div className="row justify-content-lg-left">
           <div className="col-lg-12">
             <div className="ml-4 mt-4 mb-4">
-              <span className="heading-1 d-block">
+              <span className="subheading-1 d-block">
                 Project Compliance Backlog
               </span>
             </div>

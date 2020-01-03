@@ -36,6 +36,7 @@ class FileUploader extends React.Component {
     this.OnChooseFile = this.OnChooseFile.bind(this);
     this.GetSetting = this.GetSetting.bind(this);
     this.OnUpload = this.OnUpload.bind(this);
+    this.logout = this.logout.bind(this);
   }
 
   ExpandSetting() {
@@ -48,6 +49,10 @@ class FileUploader extends React.Component {
 
   GetSetting(childState) {
     this.setState({ setting: childState });
+  }
+
+  logout() {
+    window.location = "/logout";
   }
 
   OnChooseFile(e) {
@@ -108,10 +113,9 @@ class FileUploader extends React.Component {
           contentType: "json/application",
           dataType: "json",
           success: function(response) {
-            document.write(response.result);
+            window.location = "/result";
           },
           error: function(e) {
-            console.log(e);
             window.alert("Failed to analyze. Please upload a valid zip file.");
           }
         });
@@ -125,12 +129,32 @@ class FileUploader extends React.Component {
         <div className="row justify-content-lg-center mt-5">
           <div className={classnames("col-lg-8")}>
             <div className={classnames("main_div shadow-sm")}>
-              <div className={classnames("d-flex", styles["header"])}>
-                <div className={classnames("d-flex", "align-self-center")}>
-                  <span className={classnames("ml-4", styles["header_text"])}>
-                    Code Review App
-                  </span>
-                </div>
+              <div
+                className={classnames(
+                  "justify-cotent-between",
+                  "algin-self-center",
+                  styles["header"]
+                )}
+              >
+                <span className={classnames("ml-4", styles["header_text"])}>
+                  Code Review App
+                </span>
+                <span
+                  className={classnames(
+                    "mr-4",
+                    styles["header_text"],
+                    styles["username-cust"]
+                  )}
+                >
+                  {username}&ensp;
+                  <i
+                    className={classnames(
+                      "fa fa-sign-out",
+                      styles["logout-cust"]
+                    )}
+                    onClick={() => this.logout()}
+                  ></i>
+                </span>
               </div>
 
               <div className={classnames("accordion")}>
@@ -232,11 +256,20 @@ class FileUploader extends React.Component {
                     </span>
                   </h5>
                   <label
-                    className={classnames(
-                      "btn btn-primary ml-0 mt-2 pt-2 pb-2 pl-3 pr-3",
-                      styles["btn-primary-cust"],
-                      styles["upload-button-cust"]
-                    )}
+                    className={
+                      this.state.analyzing
+                        ? classnames(
+                            "btn btn-primary ml-0 mt-2 pt-2 pb-2 pl-3 pr-3",
+                            styles["btn-primary-cust"],
+                            styles["upload-button-cust"],
+                            styles["upload-button-disable-cust"]
+                          )
+                        : classnames(
+                            "btn btn-primary ml-0 mt-2 pt-2 pb-2 pl-3 pr-3",
+                            styles["btn-primary-cust"],
+                            styles["upload-button-cust"]
+                          )
+                    }
                   >
                     {this.state.uploading ? (
                       <span
@@ -424,6 +457,6 @@ class FileUploader extends React.Component {
 }
 
 ReactDOM.render(
-  <FileUploader />,
+  <FileUploader username={username} user_id={user_id} />,
   document.getElementById("fileUploadContainer")
 );
