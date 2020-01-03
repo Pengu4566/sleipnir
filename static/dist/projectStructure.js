@@ -88,7 +88,7 @@ $(document).ready(function() {
             }
           ]
         };
-        myChart.setOption(option, true);
+        myChart.setOption(option);
       }
       //}, 'xml');}
       else {
@@ -102,7 +102,7 @@ $(document).ready(function() {
             left: "left"
           }
         };
-        myChart.setOption(option, true);
+        myChart.setOption(option);
       }
     });
 });
