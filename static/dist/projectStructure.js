@@ -2,8 +2,7 @@
 var myChart = echarts.init(document.getElementById("projectStructure"));
 
 myChart.title = "Project Structure";
-//myChart.showLoading();
-myChart.hideLoading();
+myChart.showLoading();
 $(document).ready(function() {
   //$.get('dist/project_structure_graph.gexf', function (xml) {
 
@@ -15,7 +14,7 @@ $(document).ready(function() {
     .then(function(text) {
       parsedData = JSON.parse(text);
       if (parsedData["gexf"] != null) {
-        //myChart.hideLoading();
+        myChart.hideLoading();
         var graph = echarts.dataTool.gexf.parse(parsedData["gexf"]);
 
         var categories = [];
@@ -89,11 +88,11 @@ $(document).ready(function() {
             }
           ]
         };
-        myChart.setOption(option);
+        myChart.setOption(option, true);
       }
       //}, 'xml');}
       else {
-        //myChart.hideLoading();
+        myChart.hideLoading();
         option = {
           title: {
             text: "",
@@ -103,7 +102,7 @@ $(document).ready(function() {
             left: "left"
           }
         };
-        myChart.setOption(option);
+        myChart.setOption(option, true);
       }
     });
 });
