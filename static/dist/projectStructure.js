@@ -13,8 +13,9 @@ $(document).ready(function() {
     })
     .then(function(text) {
       parsedData = JSON.parse(text);
+      myChart.hideLoading();
       if (parsedData["gexf"] != null) {
-        myChart.hideLoading();
+
         var graph = echarts.dataTool.gexf.parse(parsedData["gexf"]);
 
         var categories = [];
