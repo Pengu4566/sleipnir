@@ -1,4 +1,5 @@
 const webpack = require("webpack");
+const CompressionPlugin = require('compression-webpack-plugin')
 
 const config = {
   entry: {
@@ -53,4 +54,7 @@ const config = {
     ]
   }
 };
-module.exports = config;
+module.exports = {
+    "plugins" = new CompressionPlugin;
+}
+//module.exports = config;
