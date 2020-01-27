@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import classnames from "classnames";
 import "../css/checkTabs.css";
 import styles from "../scss/landing_page.scss";
-import CheckTabs from "./checkTabs";
+import CheckTabs from "./components/checkTabs";
 import Spinner from "react-bootstrap/Spinner";
 import Loader from "react-loader-spinner";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
@@ -36,7 +36,8 @@ class FileUploader extends React.Component {
     this.OnChooseFile = this.OnChooseFile.bind(this);
     this.GetSetting = this.GetSetting.bind(this);
     this.OnUpload = this.OnUpload.bind(this);
-    this.logout = this.logout.bind(this);
+    this.Logout = this.Logout.bind(this);
+    this.OnClickAdmin = this.OnClickAdmin.bind(this);
   }
 
   ExpandSetting() {
@@ -51,8 +52,12 @@ class FileUploader extends React.Component {
     this.setState({ setting: childState });
   }
 
-  logout() {
+  Logout() {
     window.location = "/logout";
+  }
+
+  OnClickAdmin(e) {
+    window.location = "/admin";
   }
 
   OnChooseFile(e) {
@@ -83,6 +88,7 @@ class FileUploader extends React.Component {
             success: function(e) {},
             error: function(e) {
               alert("File Error. Please upload a valid zip file.");
+              window.location = "/upload";
             }
           }).then(response => {
             this.setState({
@@ -90,9 +96,6 @@ class FileUploader extends React.Component {
               uploading: false
             });
           });
-          // .catch(error => {
-          //   alert("File Error. Please upload a valid zip file.");
-          // });
         }
       );
     } else {
@@ -127,6 +130,7 @@ class FileUploader extends React.Component {
     return (
       <React.Fragment>
         <div className="row justify-content-lg-center mt-5">
+          <div className={classnames("col-lg-2")}></div>
           <div className={classnames("col-lg-8")}>
             <div className={classnames("main_div shadow-sm")}>
               <div
@@ -152,7 +156,7 @@ class FileUploader extends React.Component {
                       "fa fa-sign-out",
                       styles["logout-cust"]
                     )}
-                    onClick={() => this.logout()}
+                    onClick={() => this.Logout()}
                   ></i>
                 </span>
               </div>
@@ -289,7 +293,10 @@ class FileUploader extends React.Component {
                         }
                       >
                         <i className={classnames("fa fa-upload")}></i>
-                        {"  "} Choose File
+                        {"  "}{" "}
+                        {this.state.fileName == ""
+                          ? "Choose File"
+                          : "Change File"}
                       </span>
                     )}
                     <input
@@ -448,6 +455,20 @@ class FileUploader extends React.Component {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+          <div className={classnames("col-lg-2")}>
+            <div className={classnames("row")}>
+              <button
+                className={classnames(styles["register-button-cust"])}
+                onClick={e => this.OnClickAdmin(e)}
+                hidden
+              >
+                <i
+                  className={classnames("fa fa-user", styles["fa-gradiant"])}
+                ></i>{" "}
+                &nbsp;Admin
+              </button>
             </div>
           </div>
         </div>

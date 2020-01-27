@@ -171,3 +171,44 @@ a:focus {
 li {
   border: 0px !important;
 }
+
+.register-button-cust {
+  // margin-top: 2rem;
+  border: transparent;
+  font-weight: bold;
+  font-size: 1.2rem;
+  background: linear-gradient(
+    to top,
+    $akoa-sunrise 10%,
+    $akoa-sunrise-light 99%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  outline-width: 0px;
+}
+
+.fa-gradiant {
+  background: linear-gradient(
+    to top,
+    $akoa-sunrise 10%,
+    $akoa-sunrise-light 99%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.register-button-cust:active,
+.register-button-cust:hover {
+  background: transparent;
+  -webkit-text-fill-color: $akoa-sunrise;
+  color: $akoa-sunrise;
+  .fa-gradiant {
+    background: transparent;
+    -webkit-text-fill-color: $akoa-sunrise;
+    color: $akoa-sunrise;
+  }
+}
+
+.register-button-cust:focus {
+  outline-width: 0px;
+}

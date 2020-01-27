@@ -23,6 +23,7 @@ from flask_session import Session
 from flask_socketio import SocketIO, emit
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
+from passlib.hash import sha256_crypt
 import pdfkit
 
 # es = Elasticsearch(['https://098b8510b627461cb0e77d37d10c4511.us-east-1.aws.found.io:9243'],
@@ -43,6 +44,7 @@ app.config['MYSQL_PORT'] = 3306
 app.config['MYSQL_USER'] = 'us-evalsql01@us-sql01'
 app.config['MYSQL_PASSWORD'] = 'LoraSQL123'
 app.config['MYSQL_DB'] = 'sleipnir'
+app.config['APP_ADMIN_RIGHT'] = 'admin'
 mysql = MySQL(app)
 
 # Check Configuration section for more details
@@ -56,6 +58,7 @@ df_annotation = []
 main_location = ""
 dict_score = {}
 df_invokeWf = []
+pepper = 'zxf98g7yq3whretgih'
 
 ######
 
@@ -86,27 +89,35 @@ def validate_user():
         tenant = requestData['tenant']
         username = requestData['username']
         password = requestData['password']
-
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("SELECT id FROM tenants WHERE tenant_name = %s", (tenant,))
         tenant_record = cursor.fetchone()
         if tenant_record:
             tenant_id = tenant_record["id"]
-            cursor.execute('SELECT id FROM users WHERE username = %s AND password = %s AND tenant_id = %s', (username, password, tenant_id,))
+            cursor.execute('SELECT id, password FROM users WHERE username = %s AND tenant_id = %s', (username, tenant_id,))
             user_record = cursor.fetchone()
             if user_record:
                 user_id = user_record["id"]
-                resp = jsonify({"result": render_template('fileUpload.html',
-                                                          username=username,
-                                                          user_id=user_id)})
-                session['loggedin'] = True
-                session['id'] = user_id
-                session['username'] = username
-                return make_response(resp, 200)
+                storedHashedPassword = user_record["password"]
+                if sha256_crypt.verify(password+pepper, storedHashedPassword):
+                    resp = jsonify({"result": render_template('fileUpload.html',
+                                                              username=username,
+                                                              user_id=user_id)})
+                    session['loggedin'] = True
+                    session['id'] = user_id
+                    session['username'] = username
+                    cursor.close()
+                    return make_response(resp, 200)
+                else:
+                    cursor.close()
+                    resp = jsonify({"message": "Wrong password"})
+                    return make_response(resp, 400)
             else:
+                cursor.close()
                 resp = jsonify({"message": "User not exists"})
                 return make_response(resp, 400)
         else:
+            cursor.close()
             resp = jsonify({"message": "Tenant not exists"})
             return make_response(resp, 400)
 
@@ -115,9 +126,28 @@ def validate_user():
 def logout():
     with app.app_context():
         session.pop('loggedin', None)
-        session.pop('user_id', None)
+        session.pop('id', None)
         session.pop('username', None)
         return redirect(url_for('login'))
+
+@app.route("/admin", methods=['GET'])
+def admin():
+    with app.app_context():
+        if session.get('loggedin'):
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute("SELECT * FROM users_rights WHERE user_id = %s "
+                           "AND right_id IN (SELECT id FROM rights WHERE `right` = %s);",
+                           (int(session.get('id')), app.config['APP_ADMIN_RIGHT'],))
+            if cursor.fetchone():
+                cursor.close()
+                return render_template('adminPanel.html',
+                                       username=session.get('username'),
+                                       user_id=session.get('id'))
+            else:
+                cursor.close()
+                return "Not Authorized"
+        else:
+            return "Please login first"
 
 
 @app.route('/upload')
@@ -130,7 +160,7 @@ def upload():
         if session.get('loggedin'):
             return render_template('fileUpload.html',
                                    username=session.get('username'),
-                                   user_id=session.get('user_id'))
+                                   user_id=session.get('id'))
         else:
             return "Please login first"
 
@@ -443,7 +473,7 @@ def result():
     with app.app_context():
         return render_template('index.html',
                                username=session.get('username'),
-                               user_id=session.get('user_id'),
+                               user_id=session.get('id'),
                                namingScore=session['namingScore'],
                                usageScore=session['usageScore'],
                                docScore=session['docScore'],

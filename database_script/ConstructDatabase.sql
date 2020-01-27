@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `tenants` (
 CREATE TABLE IF NOT EXISTS `users` (
 	`id` INT NOT NULL AUTO_INCREMENT,
   	`username` varchar(50) NOT NULL UNIQUE,
-  	`password` varchar(255) NOT NULL,
+  	`password` varchar(300) NOT NULL,
   	`email` varchar(100) NOT NULL UNIQUE,
     `tenant_id` INT NOT NULL,
 	PRIMARY KEY (`id`),

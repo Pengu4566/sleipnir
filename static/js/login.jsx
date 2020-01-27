@@ -13,6 +13,7 @@ class LoginWindow extends React.Component {
     };
     this.updateState = this.updateState.bind(this);
     this.login = this.login.bind(this);
+    this.keyPressed = this.keyPressed.bind(this);
   }
 
   updateState(e) {
@@ -20,6 +21,12 @@ class LoginWindow extends React.Component {
     let value = e.target.value;
 
     this.setState({ [name]: value });
+  }
+
+  keyPressed(e) {
+    if (e.keyCode == 13) {
+      this.login();
+    }
   }
 
   login(e) {
@@ -61,6 +68,7 @@ class LoginWindow extends React.Component {
                 type="text"
                 name="tenant"
                 onChange={e => this.updateState(e)}
+                onKeyDown={e => this.keyPressed(e)}
                 className={classnames(styles["input-cust"])}
               />
             </div>
@@ -72,6 +80,7 @@ class LoginWindow extends React.Component {
                 type="text"
                 name="username"
                 onChange={e => this.updateState(e)}
+                onKeyDown={e => this.keyPressed(e)}
                 className={classnames(styles["input-cust"])}
               />
             </div>
@@ -83,6 +92,7 @@ class LoginWindow extends React.Component {
                 type="password"
                 name="password"
                 onChange={e => this.updateState(e)}
+                onKeyDown={e => this.keyPressed(e)}
                 className={classnames(styles["input-cust"])}
               />
             </div>

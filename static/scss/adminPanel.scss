@@ -1,0 +1,214 @@
+@import "akoa/config";
+@import "bootstrap/config";
+
+.toggle-label-cust {
+  margin-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.toggle-cust {
+  margin-bottom: 0.5rem;
+  text-align: right;
+  float: right;
+}
+
+.form-check-cust {
+  padding: 0px;
+  margin-bottom: 0.3rem;
+  display: block;
+}
+
+.btn-primary-cust {
+  background-color: transparent;
+  background: linear-gradient(
+    to top,
+    $akoa-sunrise 10%,
+    $akoa-sunrise-light 95%
+  ) !important;
+  border-color: transparent;
+  border: transparent;
+}
+
+.upload-button-disable-cust {
+  opacity: 0.6;
+  background: $akoa-sunrise !important;
+}
+
+.btn-primary-cust:disabled {
+  opacity: 0.6;
+  background: $akoa-sunrise !important;
+}
+
+.btn-primary-cust:hover,
+.btn-primary-cust:active,
+.btn-primary-cust:focus {
+  background: $akoa-sunrise !important;
+}
+
+.btn-primary:focus,
+.form-control:focus {
+  box-shadow: none !important;
+}
+
+.upload-button-cust {
+  vertical-align: middle;
+  float: right;
+  width: 150px;
+  height: 35x;
+  text-align: center;
+}
+
+.upload-span-cust {
+  vertical-align: middle;
+  width: 150px;
+  height: 35x;
+  text-align: center;
+}
+
+.card-cust {
+  background: white;
+  background-color: white;
+}
+
+.card-header-cust {
+  font-weight: bold;
+  background: white;
+  background-color: white;
+  padding: 20px 20px 20px 20px;
+}
+
+.card-body-cust {
+  background: white;
+  background-color: white;
+  padding-top: 0px;
+}
+
+.category-cust {
+  font-weight: bold;
+}
+
+/*new_styles*/
+
+.main_div {
+  height: auto;
+  background-color: white;
+}
+
+.header {
+  height: 70px;
+  background-color: transparent;
+  background: linear-gradient(
+    to top,
+    $akoa-sunrise 10%,
+    $akoa-sunrise-light 95%
+  );
+  .header_text {
+    float: left;
+    font-size: 20px;
+    color: white;
+    font-weight: bold;
+    line-height: 70px;
+  }
+  .username-cust {
+    margin-left: auto;
+    float: right;
+    text-align: right;
+    .logout-cust:hover,
+    .logout-cust:active,
+    .logout-cust:focus {
+      font-size: 25px;
+    }
+  }
+}
+
+.heading-1-cust {
+  font-weight: bold;
+  font-size: 20px;
+  color: black;
+  text-decoration: none;
+  padding-left: 0px;
+}
+
+.heading-2 {
+  font-weight: bold;
+  font-size: 12px;
+  margin-left: 0px;
+}
+
+.height_auto {
+  height: auto !important;
+}
+
+.border-top-none {
+  border-top: none !important;
+}
+
+.border-bottom-none {
+  border-bottom: none !important;
+}
+
+.btn_text {
+  font-weight: 100;
+}
+
+.download-text-cust {
+  text-align: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+a {
+  color: $akoa-sunrise-light !important;
+  border: 0px;
+}
+
+a:hover,
+a:active,
+a:focus {
+  color: $akoa-sunrise !important;
+}
+
+li {
+  border: 0px !important;
+}
+
+.register-button-cust {
+  // margin-top: 2rem;
+  border: transparent;
+  font-weight: bold;
+  font-size: 1.2rem;
+  background: linear-gradient(
+    to top,
+    $akoa-sunrise 10%,
+    $akoa-sunrise-light 99%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  outline-width: 0px;
+}
+
+.fa-gradiant {
+  background: linear-gradient(
+    to top,
+    $akoa-sunrise 10%,
+    $akoa-sunrise-light 99%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.register-button-cust:active,
+.register-button-cust:hover {
+  background: transparent;
+  -webkit-text-fill-color: $akoa-sunrise;
+  color: $akoa-sunrise;
+  .fa-gradiant {
+    background: transparent;
+    -webkit-text-fill-color: $akoa-sunrise;
+    color: $akoa-sunrise;
+  }
+}
+
+.register-button-cust:focus {
+  outline-width: 0px;
+}

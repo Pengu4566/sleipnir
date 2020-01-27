@@ -2,7 +2,7 @@
 var myChart = echarts.init(document.getElementById("projectStructure"));
 
 myChart.title = "Project Structure";
-myChart.showLoading();
+// myChart.showLoading();
 $(document).ready(function() {
   //$.get('dist/project_structure_graph.gexf', function (xml) {
 
@@ -14,7 +14,7 @@ $(document).ready(function() {
     .then(function(text) {
       parsedData = JSON.parse(text);
       if (parsedData["gexf"] != null) {
-        myChart.hideLoading();
+        // myChart.hideLoading();
         var graph = echarts.dataTool.gexf.parse(parsedData["gexf"]);
 
         var categories = [];
@@ -92,7 +92,7 @@ $(document).ready(function() {
       }
       //}, 'xml');}
       else {
-        myChart.hideLoading();
+        // myChart.hideLoading();
         option = {
           title: {
             text: "",
